@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>Secagem #{{ $secagem->numero }}</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; color:#222; font-size:12px; }
+        h1 { color:#5a3a22; margin:0 0 4px; font-size:18px; }
+        .muted { color:#666; font-size:11px; }
+        .header { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #5a3a22; padding-bottom:8px; margin-bottom:12px; }
+        table { width:100%; border-collapse:collapse; margin-top:10px; }
+        th, td { padding:6px 8px; border-bottom:1px solid #e8dcc7; font-size:11px; }
+        th { background:#f6f1ea; text-align:left; }
+        tfoot td { background:#f6f1ea; font-weight:bold; }
+        .right { text-align:right; }
+        .badge { padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold; }
+        .badge-active { background:#dcfce7; color:#166534; }
+        .badge-trial { background:#fef3c7; color:#92400e; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h1>Secagem #{{ $secagem->numero }}</h1>
+        <div class="muted">{{ $secagem->farm->nome }} · {{ $secagem->data->format('d/m/Y') }} · Secador: {{ $secagem->secador }}</div>
+    </div>
+    <div>
+        @if($secagem->isConcluida())
+            <span class="badge badge-active">CONCLUÍDA em {{ $secagem->concluida_at->format('d/m/Y H:i') }}</span>
+        @else
+            <span class="badge badge-trial">RASCUNHO</span>
+        @endif
+    </div>
+</div>
+
+@if($secagem->observacoes)
+    <p><strong>Observações:</strong> {{ $secagem->observacoes }}</p>
+@endif
+
+<table>
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th class="right">Recebido (kg)</th>
+            <th class="right">Seco (kg)</th>
+            <th class="right">Rendimento</th>
+            <th class="right">Comissão %</th>
+            <th class="right">Comissão (kg)</th>
+            <th class="right">Líquido (kg)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($secagem->items as $item)
+            <tr>
+                <td>{{ $item->customer->nome }}</td>
+                <td class="right">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->quantidade_seca_kg, 3, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
+                <td class="right">{{ number_format($item->comissao_percentual, 2, ',', '.') }}%</td>
+                <td class="right">{{ number_format($item->comissao_kg, 3, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>Totais</td>
+            <td class="right">{{ number_format($secagem->totalRecebidoKg(), 3, ',', '.') }}</td>
+            <td class="right">{{ number_format($secagem->totalSecoKg(), 3, ',', '.') }}</td>
+            <td></td><td></td>
+            <td class="right">{{ number_format($secagem->totalComissaoKg(), 3, ',', '.') }}</td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
+
+<p class="muted" style="margin-top:24px;">Documento gerado em {{ now()->format('d/m/Y H:i') }} · secadordecafe</p>
+
+</body>
+</html>

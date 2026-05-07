@@ -9,9 +9,11 @@ use App\Http\Requests\Secagens\StoreSecagemRequest;
 use App\Models\Customer;
 use App\Models\Secagem;
 use App\Models\SecagemItem;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class SecagemController extends Controller
@@ -115,6 +117,16 @@ class SecagemController extends Controller
         }
         $item->delete();
         return redirect()->route('secagens.edit', $secagem)->with('flash', 'Item removido.');
+    }
+
+    public function pdf(Secagem $secagem): Response
+    {
+        $this->ensureSameFarm($secagem);
+        $this->authorize('view', $secagem);
+        $secagem->load('items.customer', 'farm');
+
+        $pdf = Pdf::loadView('secagens.pdf', compact('secagem'))->setPaper('a4', 'landscape');
+        return $pdf->download("secagem-{$secagem->numero}.pdf");
     }
 
     public function conclude(Secagem $secagem, ConcludeSecagemAction $action): RedirectResponse

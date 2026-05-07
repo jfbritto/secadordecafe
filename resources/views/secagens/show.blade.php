@@ -14,7 +14,10 @@
             @endif
         </small>
     </div>
-    <a href="{{ route('secagens.index') }}">← voltar</a>
+    <div>
+        <a href="{{ route('secagens.pdf', $secagem) }}" class="btn btn-primary" style="width:auto; padding:8px 14px; margin-right:6px;">⬇ PDF</a>
+        <a href="{{ route('secagens.index') }}">← voltar</a>
+    </div>
 </div>
 
 @if($secagem->observacoes)

@@ -28,6 +28,16 @@ trait BelongsToFarm
     {
         return $this->belongsTo(Farm::class);
     }
+
+    /**
+     * Spatie Activitylog hook — anexa farm_id como property pra scoping.
+     */
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    {
+        if (isset($this->farm_id) && $this->farm_id) {
+            $activity->properties = $activity->properties->put('farm_id', (int) $this->farm_id);
+        }
+    }
 }
 
 class FarmScope implements Scope

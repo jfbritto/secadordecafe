@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureFarmActive;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetTenantContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(append: [SecurityHeaders::class]);
         $middleware->alias([
             'tenant.context' => SetTenantContext::class,
             'farm.active' => EnsureFarmActive::class,

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AsaasWebhookController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BillingController;
@@ -20,10 +21,10 @@ Route::get('/', fn () => redirect()->route('dashboard'));
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisterController::class, 'show'])->name('register');
-    Route::post('register', [RegisterController::class, 'store']);
+    Route::post('register', [RegisterController::class, 'store'])->middleware('throttle:5,10');
 
     Route::get('login', [LoginController::class, 'show'])->name('login');
-    Route::post('login', [LoginController::class, 'store']);
+    Route::post('login', [LoginController::class, 'store'])->middleware('throttle:10,1');
 });
 
 Route::post('logout', [LoginController::class, 'destroy'])
@@ -60,6 +61,7 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::post('secagens/{secagem}/items', [SecagemController::class, 'storeItem'])->name('secagens.items.store');
         Route::delete('secagens/{secagem}/items/{item}', [SecagemController::class, 'destroyItem'])->name('secagens.items.destroy');
         Route::post('secagens/{secagem}/concluir', [SecagemController::class, 'conclude'])->name('secagens.conclude');
+        Route::get('secagens/{secagem}/pdf', [SecagemController::class, 'pdf'])->name('secagens.pdf');
 
         Route::get('despesas', [ExpenseController::class, 'index'])->name('despesas.index');
         Route::get('despesas/criar', [ExpenseController::class, 'create'])->name('despesas.create');
@@ -72,6 +74,8 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::put('fazenda', [FarmController::class, 'update'])->name('fazenda.update');
 
         Route::get('assinatura', [BillingController::class, 'show'])->name('assinatura.show');
+
+        Route::get('auditoria', [AuditController::class, 'index'])->name('auditoria.index');
 
         Route::get('usuarios', [UserController::class, 'index'])->name('usuarios.index');
         Route::put('usuarios/{usuario}/role', [UserController::class, 'updateRole'])->name('usuarios.role.update');
