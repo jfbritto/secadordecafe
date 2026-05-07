@@ -38,7 +38,9 @@ it('admin can view audit page', function () {
     $this->actingAs($admin)
         ->get('/auditoria')
         ->assertOk()
-        ->assertSee('cliente updated');
+        ->assertSee('editou')      // verbo humanizado em PT-BR
+        ->assertSee('Cliente')     // label da entidade em PT-BR
+        ->assertSee('Atualizado'); // nome do cliente após edição
 });
 
 it('non-admin cannot view audit page', function () {

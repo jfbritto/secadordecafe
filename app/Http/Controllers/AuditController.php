@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\AuditFormatter;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Spatie\Activitylog\Models\Activity;
@@ -34,6 +35,13 @@ class AuditController extends Controller
         }
 
         $activities = $query->paginate(40);
+
+        // Anexa estrutura humana e diff serializado pra cada item
+        $activities->getCollection()->transform(function (Activity $a) {
+            $a->humanized = AuditFormatter::describe($a);
+            $a->diff_data = $a->humanized['has_diff'] ? AuditFormatter::diff($a) : [];
+            return $a;
+        });
 
         return view('audit.index', compact('activities'));
     }
