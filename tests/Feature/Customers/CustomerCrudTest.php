@@ -68,6 +68,25 @@ it('tela do cliente expõe stats agregadas (entradas, secado, saídas, qtd secag
     expect($stats['qtd_movimentacoes'])->toBe(4);
 });
 
+it('tela do cliente: query de stats NAO tem ORDER BY (regressão MySQL only_full_group_by)', function () {
+    // O Customer::movements() relação inclui orderByDesc('occurred_at') por padrão.
+    // Em MySQL com only_full_group_by, ORDER BY com coluna não-agregada quebra a query
+    // agrupada. reorder() é necessário antes do GROUP BY.
+    $admin = makeFarmUser('admin');
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 0]);
+    $this->actingAs($admin)->post("/clientes/{$c->id}/movimentacoes", ['tipo' => 'entrada', 'quantidade' => 50]);
+
+    \Illuminate\Support\Facades\DB::enableQueryLog();
+    $this->actingAs($admin)->get(route('clientes.show', $c))->assertOk();
+    $queries = \Illuminate\Support\Facades\DB::getQueryLog();
+    \Illuminate\Support\Facades\DB::disableQueryLog();
+
+    // Encontra a query agregada (tem GROUP BY tipo + SUM)
+    $statsQuery = collect($queries)->first(fn ($q) => str_contains($q['query'], 'group by') && str_contains($q['query'], 'SUM(quantidade_kg)'));
+    expect($statsQuery)->not->toBeNull();
+    expect(strtolower($statsQuery['query']))->not->toContain('order by');
+});
+
 it('tela do cliente lista últimas movimentações (até 5) e secagens recentes', function () {
     $admin = makeFarmUser('admin');
     $dryer = \App\Models\Dryer::factory()->forFarm($admin->farm)->create();

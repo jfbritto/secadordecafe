@@ -62,8 +62,11 @@ class CustomerController extends Controller
         $this->ensureSameFarm($cliente);
         $this->authorize('view', $cliente);
 
-        // Totais por tipo de movimentação (tudo em 1 query)
+        // Totais por tipo de movimentação (tudo em 1 query).
+        // reorder() limpa o orderBy padrão da relação (occurred_at desc) — incompatível
+        // com only_full_group_by no MySQL quando agrupamos por tipo.
         $totaisPorTipo = $cliente->movements()
+            ->reorder()
             ->selectRaw('tipo, SUM(quantidade_kg) as total, COUNT(*) as cnt, COUNT(DISTINCT source_id) as cnt_source')
             ->groupBy('tipo')
             ->get()
