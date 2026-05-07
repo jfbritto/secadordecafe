@@ -153,7 +153,10 @@
                                       data-confirm-text="O cliente sai da lista. Você pode adicionar de novo enquanto a secagem for rascunho."
                                       data-confirm-yes="Sim, remover" class="inline">
                                     @csrf @method('DELETE')
-                                    <button class="text-rose-600 text-xs font-semibold hover:underline">remover</button>
+                                    <button class="inline-flex items-center gap-1 text-rose-600 text-xs font-semibold hover:underline">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        remover
+                                    </button>
                                 </form>
                             </td>
                         </tr>
@@ -207,7 +210,8 @@
                       data-confirm-yes="Sim, excluir"
                       class="w-full sm:w-auto">
                     @csrf @method('DELETE')
-                    <button class="w-full sm:w-auto px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
+                    <button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         Excluir rascunho
                     </button>
                 </form>

@@ -62,9 +62,16 @@
                         @if($u->id === auth()->id())
                             <span class="text-coffee-700">{{ ucfirst($u->roles->pluck('name')->join(', ') ?: '—') }}</span>
                         @else
-                            <form method="POST" action="{{ route('usuarios.role.update', $u) }}" class="inline">
+                            <form method="POST" action="{{ route('usuarios.role.update', $u) }}" class="inline"
+                                  data-confirm="Alterar permissão de {{ $u->name }}?"
+                                  data-confirm-text="A nova permissão entra em vigor imediatamente. Confira a opção selecionada antes de confirmar."
+                                  data-confirm-icon="question"
+                                  data-confirm-yes="Sim, alterar"
+                                  data-confirm-danger="0">
                                 @csrf @method('PUT')
-                                <select name="role" onchange="this.form.submit()" class="px-2 py-1 text-sm rounded-md border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+                                <select name="role" data-original="{{ $u->roles->pluck('name')->first() }}"
+                                        onchange="if(this.value !== this.dataset.original) this.form.requestSubmit(); else this.form.dataset.confirmed='1';"
+                                        class="px-2 py-1 text-sm rounded-md border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
                                     @foreach(['admin','operador','financeiro','visualizador'] as $role)
                                         <option value="{{ $role }}" @selected($u->hasRole($role))>{{ ucfirst($role) }}</option>
                                     @endforeach
@@ -80,7 +87,10 @@
                                   data-confirm-yes="Sim, remover"
                                   class="inline">
                                 @csrf @method('DELETE')
-                                <button class="text-rose-600 text-sm hover:underline">remover</button>
+                                <button class="inline-flex items-center gap-1 text-rose-600 text-sm font-semibold hover:underline">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    remover
+                                </button>
                             </form>
                         @endif
                     </td>
@@ -117,7 +127,10 @@
                                   data-confirm-yes="Sim, cancelar"
                                   class="inline">
                                 @csrf @method('DELETE')
-                                <button class="text-rose-600 text-sm hover:underline">cancelar</button>
+                                <button class="inline-flex items-center gap-1 text-rose-600 text-sm font-semibold hover:underline">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    cancelar
+                                </button>
                             </form>
                         </td>
                     </tr>
