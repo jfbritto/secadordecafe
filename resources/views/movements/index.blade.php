@@ -115,6 +115,8 @@
                         <th class="text-left px-6 py-3 font-semibold">Quando</th>
                         <th class="text-left px-6 py-3 font-semibold">Tipo</th>
                         <th class="text-right px-6 py-3 font-semibold">Qtd. (kg)</th>
+                        <th class="text-right px-6 py-3 font-semibold">Saldo após</th>
+                        <th class="text-left px-6 py-3 font-semibold">Origem</th>
                         <th class="text-left px-6 py-3 font-semibold">Observação</th>
                         <th class="text-left px-6 py-3 font-semibold">Por</th>
                     </tr>
@@ -122,7 +124,7 @@
                 <tbody class="divide-y divide-coffee-100">
                     @forelse($movements as $m)
                         <tr class="hover:bg-coffee-50/30 transition">
-                            <td class="px-6 py-3 text-coffee-700">{{ $m->occurred_at->format('d/m/Y H:i') }}</td>
+                            <td class="px-6 py-3 text-coffee-700 whitespace-nowrap">{{ $m->occurred_at->format('d/m/Y H:i') }}</td>
                             <td class="px-6 py-3">
                                 @php
                                     $cls = match($m->tipo) {
@@ -135,14 +137,39 @@
                                 @endphp
                                 <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ $m->tipo }}</span>
                             </td>
-                            <td class="px-6 py-3 text-right font-bold {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
+                            <td class="px-6 py-3 text-right font-bold whitespace-nowrap {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
                                 {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }}
                             </td>
+                            <td class="px-6 py-3 text-right font-semibold text-coffee-900 whitespace-nowrap">
+                                @isset($m->saldo_apos)
+                                    {{ number_format($m->saldo_apos, 3, ',', '.') }}
+                                @else
+                                    —
+                                @endisset
+                            </td>
+                            <td class="px-6 py-3 text-coffee-700">
+                                @php $src = $m->source; @endphp
+                                @if($src instanceof \App\Models\Secagem)
+                                    <a href="{{ route('secagens.show', $src) }}"
+                                       class="inline-flex items-center gap-1 text-coffee-700 font-semibold hover:underline">
+                                        Secagem #{{ $src->numero }}
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </a>
+                                @elseif($src instanceof \App\Models\SecagemItem && $src->secagem)
+                                    <a href="{{ route('secagens.show', $src->secagem) }}"
+                                       class="inline-flex items-center gap-1 text-coffee-700 font-semibold hover:underline">
+                                        Secagem #{{ $src->secagem->numero }}
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </a>
+                                @else
+                                    <span class="text-coffee-400">—</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-3 text-coffee-700">{{ $m->observacao ?? '—' }}</td>
-                            <td class="px-6 py-3 text-coffee-500">{{ $m->user?->name ?? '—' }}</td>
+                            <td class="px-6 py-3 text-coffee-500 whitespace-nowrap">{{ $m->user?->name ?? '—' }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="px-6 py-12 text-center text-coffee-500">Sem movimentações.</td></tr>
+                        <tr><td colspan="7" class="px-6 py-12 text-center text-coffee-500">Sem movimentações.</td></tr>
                     @endforelse
                 </tbody>
             </table>

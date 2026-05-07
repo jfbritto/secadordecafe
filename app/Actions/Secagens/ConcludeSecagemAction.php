@@ -2,6 +2,7 @@
 
 namespace App\Actions\Secagens;
 
+use App\Actions\Movements\RegisterMovementAction;
 use App\Exceptions\DomainException;
 use App\Models\Customer;
 use App\Models\Movement;
@@ -11,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 class ConcludeSecagemAction
 {
+    public function __construct(private RegisterMovementAction $registerMovement)
+    {
+    }
+
     public function execute(Secagem $secagem, User $user): Secagem
     {
         if ($secagem->isConcluida()) {
@@ -30,7 +35,7 @@ class ConcludeSecagemAction
                 ->get()
                 ->keyBy('id');
 
-            // Validar saldos
+            // Validar saldos antes de aplicar (defesa em profundidade — o item-add já valida)
             foreach ($secagem->items as $item) {
                 $customer = $locked[$item->customer_id] ?? null;
                 if (! $customer) {
@@ -50,25 +55,19 @@ class ConcludeSecagemAction
                 }
             }
 
-            // Aplicar débitos + criar movements
+            // Cada item vira um Movement (tipo=secagem) com source = Secagem.
+            // O RegisterMovementAction cuida do lock/transação/saldo.
+            $occurredAt = $secagem->data->setTime(now()->hour, now()->minute, now()->second);
             foreach ($secagem->items as $item) {
-                $customer = $locked[$item->customer_id];
-                $debit = (float) $item->quantidade_recebida_kg;
-
-                Movement::create([
-                    'farm_id' => $secagem->farm_id,
-                    'customer_id' => $customer->id,
-                    'user_id' => $user->id,
-                    'tipo' => Movement::TIPO_SECAGEM,
-                    'quantidade_kg' => -$debit,
-                    'observacao' => "Secagem #{$secagem->numero}",
-                    'source_type' => $item->getMorphClass(),
-                    'source_id' => $item->id,
-                    'occurred_at' => $secagem->data->setTime(now()->hour, now()->minute, now()->second),
-                ]);
-
-                $customer->saldo_cafe_kg = (float) $customer->saldo_cafe_kg - $debit;
-                $customer->save();
+                $this->registerMovement->execute(
+                    customer: $locked[$item->customer_id],
+                    user: $user,
+                    tipo: Movement::TIPO_SECAGEM,
+                    quantidade: (float) $item->quantidade_recebida_kg,
+                    observacao: "Secagem #{$secagem->numero}",
+                    occurredAt: $occurredAt,
+                    source: $secagem,
+                );
             }
 
             $secagem->status = Secagem::STATUS_CONCLUIDA;

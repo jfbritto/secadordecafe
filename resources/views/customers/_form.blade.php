@@ -47,26 +47,36 @@
     </div>
 </div>
 
-{{-- Saldo inicial --}}
+{{-- Saldo inicial: só na criação. Depois o saldo vive no extrato. --}}
+@if(! $C)
 <div class="border-b border-coffee-100 pb-5 mb-6">
     <h2 class="text-base font-bold text-coffee-900">Saldo de café</h2>
-    <p class="text-sm text-coffee-500 mt-0.5">Quanto café este cliente já tem em estoque na fazenda agora.</p>
+    <p class="text-sm text-coffee-500 mt-0.5">Já tem café deste cliente em estoque? Informe o valor inicial — vamos registrar como uma entrada no extrato.</p>
 </div>
 
 <div class="mb-6">
     <label for="saldo_cafe_kg" class="block text-sm font-bold text-coffee-900 mb-2">Saldo inicial (kg)</label>
     <div class="relative">
         <input id="saldo_cafe_kg" type="number" step="0.001" min="0" inputmode="decimal" name="saldo_cafe_kg"
-               value="{{ old('saldo_cafe_kg', $C?->saldo_cafe_kg ?? 0) }}"
+               value="{{ old('saldo_cafe_kg', 0) }}"
                placeholder="0,000"
                class="w-full pl-4 pr-14 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-coffee-500 pointer-events-none">kg</span>
     </div>
     <p class="mt-1.5 text-sm text-coffee-500">
-        Use <strong>0</strong> se ainda não há café em estoque.
-        Depois, este saldo passa a ser controlado automaticamente pelas movimentações (entradas, secagens, saídas).
+        Use <strong>0</strong> se ainda não há café em estoque. Daqui pra frente, o saldo só muda pelas movimentações (entradas, secagens, ajustes, saídas) — registradas no extrato.
     </p>
 </div>
+@else
+<div class="border-b border-coffee-100 pb-5 mb-6">
+    <h2 class="text-base font-bold text-coffee-900">Saldo de café</h2>
+    <p class="text-sm text-coffee-500 mt-0.5">
+        O saldo é controlado pelo extrato — entradas, secagens, ajustes e saídas. Saldo atual:
+        <strong class="text-coffee-700">{{ number_format($C->saldo_cafe_kg, 3, ',', '.') }} kg</strong>.
+        <a href="{{ route('clientes.movimentacoes.index', $C) }}" class="text-coffee-700 font-semibold hover:underline">Abrir extrato</a>.
+    </p>
+</div>
+@endif
 
 {{-- Observações --}}
 <div class="mb-6">

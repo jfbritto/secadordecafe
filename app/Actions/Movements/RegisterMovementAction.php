@@ -6,16 +6,18 @@ use App\Exceptions\DomainException;
 use App\Models\Customer;
 use App\Models\Movement;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class RegisterMovementAction
 {
     /**
-     * Cria movimentação manual (entrada / ajuste / saida) e atualiza saldo.
+     * Cria movimentação e atualiza saldo do cliente sob lock.
      *
-     * @param string $tipo  one of entrada|saida|ajuste
-     * @param string $direcao  '+' ou '-' (apenas para ajuste; ignorado para entrada/saida)
+     * @param string $tipo  one of entrada|saida|ajuste|secagem
+     * @param string $direcao  '+' ou '-' (apenas para ajuste; ignorado para os demais)
      * @param float  $quantidade  sempre positivo (módulo)
+     * @param Model  $source  origem polimórfica da movimentação (ex.: Secagem)
      */
     public function execute(
         Customer $customer,
@@ -25,6 +27,7 @@ class RegisterMovementAction
         ?string $observacao = null,
         ?string $direcao = null,
         ?\DateTimeInterface $occurredAt = null,
+        ?Model $source = null,
     ): Movement {
         if ($quantidade <= 0) {
             throw new DomainException('Quantidade deve ser maior que zero.');
@@ -33,11 +36,12 @@ class RegisterMovementAction
         $signed = match ($tipo) {
             Movement::TIPO_ENTRADA => +$quantidade,
             Movement::TIPO_SAIDA => -$quantidade,
+            Movement::TIPO_SECAGEM => -$quantidade,
             Movement::TIPO_AJUSTE => $direcao === '-' ? -$quantidade : +$quantidade,
             default => throw new DomainException("Tipo inválido: {$tipo}"),
         };
 
-        return DB::transaction(function () use ($customer, $user, $tipo, $signed, $observacao, $occurredAt) {
+        return DB::transaction(function () use ($customer, $user, $tipo, $signed, $observacao, $occurredAt, $source) {
             $locked = Customer::query()->whereKey($customer->id)->lockForUpdate()->first();
             if (! $locked) {
                 throw new DomainException('Cliente não encontrado.');
@@ -55,6 +59,8 @@ class RegisterMovementAction
                 'tipo' => $tipo,
                 'quantidade_kg' => $signed,
                 'observacao' => $observacao,
+                'source_type' => $source?->getMorphClass(),
+                'source_id' => $source?->getKey(),
                 'occurred_at' => $occurredAt ?? now(),
             ]);
 

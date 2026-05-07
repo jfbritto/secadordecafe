@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Movements\RegisterMovementAction;
 use App\Http\Requests\Customers\StoreCustomerRequest;
 use App\Http\Requests\Customers\UpdateCustomerRequest;
 use App\Models\Customer;
+use App\Models\Movement;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,9 +34,23 @@ class CustomerController extends Controller
         return view('customers.create');
     }
 
-    public function store(StoreCustomerRequest $request): RedirectResponse
+    public function store(StoreCustomerRequest $request, RegisterMovementAction $register): RedirectResponse
     {
-        $customer = Customer::create($request->validated());
+        $data = $request->validated();
+        $saldoInicial = (float) ($data['saldo_cafe_kg'] ?? 0);
+        $data['saldo_cafe_kg'] = 0; // saldo é controlado por movements
+
+        $customer = Customer::create($data);
+
+        if ($saldoInicial > 0) {
+            $register->execute(
+                customer: $customer,
+                user: $request->user(),
+                tipo: Movement::TIPO_ENTRADA,
+                quantidade: $saldoInicial,
+                observacao: 'Saldo inicial',
+            );
+        }
 
         return redirect()->route('clientes.index')
             ->with('flash', '<strong>' . e($customer->nome) . '</strong> cadastrado.');

@@ -90,6 +90,12 @@ it('conclude secagem debits customer saldos and creates movements', function () 
     expect((float) Movement::where('customer_id', $c1->id)->first()->quantidade_kg)->toBe(-600.0);
     expect((float) Movement::where('customer_id', $c2->id)->first()->quantidade_kg)->toBe(-200.0);
 
+    // Cada movement aponta source pra Secagem (não SecagemItem) — habilita link clicável no extrato
+    Movement::where('tipo', 'secagem')->get()->each(function ($m) use ($s) {
+        expect($m->source_type)->toBe(\App\Models\Secagem::class);
+        expect($m->source_id)->toBe($s->id);
+    });
+
     $s->refresh();
     expect($s->status)->toBe('concluida');
     expect($s->concluida_at)->not->toBeNull();

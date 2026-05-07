@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Customer;
+use App\Models\Movement;
 
 it('lists customers paginated', function () {
     $admin = makeFarmUser('admin');
@@ -31,6 +32,35 @@ it('creates a customer', function () {
     expect((float) $c->saldo_cafe_kg)->toBe(250.5);
 });
 
+it('cria movement de entrada "Saldo inicial" quando saldo informado > 0', function () {
+    $admin = makeFarmUser('admin');
+
+    $this->actingAs($admin)
+        ->post('/clientes', ['nome' => 'Maria', 'saldo_cafe_kg' => 100])
+        ->assertRedirect('/clientes');
+
+    $c = Customer::first();
+    expect((float) $c->saldo_cafe_kg)->toBe(100.0);
+    expect(Movement::where('customer_id', $c->id)->count())->toBe(1);
+
+    $m = Movement::where('customer_id', $c->id)->first();
+    expect($m->tipo)->toBe('entrada');
+    expect((float) $m->quantidade_kg)->toBe(100.0);
+    expect($m->observacao)->toBe('Saldo inicial');
+    expect($m->user_id)->toBe($admin->id);
+});
+
+it('NAO cria movement quando saldo inicial é 0', function () {
+    $admin = makeFarmUser('admin');
+
+    $this->actingAs($admin)
+        ->post('/clientes', ['nome' => 'Sem saldo', 'saldo_cafe_kg' => 0])
+        ->assertRedirect('/clientes');
+
+    expect(Movement::count())->toBe(0);
+    expect((float) Customer::first()->saldo_cafe_kg)->toBe(0.0);
+});
+
 it('updates a customer', function () {
     $admin = makeFarmUser('admin');
     $c = Customer::factory()->forFarm($admin->farm)->create(['nome' => 'A']);
@@ -38,11 +68,36 @@ it('updates a customer', function () {
     $this->actingAs($admin)
         ->put("/clientes/{$c->id}", [
             'nome' => 'Atualizado',
-            'saldo_cafe_kg' => 0,
         ])
         ->assertRedirect('/clientes');
 
     expect($c->fresh()->nome)->toBe('Atualizado');
+});
+
+it('update NAO altera saldo mesmo se saldo_cafe_kg vier no payload', function () {
+    $admin = makeFarmUser('admin');
+    $c = Customer::factory()->forFarm($admin->farm)->create(['nome' => 'Original', 'saldo_cafe_kg' => 80]);
+
+    $this->actingAs($admin)
+        ->put("/clientes/{$c->id}", [
+            'nome' => 'Original',
+            'saldo_cafe_kg' => 9999, // ignorado: saldo só muda via extrato
+        ])
+        ->assertRedirect('/clientes');
+
+    expect((float) $c->fresh()->saldo_cafe_kg)->toBe(80.0);
+    expect(Movement::count())->toBe(0);
+});
+
+it('formulario de edicao NAO mostra campo Saldo inicial', function () {
+    $admin = makeFarmUser('admin');
+    $c = Customer::factory()->forFarm($admin->farm)->create();
+
+    $this->actingAs($admin)
+        ->get("/clientes/{$c->id}/edit")
+        ->assertOk()
+        ->assertDontSee('name="saldo_cafe_kg"', escape: false)
+        ->assertSee('Abrir extrato');
 });
 
 it('deletes a customer (admin only)', function () {

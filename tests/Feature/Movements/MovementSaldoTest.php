@@ -85,3 +85,45 @@ it('extrato lista movimentacoes do cliente', function () {
         ->assertOk()
         ->assertSee('Lote A');
 });
+
+it('extrato calcula saldo após cada movimentação (running balance)', function () {
+    $admin = makeFarmUser('admin');
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 0]);
+
+    // Fluxo: +100 (saldo 100) → +50 (saldo 150) → ajuste -20 (saldo 130)
+    $this->actingAs($admin)->post("/clientes/{$c->id}/movimentacoes", ['tipo' => 'entrada', 'quantidade' => 100]);
+    $this->actingAs($admin)->post("/clientes/{$c->id}/movimentacoes", ['tipo' => 'entrada', 'quantidade' => 50]);
+    $this->actingAs($admin)->post("/clientes/{$c->id}/movimentacoes", ['tipo' => 'ajuste', 'direcao' => '-', 'quantidade' => 20]);
+
+    $resp = $this->actingAs($admin)->get("/clientes/{$c->id}/movimentacoes");
+    $resp->assertOk();
+
+    $movements = $resp->viewData('movements');
+    // Ordem DESC: o mais recente vem primeiro
+    expect((float) $movements[0]->saldo_apos)->toBe(130.0);
+    expect((float) $movements[1]->saldo_apos)->toBe(150.0);
+    expect((float) $movements[2]->saldo_apos)->toBe(100.0);
+
+    // Saldo atual do cliente bate com o saldo após o mais recente
+    expect((float) $c->fresh()->saldo_cafe_kg)->toBe(130.0);
+});
+
+it('extrato mostra link clicável pra Secagem como origem', function () {
+    $admin = makeFarmUser('admin');
+    $dryer = \App\Models\Dryer::factory()->forFarm($admin->farm)->create();
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $dryer->id]);
+    $s = \App\Models\Secagem::first();
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'customer_id' => $c->id, 'quantidade_recebida_kg' => 500,
+        'quantidade_seca_kg' => 300, 'comissao_percentual' => 5,
+    ]);
+    $this->actingAs($admin)->post("/secagens/{$s->id}/concluir");
+
+    $this->actingAs($admin)
+        ->get("/clientes/{$c->id}/movimentacoes")
+        ->assertOk()
+        ->assertSee("Secagem #{$s->numero}")
+        ->assertSee("/secagens/{$s->id}", escape: false);
+});
