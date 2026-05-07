@@ -188,3 +188,83 @@ it('shows no-dryer page when no active dryer exists', function () {
 it('also rejects PDF tests update on secagem without dryer text', function () {
     expect(true)->toBeTrue(); // placeholder, dryer model exists, see SecagemPdfTest
 });
+
+it('rejeita adicionar o mesmo cliente duas vezes na mesma secagem', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+
+    // Primeiro item: OK
+    $this->actingAs($admin)
+        ->post("/secagens/{$s->id}/items", [
+            'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
+            'quantidade_seca_kg' => 60, 'comissao_percentual' => 5,
+        ])
+        ->assertRedirect();
+
+    // Segundo item com MESMO cliente: deve falhar com erro de validação
+    $this->actingAs($admin)
+        ->post("/secagens/{$s->id}/items", [
+            'customer_id' => $c->id, 'quantidade_recebida_kg' => 50,
+            'quantidade_seca_kg' => 30, 'comissao_percentual' => 5,
+        ])
+        ->assertSessionHasErrors('customer_id');
+
+    // Tabela permanece com 1 item só
+    expect(SecagemItem::where('secagem_id', $s->id)->count())->toBe(1);
+});
+
+it('mesmo cliente PODE estar em secagens diferentes', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 2000]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
+    $s1 = Secagem::orderBy('id')->first();
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
+    $s2 = Secagem::orderByDesc('id')->first();
+
+    $this->actingAs($admin)
+        ->post("/secagens/{$s1->id}/items", [
+            'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
+            'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
+        ])
+        ->assertRedirect();
+
+    $this->actingAs($admin)
+        ->post("/secagens/{$s2->id}/items", [
+            'customer_id' => $c->id, 'quantidade_recebida_kg' => 200,
+            'quantidade_seca_kg' => 120, 'comissao_percentual' => 0,
+        ])
+        ->assertRedirect();
+
+    expect(SecagemItem::count())->toBe(2);
+});
+
+it('apos remover, da pra readicionar o mesmo cliente', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
+        'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
+    ])->assertRedirect();
+
+    $item = SecagemItem::first();
+    $this->actingAs($admin)->delete("/secagens/{$s->id}/items/{$item->id}")->assertRedirect();
+
+    // Re-adiciona com valores diferentes
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'customer_id' => $c->id, 'quantidade_recebida_kg' => 200,
+        'quantidade_seca_kg' => 120, 'comissao_percentual' => 5,
+    ])->assertRedirect();
+
+    expect(SecagemItem::where('secagem_id', $s->id)->count())->toBe(1);
+});

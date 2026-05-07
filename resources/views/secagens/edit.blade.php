@@ -62,7 +62,7 @@
             @csrf
             <div class="border-b border-coffee-100 pb-4 mb-5">
                 <h2 class="text-base font-bold text-coffee-900">Adicionar cliente à secagem</h2>
-                <p class="text-sm text-coffee-500 mt-0.5">Cada item representa um produtor com sua quantidade própria.</p>
+                <p class="text-sm text-coffee-500 mt-0.5">Cada cliente entra <strong>uma vez por secagem</strong>. Pra ajustar valores, remova o item e adicione de novo.</p>
             </div>
 
             <div class="space-y-4">
