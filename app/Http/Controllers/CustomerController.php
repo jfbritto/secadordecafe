@@ -7,6 +7,7 @@ use App\Http\Requests\Customers\StoreCustomerRequest;
 use App\Http\Requests\Customers\UpdateCustomerRequest;
 use App\Models\Customer;
 use App\Models\Movement;
+use App\Models\Secagem;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -60,7 +61,41 @@ class CustomerController extends Controller
     {
         $this->ensureSameFarm($cliente);
         $this->authorize('view', $cliente);
-        return view('customers.show', ['customer' => $cliente]);
+
+        // Totais por tipo de movimentação (tudo em 1 query)
+        $totaisPorTipo = $cliente->movements()
+            ->selectRaw('tipo, SUM(quantidade_kg) as total, COUNT(*) as cnt, COUNT(DISTINCT source_id) as cnt_source')
+            ->groupBy('tipo')
+            ->get()
+            ->keyBy('tipo');
+
+        $stats = [
+            'total_entradas' => (float) ($totaisPorTipo[Movement::TIPO_ENTRADA]->total ?? 0),
+            'total_secado' => abs((float) ($totaisPorTipo[Movement::TIPO_SECAGEM]->total ?? 0)),
+            'total_saidas' => abs((float) ($totaisPorTipo[Movement::TIPO_SAIDA]->total ?? 0)),
+            'qtd_secagens' => (int) ($totaisPorTipo[Movement::TIPO_SECAGEM]->cnt_source ?? 0),
+            'qtd_movimentacoes' => (int) $totaisPorTipo->sum('cnt'),
+        ];
+
+        $ultimasMovimentacoes = $cliente->movements()
+            ->with(['user', 'source'])
+            ->limit(5)
+            ->get();
+
+        $ultimasSecagens = Secagem::query()
+            ->whereHas('items', fn ($q) => $q->where('customer_id', $cliente->id))
+            ->with(['dryer', 'items' => fn ($q) => $q->where('customer_id', $cliente->id)])
+            ->orderByDesc('data')
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get();
+
+        return view('customers.show', [
+            'customer' => $cliente,
+            'stats' => $stats,
+            'ultimasMovimentacoes' => $ultimasMovimentacoes,
+            'ultimasSecagens' => $ultimasSecagens,
+        ]);
     }
 
     public function edit(Customer $cliente): View

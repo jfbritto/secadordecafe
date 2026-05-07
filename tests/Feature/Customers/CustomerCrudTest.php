@@ -36,6 +36,59 @@ it('tela do cliente mostra botao Editar para admin', function () {
         ->assertSee('Editar');
 });
 
+it('tela do cliente expõe stats agregadas (entradas, secado, saídas, qtd secagens)', function () {
+    $admin = makeFarmUser('admin');
+    $dryer = \App\Models\Dryer::factory()->forFarm($admin->farm)->create();
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 0]);
+
+    // 2 entradas (100 + 200 = 300)
+    $this->actingAs($admin)->post("/clientes/{$c->id}/movimentacoes", ['tipo' => 'entrada', 'quantidade' => 100]);
+    $this->actingAs($admin)->post("/clientes/{$c->id}/movimentacoes", ['tipo' => 'entrada', 'quantidade' => 200]);
+
+    // 1 secagem (debita 150)
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $dryer->id]);
+    $s = \App\Models\Secagem::first();
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'customer_id' => $c->id, 'quantidade_recebida_kg' => 150,
+        'quantidade_seca_kg' => 90, 'comissao_percentual' => 0,
+    ]);
+    $this->actingAs($admin)->post("/secagens/{$s->id}/concluir");
+
+    // 1 saída (50)
+    $this->actingAs($admin)->post("/clientes/{$c->id}/movimentacoes", ['tipo' => 'saida', 'quantidade' => 50]);
+
+    $resp = $this->actingAs($admin)->get(route('clientes.show', $c));
+    $resp->assertOk();
+    $stats = $resp->viewData('stats');
+
+    expect($stats['total_entradas'])->toBe(300.0);
+    expect($stats['total_secado'])->toBe(150.0);
+    expect($stats['total_saidas'])->toBe(50.0);
+    expect($stats['qtd_secagens'])->toBe(1);
+    expect($stats['qtd_movimentacoes'])->toBe(4);
+});
+
+it('tela do cliente lista últimas movimentações (até 5) e secagens recentes', function () {
+    $admin = makeFarmUser('admin');
+    $dryer = \App\Models\Dryer::factory()->forFarm($admin->farm)->create();
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $dryer->id]);
+    $s = \App\Models\Secagem::first();
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'customer_id' => $c->id, 'quantidade_recebida_kg' => 200,
+        'quantidade_seca_kg' => 120, 'comissao_percentual' => 5,
+    ]);
+    $this->actingAs($admin)->post("/secagens/{$s->id}/concluir");
+
+    $this->actingAs($admin)
+        ->get(route('clientes.show', $c))
+        ->assertOk()
+        ->assertSee("Secagem #{$s->numero}")
+        ->assertSee('200,000') // recebido na secagem listada
+        ->assertSee('Cliente desde');
+});
+
 it('creates a customer', function () {
     $admin = makeFarmUser('admin');
 
