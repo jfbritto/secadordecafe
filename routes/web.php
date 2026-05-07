@@ -8,6 +8,8 @@ use App\Http\Controllers\FarmBlockedController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\InvitationAcceptController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\MovementController;
+use App\Http\Controllers\SecagemController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +38,22 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('clientes', CustomerController::class)->parameters(['clientes' => 'cliente']);
+
+        Route::get('clientes/{cliente}/movimentacoes', [MovementController::class, 'index'])
+            ->name('clientes.movimentacoes.index');
+        Route::post('clientes/{cliente}/movimentacoes', [MovementController::class, 'store'])
+            ->name('clientes.movimentacoes.store');
+
+        Route::get('secagens', [SecagemController::class, 'index'])->name('secagens.index');
+        Route::get('secagens/criar', [SecagemController::class, 'create'])->name('secagens.create');
+        Route::post('secagens', [SecagemController::class, 'store'])->name('secagens.store');
+        Route::get('secagens/{secagem}', [SecagemController::class, 'show'])->name('secagens.show');
+        Route::get('secagens/{secagem}/editar', [SecagemController::class, 'edit'])->name('secagens.edit');
+        Route::put('secagens/{secagem}', [SecagemController::class, 'update'])->name('secagens.update');
+        Route::delete('secagens/{secagem}', [SecagemController::class, 'destroy'])->name('secagens.destroy');
+        Route::post('secagens/{secagem}/items', [SecagemController::class, 'storeItem'])->name('secagens.items.store');
+        Route::delete('secagens/{secagem}/items/{item}', [SecagemController::class, 'destroyItem'])->name('secagens.items.destroy');
+        Route::post('secagens/{secagem}/concluir', [SecagemController::class, 'conclude'])->name('secagens.conclude');
 
         Route::get('fazenda', [FarmController::class, 'edit'])->name('fazenda.edit');
         Route::put('fazenda', [FarmController::class, 'update'])->name('fazenda.update');

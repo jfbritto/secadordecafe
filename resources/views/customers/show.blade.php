@@ -20,5 +20,8 @@
     @endif
 </div>
 
-<p style="margin-top:14px;"><a href="{{ route('clientes.index') }}">← voltar</a></p>
+<p style="margin-top:14px;">
+    <a href="{{ route('clientes.movimentacoes.index', $customer) }}">Ver extrato/movimentações →</a>
+    &nbsp;|&nbsp; <a href="{{ route('clientes.index') }}">← voltar</a>
+</p>
 @endsection

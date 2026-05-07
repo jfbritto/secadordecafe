@@ -6,6 +6,7 @@ use App\Models\Concerns\BelongsToFarm;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
@@ -23,6 +24,11 @@ class Customer extends Model
     protected $casts = [
         'saldo_cafe_kg' => 'decimal:3',
     ];
+
+    public function movements(): HasMany
+    {
+        return $this->hasMany(Movement::class)->orderByDesc('occurred_at');
+    }
 
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
