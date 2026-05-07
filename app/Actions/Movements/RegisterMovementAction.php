@@ -42,9 +42,21 @@ class RegisterMovementAction
         };
 
         return DB::transaction(function () use ($customer, $user, $tipo, $signed, $observacao, $occurredAt, $source) {
-            $locked = Customer::query()->whereKey($customer->id)->lockForUpdate()->first();
+            $locked = Customer::query()->withoutGlobalScopes()->whereKey($customer->id)->lockForUpdate()->first();
             if (! $locked) {
                 throw new DomainException('Cliente não encontrado.');
+            }
+
+            // Defesa em profundidade: cliente DEVE ser da mesma fazenda do usuário.
+            // Os controllers já filtram via route binding + global scope, mas se uma action
+            // interna passar um Customer de outra farm por engano, falha aqui em vez de mexer no saldo.
+            if (! $user->isRoot() && $locked->farm_id !== $user->farm_id) {
+                throw new DomainException('Cliente fora da fazenda atual.');
+            }
+
+            // Source (Secagem etc.) também precisa pertencer à mesma farm.
+            if ($source && isset($source->farm_id) && $source->farm_id !== $locked->farm_id) {
+                throw new DomainException('Origem da movimentação fora da fazenda do cliente.');
             }
 
             $newSaldo = (float) $locked->saldo_cafe_kg + $signed;

@@ -22,6 +22,11 @@ class InvitationFactory extends Factory
         ];
     }
 
+    public function forFarm(Farm $farm): static
+    {
+        return $this->state(fn () => ['farm_id' => $farm->id]);
+    }
+
     public function expired(): static
     {
         return $this->state(fn () => ['expires_at' => now()->subDay()]);
