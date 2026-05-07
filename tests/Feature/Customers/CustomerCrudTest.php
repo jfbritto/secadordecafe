@@ -13,6 +13,29 @@ it('lists customers paginated', function () {
         ->assertSee(Customer::first()->nome);
 });
 
+it('listagem NAO tem link editar — abre o cliente para decidir lá dentro', function () {
+    $admin = makeFarmUser('admin');
+    $c = Customer::factory()->forFarm($admin->farm)->create();
+
+    $this->actingAs($admin)
+        ->get('/clientes')
+        ->assertOk()
+        ->assertDontSee(route('clientes.edit', $c), escape: false)
+        ->assertSee(route('clientes.show', $c), escape: false)
+        ->assertSee('Abrir');
+});
+
+it('tela do cliente mostra botao Editar para admin', function () {
+    $admin = makeFarmUser('admin');
+    $c = Customer::factory()->forFarm($admin->farm)->create();
+
+    $this->actingAs($admin)
+        ->get(route('clientes.show', $c))
+        ->assertOk()
+        ->assertSee(route('clientes.edit', $c), escape: false)
+        ->assertSee('Editar');
+});
+
 it('creates a customer', function () {
     $admin = makeFarmUser('admin');
 

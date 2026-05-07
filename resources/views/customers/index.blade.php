@@ -45,9 +45,11 @@
                     <td class="px-6 py-3.5 text-coffee-600">{{ $c->cpf_cnpj ?? '—' }}</td>
                     <td class="px-6 py-3.5 text-right font-bold text-coffee-700">{{ number_format($c->saldo_cafe_kg, 3, ',', '.') }}</td>
                     <td class="px-6 py-3.5 text-right text-sm">
-                        @can('update', $c)
-                            <a href="{{ route('clientes.edit', $c) }}" class="text-coffee-600 hover:text-coffee-900 hover:underline">editar</a>
-                        @endcan
+                        <a href="{{ route('clientes.show', $c) }}"
+                           class="inline-flex items-center gap-1 font-semibold text-coffee-700 hover:text-coffee-900 hover:underline">
+                            Abrir
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </a>
                     </td>
                 </tr>
             @empty
