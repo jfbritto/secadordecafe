@@ -33,6 +33,9 @@ Comandos:
   fresh           php artisan migrate:fresh --seed
   build           Reconstroi imagens
   bootstrap       Cria projeto Laravel inicial (uso único)
+  queue:logs      Mostra logs do worker da queue
+  queue:restart   Reinicia o worker (necessário após editar listeners/mailables)
+  mailhog         Abre Mailhog no navegador
   help            Esta ajuda
 EOF
 }
@@ -53,6 +56,14 @@ case "$cmd" in
   pest)      "${DC[@]}" exec "$APP_SVC" ./vendor/bin/pest "$@" ;;
   fresh)     "${DC[@]}" exec "$APP_SVC" php artisan migrate:fresh --seed ;;
   build)     "${DC[@]}" build "$@" ;;
+  queue:logs) "${DC[@]}" logs -f queue ;;
+  queue:restart)
+    "${DC[@]}" exec "$APP_SVC" php artisan queue:restart || true
+    "${DC[@]}" restart queue
+    ;;
+  mailhog)
+    if command -v open >/dev/null; then open http://localhost:8025; else echo "http://localhost:8025"; fi
+    ;;
   bootstrap)
     echo ">> Bootstrap Laravel via composer (container temporário)..."
     docker run --rm -v "$ROOT_DIR":/app -w /app composer:2 \

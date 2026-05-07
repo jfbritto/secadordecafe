@@ -61,9 +61,14 @@ Credenciais root (dev/test apenas):
 - e-mail: `root@secadordecafe.test`
 - senha: `root12345`
 
-Worker de queue (em terminal separado):
+Worker de queue: roda automaticamente no container `secadordecafe_queue`
+processando filas `emails,default`. Logs em tempo real:
 ```bash
-bin/dev art queue:work --queue=emails,default
+bin/dev queue:logs
+```
+Após editar listeners/mailables, recarregue o worker (ele cacheia código):
+```bash
+bin/dev queue:restart
 ```
 
 ## Comandos `bin/dev`

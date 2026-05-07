@@ -74,6 +74,39 @@ services:
     networks:
       - secadordecafe
 
+  queue:
+    build:
+      context: ./docker/php
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    container_name: secadordecafe_queue
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/zz-app.ini:ro
+    command:
+      - sh
+      - -c
+      - |
+        # Aguarda o vendor/ existir (caso de primeiro setup)
+        until [ -f /var/www/html/vendor/autoload.php ]; do
+          echo "[queue] aguardando composer install..."
+          sleep 3
+        done
+        echo "[queue] iniciando queue:work redis --queue=emails,default"
+        php artisan queue:work redis --queue=emails,default --tries=3 --sleep=2 --max-time=3600
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      mailhog:
+        condition: service_started
+    networks:
+      - secadordecafe
+
   node:
     image: node:22-alpine
     container_name: secadordecafe_node

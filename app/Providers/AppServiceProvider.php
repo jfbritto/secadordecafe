@@ -2,12 +2,7 @@
 
 namespace App\Providers;
 
-use App\Events\FarmRegistered;
-use App\Events\InvitationCreated;
-use App\Listeners\SendInvitationEmail;
-use App\Listeners\SendWelcomeEmail;
 use App\Models\User;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
             return $user->isRoot() ? true : null;
         });
 
-        Event::listen(FarmRegistered::class, SendWelcomeEmail::class);
-        Event::listen(InvitationCreated::class, SendInvitationEmail::class);
+        // Eventos: FarmRegistered -> SendWelcomeEmail e InvitationCreated -> SendInvitationEmail
+        // são registrados automaticamente pelo auto-discovery do Laravel 11
+        // (typehint do parâmetro $event no método handle() do listener).
+        // Não registrar manualmente aqui causa duplicação.
     }
 }
