@@ -22,7 +22,11 @@
             <a href="{{ route('despesas.index') }}" class="text-center sm:text-left px-4 py-3 sm:py-0 text-sm font-semibold text-coffee-600 hover:text-coffee-900">Cancelar</a>
             @can('delete', $expense)
                 <span class="hidden sm:flex flex-1"></span>
-                <form method="POST" action="{{ route('despesas.destroy', $expense) }}" onsubmit="return confirm('Excluir esta despesa? A ação não pode ser desfeita.');" class="w-full sm:w-auto">
+                <form method="POST" action="{{ route('despesas.destroy', $expense) }}"
+                      data-confirm="Excluir esta despesa?"
+                      data-confirm-text="Esta ação não pode ser desfeita."
+                      data-confirm-yes="Sim, excluir"
+                      class="w-full sm:w-auto">
                     @csrf @method('DELETE')
                     <button class="w-full sm:w-auto px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
                         Excluir despesa

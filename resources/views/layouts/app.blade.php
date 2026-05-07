@@ -26,6 +26,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('head')
     <style>
         [x-cloak] { display: none !important; }
@@ -179,19 +180,6 @@
             </div>
         @endif
 
-        {{-- Flash --}}
-        @if(session('flash'))
-            <div class="bg-emerald-50 border-l-4 border-emerald-400 text-emerald-900 px-4 py-2.5 text-sm flex-shrink-0" x-data="{open:true}" x-show="open">
-                <div class="flex items-center justify-between max-w-7xl mx-auto">
-                    <span>{{ session('flash') }}</span>
-                    <button @click="open=false" class="text-emerald-700 hover:text-emerald-900 px-2">&times;</button>
-                </div>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="bg-rose-50 border-l-4 border-rose-400 text-rose-900 px-4 py-2.5 text-sm flex-shrink-0">{{ session('error') }}</div>
-        @endif
-
         {{-- Content --}}
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div class="max-w-7xl mx-auto">
@@ -202,6 +190,60 @@
 </div>
 
 @stack('scripts')
+
+{{-- Toasts via SweetAlert2: flash de sucesso e erro --}}
+@if(session('flash') || session('error'))
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    @if(session('flash'))
+    Swal.fire({
+        toast: true, position: 'top-end', icon: 'success',
+        title: @json(session('flash')),
+        showConfirmButton: false, timer: 4500, timerProgressBar: true,
+        background: '#ecfdf5', iconColor: '#059669', color: '#065f46',
+    });
+    @endif
+    @if(session('error'))
+    Swal.fire({
+        toast: true, position: 'top-end', icon: 'error',
+        title: @json(session('error')),
+        showConfirmButton: false, timer: 6000, timerProgressBar: true,
+        background: '#fef2f2', iconColor: '#dc2626', color: '#991b1b',
+    });
+    @endif
+});
+</script>
+@endif
+
+{{-- Confirmação de ações via data-confirm + data-confirm-text --}}
+<script>
+document.addEventListener('submit', function (e) {
+    const form = e.target;
+    if (!(form instanceof HTMLFormElement)) return;
+    const msg = form.dataset.confirm;
+    if (!msg) return;
+    if (form.dataset.confirmed === '1') return;
+    e.preventDefault();
+    Swal.fire({
+        title: msg,
+        text: form.dataset.confirmText || '',
+        icon: form.dataset.confirmIcon || 'warning',
+        showCancelButton: true,
+        confirmButtonText: form.dataset.confirmYes || 'Sim, confirmar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: form.dataset.confirmDanger === '0' ? '#5a3a22' : '#dc2626',
+        cancelButtonColor: '#a87a47',
+        reverseButtons: true,
+        focusCancel: true,
+    }).then(function (r) {
+        if (r.isConfirmed) {
+            form.dataset.confirmed = '1';
+            form.submit();
+        }
+    });
+});
+</script>
+
 <script>
 // Máscaras automáticas via data-mask="cpfcnpj"|"phone"|"uf"
 (function () {

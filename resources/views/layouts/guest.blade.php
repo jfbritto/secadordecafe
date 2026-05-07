@@ -7,6 +7,7 @@
     <title>@yield('title', 'Acesso') — secadordecafe</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M17 8h1a4 4 0 010 8h-1m0-8H3v9a4 4 0 004 4h6a4 4 0 004-4V8z' stroke='%235a3a22' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = { theme: { extend: { colors: { coffee: {
             50:'#faf6f1',100:'#f1e6d6',200:'#e1c8a4',300:'#cca572',400:'#a87a47',

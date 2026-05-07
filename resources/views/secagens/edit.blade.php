@@ -148,7 +148,10 @@
                             <td class="px-4 py-3 text-right text-coffee-700">{{ number_format($item->comissao_kg, 3, ',', '.') }}</td>
                             <td class="px-4 py-3 text-right font-bold text-coffee-800">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }}</td>
                             <td class="px-4 py-3 text-right">
-                                <form method="POST" action="{{ route('secagens.items.destroy', [$secagem, $item]) }}" onsubmit="return confirm('Remover este item da secagem?');" class="inline">
+                                <form method="POST" action="{{ route('secagens.items.destroy', [$secagem, $item]) }}"
+                                      data-confirm="Remover este item da secagem?"
+                                      data-confirm-text="O cliente sai da lista. Você pode adicionar de novo enquanto a secagem for rascunho."
+                                      data-confirm-yes="Sim, remover" class="inline">
                                     @csrf @method('DELETE')
                                     <button class="text-rose-600 text-xs font-semibold hover:underline">remover</button>
                                 </form>
@@ -180,7 +183,13 @@
     <div class="bg-white rounded-2xl border border-coffee-100 shadow-sm p-6">
         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
             @can('conclude', $secagem)
-                <form method="POST" action="{{ route('secagens.conclude', $secagem) }}" onsubmit="return confirm('Concluir esta secagem? Os saldos dos clientes serão debitados e a secagem ficará bloqueada para edição.');" class="w-full sm:w-auto">
+                <form method="POST" action="{{ route('secagens.conclude', $secagem) }}"
+                      data-confirm="Concluir esta secagem?"
+                      data-confirm-text="Os saldos dos clientes envolvidos serão debitados automaticamente e a secagem ficará bloqueada para edição."
+                      data-confirm-icon="question"
+                      data-confirm-yes="Sim, concluir"
+                      data-confirm-danger="0"
+                      class="w-full sm:w-auto">
                     @csrf
                     <button class="w-full sm:w-auto px-6 py-3 text-base font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm">
                         ✓ Concluir secagem
@@ -192,7 +201,11 @@
             @endcan
             @can('delete', $secagem)
                 <span class="hidden sm:flex flex-1"></span>
-                <form method="POST" action="{{ route('secagens.destroy', $secagem) }}" onsubmit="return confirm('Excluir este rascunho? Os itens serão perdidos.');" class="w-full sm:w-auto">
+                <form method="POST" action="{{ route('secagens.destroy', $secagem) }}"
+                      data-confirm="Excluir este rascunho?"
+                      data-confirm-text="Os itens adicionados serão perdidos. Os saldos dos clientes não foram debitados ainda, então nada precisa ser revertido."
+                      data-confirm-yes="Sim, excluir"
+                      class="w-full sm:w-auto">
                     @csrf @method('DELETE')
                     <button class="w-full sm:w-auto px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
                         Excluir rascunho

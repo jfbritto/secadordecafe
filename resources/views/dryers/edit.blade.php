@@ -22,7 +22,11 @@
             <a href="{{ route('secadores.index') }}" class="text-center sm:text-left px-4 py-3 sm:py-0 text-sm font-semibold text-coffee-600 hover:text-coffee-900">Cancelar</a>
             @can('delete', $dryer)
                 <span class="hidden sm:flex flex-1"></span>
-                <form method="POST" action="{{ route('secadores.destroy', $dryer) }}" onsubmit="return confirm('Excluir este secador? Só é possível se não houver secagens vinculadas. Para tirar de circulação, desmarque \'Secador ativo\' em vez de excluir.');" class="w-full sm:w-auto">
+                <form method="POST" action="{{ route('secadores.destroy', $dryer) }}"
+                      data-confirm="Excluir este secador?"
+                      data-confirm-text="Só é possível se não houver secagens vinculadas. Para tirar de circulação sem perder o histórico, desmarque 'Secador ativo' em vez de excluir."
+                      data-confirm-yes="Sim, excluir"
+                      class="w-full sm:w-auto">
                     @csrf @method('DELETE')
                     <button class="w-full sm:w-auto px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
                         Excluir secador

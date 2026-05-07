@@ -74,7 +74,11 @@
                     </td>
                     <td class="px-6 py-3 text-right">
                         @if($u->id !== auth()->id())
-                            <form method="POST" action="{{ route('usuarios.destroy', $u) }}" onsubmit="return confirm('Remover este usuário?');" class="inline">
+                            <form method="POST" action="{{ route('usuarios.destroy', $u) }}"
+                                  data-confirm="Remover {{ $u->name }} da fazenda?"
+                                  data-confirm-text="A pessoa perde acesso imediatamente. Para dar acesso de novo, será preciso enviar um novo convite."
+                                  data-confirm-yes="Sim, remover"
+                                  class="inline">
                                 @csrf @method('DELETE')
                                 <button class="text-rose-600 text-sm hover:underline">remover</button>
                             </form>
@@ -107,7 +111,11 @@
                         <td class="px-6 py-3 text-coffee-600">{{ ucfirst($inv->role) }}</td>
                         <td class="px-6 py-3 text-coffee-500">{{ $inv->expires_at->format('d/m/Y H:i') }}</td>
                         <td class="px-6 py-3 text-right">
-                            <form method="POST" action="{{ route('convites.destroy', $inv) }}" onsubmit="return confirm('Cancelar convite?');" class="inline">
+                            <form method="POST" action="{{ route('convites.destroy', $inv) }}"
+                                  data-confirm="Cancelar convite para {{ $inv->email }}?"
+                                  data-confirm-text="O link enviado por e-mail deixa de funcionar. Você pode enviar um novo convite a qualquer momento."
+                                  data-confirm-yes="Sim, cancelar"
+                                  class="inline">
                                 @csrf @method('DELETE')
                                 <button class="text-rose-600 text-sm hover:underline">cancelar</button>
                             </form>

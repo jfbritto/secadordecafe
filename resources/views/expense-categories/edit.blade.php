@@ -24,7 +24,11 @@
             <a href="{{ route('despesas.categorias.index') }}" class="text-center sm:text-left px-4 py-3 sm:py-0 text-sm font-semibold text-coffee-600 hover:text-coffee-900">Cancelar</a>
             @can('delete', $category)
                 <span class="hidden sm:flex flex-1"></span>
-                <form method="POST" action="{{ route('despesas.categorias.destroy', $category) }}" onsubmit="return confirm('Excluir esta categoria? Só é possível se não houver despesas vinculadas. Para tirar de circulação, desmarque \'Categoria ativa\' em vez de excluir.');" class="w-full sm:w-auto">
+                <form method="POST" action="{{ route('despesas.categorias.destroy', $category) }}"
+                      data-confirm="Excluir esta categoria?"
+                      data-confirm-text="Só é possível se não houver despesas vinculadas. Para tirar de circulação sem perder o histórico, desmarque 'Categoria ativa' em vez de excluir."
+                      data-confirm-yes="Sim, excluir"
+                      class="w-full sm:w-auto">
                     @csrf @method('DELETE')
                     <button class="w-full sm:w-auto px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
                         Excluir categoria
