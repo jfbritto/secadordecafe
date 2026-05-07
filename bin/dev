@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Atalho para comandos do ambiente Docker do secadordecafe.
+# Uso: bin/dev <subcomando> [args...]
+
+set -euo pipefail
+
+# Resolve a raiz do projeto (parent da pasta deste script).
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+DC=(docker compose)
+APP_SVC=app
+NODE_SVC=node
+
+usage() {
+  cat <<EOF
+secadordecafe — atalhos de desenvolvimento
+
+Uso: bin/dev <comando> [args]
+
+Comandos:
+  up              Sobe os containers em background
+  down            Derruba os containers
+  restart         Reinicia tudo
+  ps              Lista containers
+  logs [svc]      Mostra logs (default: app)
+  shell           Abre shell no container app
+  art <args>      Roda php artisan <args>
+  composer <args> Roda composer <args>
+  npm <args>      Roda npm <args> (container node)
+  test [args]     Roda php artisan test
+  pest [args]     Roda ./vendor/bin/pest
+  fresh           php artisan migrate:fresh --seed
+  build           Reconstroi imagens
+  bootstrap       Cria projeto Laravel inicial (uso único)
+  help            Esta ajuda
+EOF
+}
+
+cmd="${1:-help}"; shift || true
+
+case "$cmd" in
+  up)        "${DC[@]}" up -d "$@" ;;
+  down)      "${DC[@]}" down "$@" ;;
+  restart)   "${DC[@]}" restart "$@" ;;
+  ps)        "${DC[@]}" ps "$@" ;;
+  logs)      "${DC[@]}" logs -f "${1:-$APP_SVC}" ;;
+  shell)     "${DC[@]}" exec "$APP_SVC" sh ;;
+  art)       "${DC[@]}" exec "$APP_SVC" php artisan "$@" ;;
+  composer)  "${DC[@]}" exec "$APP_SVC" composer "$@" ;;
+  npm)       "${DC[@]}" run --rm "$NODE_SVC" npm "$@" ;;
+  test)      "${DC[@]}" exec "$APP_SVC" php artisan test "$@" ;;
+  pest)      "${DC[@]}" exec "$APP_SVC" ./vendor/bin/pest "$@" ;;
+  fresh)     "${DC[@]}" exec "$APP_SVC" php artisan migrate:fresh --seed ;;
+  build)     "${DC[@]}" build "$@" ;;
+  bootstrap)
+    echo ">> Bootstrap Laravel via composer (container temporário)..."
+    docker run --rm -v "$ROOT_DIR":/app -w /app composer:2 \
+      sh -c "composer create-project laravel/laravel:^11.0 _laravel_tmp --no-interaction --prefer-dist && \
+             cp -r _laravel_tmp/. . && rm -rf _laravel_tmp"
+    echo ">> Bootstrap concluído. Agora: bin/dev build && bin/dev up"
+    ;;
+  help|--help|-h) usage ;;
+  *) echo "Comando desconhecido: $cmd"; usage; exit 2 ;;
+esac
