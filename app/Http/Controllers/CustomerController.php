@@ -37,7 +37,7 @@ class CustomerController extends Controller
         $customer = Customer::create($request->validated());
 
         return redirect()->route('clientes.index')
-            ->with('flash', "Cliente {$customer->nome} criado.");
+            ->with('flash', '<strong>' . e($customer->nome) . '</strong> cadastrado.');
     }
 
     public function show(Customer $cliente): View
@@ -60,7 +60,7 @@ class CustomerController extends Controller
         $cliente->update($request->validated());
 
         return redirect()->route('clientes.index')
-            ->with('flash', "Cliente {$cliente->nome} atualizado.");
+            ->with('flash', '<strong>' . e($cliente->nome) . '</strong> atualizado.');
     }
 
     public function destroy(Customer $cliente): RedirectResponse
@@ -71,7 +71,7 @@ class CustomerController extends Controller
         $cliente->delete();
 
         return redirect()->route('clientes.index')
-            ->with('flash', "Cliente {$nome} excluído.");
+            ->with('flash', '<strong>' . e($nome) . '</strong> excluído.');
     }
 
     private function ensureSameFarm(Customer $customer): void

@@ -61,7 +61,8 @@ class ExpenseController extends Controller
         $data['user_id'] = $request->user()->id;
         Expense::create($data);
 
-        return redirect()->route('despesas.index')->with('flash', 'Despesa registrada.');
+        return redirect()->route('despesas.index')
+            ->with('flash', '<strong>R$ ' . number_format((float) $data['valor_total'], 2, ',', '.') . '</strong> · ' . e($data['descricao']) . ' registrada.');
     }
 
     public function edit(Expense $despesa): View
@@ -82,15 +83,18 @@ class ExpenseController extends Controller
     {
         $this->ensureSameFarm($despesa);
         $despesa->update($request->validated());
-        return redirect()->route('despesas.index')->with('flash', 'Despesa atualizada.');
+        return redirect()->route('despesas.index')
+            ->with('flash', '<strong>' . e($despesa->descricao) . '</strong> atualizada.');
     }
 
     public function destroy(Expense $despesa): RedirectResponse
     {
         $this->ensureSameFarm($despesa);
         $this->authorize('delete', $despesa);
+        $descricao = $despesa->descricao;
         $despesa->delete();
-        return redirect()->route('despesas.index')->with('flash', 'Despesa excluída.');
+        return redirect()->route('despesas.index')
+            ->with('flash', '<strong>' . e($descricao) . '</strong> excluída.');
     }
 
     private function ensureSameFarm(Expense $expense): void

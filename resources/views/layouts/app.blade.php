@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @if(session('flash'))
     Swal.fire({
         toast: true, position: 'top-end', icon: 'success',
-        title: @json(session('flash')),
+        html: @json(session('flash')),
         showConfirmButton: false, timer: 4500, timerProgressBar: true,
         background: '#ecfdf5', iconColor: '#059669', color: '#065f46',
     });
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @if(session('error'))
     Swal.fire({
         toast: true, position: 'top-end', icon: 'error',
-        title: @json(session('error')),
+        html: @json(session('error')),
         showConfirmButton: false, timer: 6000, timerProgressBar: true,
         background: '#fef2f2', iconColor: '#dc2626', color: '#991b1b',
     });

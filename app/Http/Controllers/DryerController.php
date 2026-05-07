@@ -32,7 +32,8 @@ class DryerController extends Controller
     public function store(StoreDryerRequest $request): RedirectResponse
     {
         $dryer = Dryer::create($request->validated());
-        return redirect()->route('secadores.index')->with('flash', "Secador {$dryer->nome} criado.");
+        return redirect()->route('secadores.index')
+            ->with('flash', '<strong>' . e($dryer->nome) . '</strong> cadastrado.');
     }
 
     public function edit(Dryer $secador): View
@@ -46,7 +47,8 @@ class DryerController extends Controller
     {
         $this->ensureSameFarm($secador);
         $secador->update($request->validated());
-        return redirect()->route('secadores.index')->with('flash', "Secador {$secador->nome} atualizado.");
+        return redirect()->route('secadores.index')
+            ->with('flash', '<strong>' . e($secador->nome) . '</strong> atualizado.');
     }
 
     public function destroy(Dryer $secador): RedirectResponse
@@ -56,13 +58,14 @@ class DryerController extends Controller
 
         if ($secador->secagens()->exists()) {
             return redirect()->route('secadores.index')
-                ->with('error', "Não é possível excluir {$secador->nome}: há secagens vinculadas. Inative-o em vez de excluir.");
+                ->with('error', 'Não é possível excluir <strong>' . e($secador->nome) . '</strong>: há secagens vinculadas. Inative-o em vez de excluir.');
         }
 
         $nome = $secador->nome;
         $secador->delete();
 
-        return redirect()->route('secadores.index')->with('flash', "Secador {$nome} excluído.");
+        return redirect()->route('secadores.index')
+            ->with('flash', '<strong>' . e($nome) . '</strong> excluído.');
     }
 
     private function ensureSameFarm(Dryer $dryer): void

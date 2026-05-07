@@ -33,7 +33,7 @@ class ExpenseCategoryController extends Controller
     {
         $cat = ExpenseCategory::create($request->validated());
         return redirect()->route('despesas.categorias.index')
-            ->with('flash', "Categoria {$cat->nome} criada.");
+            ->with('flash', '<strong>' . e($cat->nome) . '</strong> cadastrada.');
     }
 
     public function edit(ExpenseCategory $categoria): View
@@ -48,7 +48,7 @@ class ExpenseCategoryController extends Controller
         $this->ensureSameFarm($categoria);
         $categoria->update($request->validated());
         return redirect()->route('despesas.categorias.index')
-            ->with('flash', "Categoria {$categoria->nome} atualizada.");
+            ->with('flash', '<strong>' . e($categoria->nome) . '</strong> atualizada.');
     }
 
     public function destroy(ExpenseCategory $categoria): RedirectResponse
@@ -58,13 +58,14 @@ class ExpenseCategoryController extends Controller
 
         if ($categoria->expenses()->exists()) {
             return redirect()->route('despesas.categorias.index')
-                ->with('error', "Não é possível excluir {$categoria->nome}: há despesas vinculadas. Inative-a em vez de excluir.");
+                ->with('error', 'Não é possível excluir <strong>' . e($categoria->nome) . '</strong>: há despesas vinculadas. Inative-a em vez de excluir.');
         }
 
         $nome = $categoria->nome;
         $categoria->delete();
 
-        return redirect()->route('despesas.categorias.index')->with('flash', "Categoria {$nome} excluída.");
+        return redirect()->route('despesas.categorias.index')
+            ->with('flash', '<strong>' . e($nome) . '</strong> excluída.');
     }
 
     private function ensureSameFarm(ExpenseCategory $cat): void

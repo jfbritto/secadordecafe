@@ -48,7 +48,8 @@ class UserController extends Controller
         app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId($usuario->farm_id);
         $usuario->syncRoles([$newRole]);
 
-        return redirect()->route('usuarios.index')->with('flash', 'Permissão atualizada.');
+        return redirect()->route('usuarios.index')
+            ->with('flash', '<strong>' . e($usuario->name) . '</strong> agora é <strong>' . ucfirst($newRole) . '</strong>.');
     }
 
     public function destroy(User $usuario): RedirectResponse
@@ -60,8 +61,10 @@ class UserController extends Controller
                 ->with('error', 'Não é possível remover a última administradora.');
         }
 
+        $nome = $usuario->name;
         $usuario->delete();
-        return redirect()->route('usuarios.index')->with('flash', 'Usuário removido.');
+        return redirect()->route('usuarios.index')
+            ->with('flash', '<strong>' . e($nome) . '</strong> removido(a) da fazenda.');
     }
 
     private function isLastAdminBeingDemoted(User $target, ?string $newRole): bool

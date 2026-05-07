@@ -11,19 +11,23 @@ class InvitationController extends Controller
 {
     public function store(StoreInvitationRequest $request, SendInvitationAction $action): RedirectResponse
     {
+        $email = $request->validated('email');
         $action->execute(
             inviter: $request->user(),
-            email: $request->validated('email'),
+            email: $email,
             role: $request->validated('role'),
         );
 
-        return redirect()->route('usuarios.index')->with('flash', 'Convite enviado.');
+        return redirect()->route('usuarios.index')
+            ->with('flash', 'Convite enviado para <strong>' . e($email) . '</strong>.');
     }
 
     public function destroy(Invitation $convite): RedirectResponse
     {
         $this->authorize('delete', $convite);
+        $email = $convite->email;
         $convite->delete();
-        return redirect()->route('usuarios.index')->with('flash', 'Convite cancelado.');
+        return redirect()->route('usuarios.index')
+            ->with('flash', 'Convite para <strong>' . e($email) . '</strong> cancelado.');
     }
 }

@@ -49,7 +49,7 @@ class SecagemController extends Controller
     {
         $secagem = $action->execute($request->user(), $request->validated());
         return redirect()->route('secagens.edit', $secagem)
-            ->with('flash', "Secagem #{$secagem->numero} criada (rascunho).");
+            ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> criada como rascunho.');
     }
 
     public function show(Secagem $secagem): View
@@ -82,7 +82,8 @@ class SecagemController extends Controller
         $this->authorize('update', $secagem);
 
         $secagem->update($request->validated());
-        return redirect()->route('secagens.edit', $secagem)->with('flash', 'Secagem atualizada.');
+        return redirect()->route('secagens.edit', $secagem)
+            ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> atualizada.');
     }
 
     public function destroy(Secagem $secagem): RedirectResponse
@@ -92,7 +93,8 @@ class SecagemController extends Controller
         $numero = $secagem->numero;
         $secagem->delete();
 
-        return redirect()->route('secagens.index')->with('flash', "Secagem #{$numero} excluída.");
+        return redirect()->route('secagens.index')
+            ->with('flash', '<strong>Secagem #' . $numero . '</strong> excluída.');
     }
 
     public function storeItem(StoreSecagemItemRequest $request, Secagem $secagem): RedirectResponse
@@ -117,7 +119,8 @@ class SecagemController extends Controller
             'saldo_liquido_kg' => $liquido,
         ]);
 
-        return redirect()->route('secagens.edit', $secagem)->with('flash', 'Item adicionado.');
+        return redirect()->route('secagens.edit', $secagem)
+            ->with('flash', 'Item adicionado à secagem.');
     }
 
     public function destroyItem(Secagem $secagem, SecagemItem $item): RedirectResponse
@@ -128,7 +131,8 @@ class SecagemController extends Controller
             throw new AuthorizationException();
         }
         $item->delete();
-        return redirect()->route('secagens.edit', $secagem)->with('flash', 'Item removido.');
+        return redirect()->route('secagens.edit', $secagem)
+            ->with('flash', 'Item removido da secagem.');
     }
 
     public function pdf(Secagem $secagem): Response
@@ -149,7 +153,7 @@ class SecagemController extends Controller
         $action->execute($secagem, auth()->user());
 
         return redirect()->route('secagens.show', $secagem)
-            ->with('flash', "Secagem #{$secagem->numero} concluída.");
+            ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> concluída. Saldos dos clientes atualizados.');
     }
 
     private function ensureSameFarm(Secagem $secagem): void

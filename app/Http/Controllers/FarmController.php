@@ -21,6 +21,7 @@ class FarmController extends Controller
         $farm = $request->user()->farm;
         $farm->update($request->validated());
 
-        return redirect()->route('fazenda.edit')->with('flash', 'Fazenda atualizada.');
+        return redirect()->route('fazenda.edit')
+            ->with('flash', '<strong>' . e($farm->nome) . '</strong> atualizada.');
     }
 }

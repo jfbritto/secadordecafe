@@ -38,8 +38,9 @@ class MovementController extends Controller
             occurredAt: $request->validated('occurred_at') ? new \DateTime($request->validated('occurred_at')) : null,
         );
 
+        $cliente->refresh();
         return redirect()->route('clientes.movimentacoes.index', $cliente)
-            ->with('flash', 'Movimentação registrada.');
+            ->with('flash', 'Movimentação registrada. Novo saldo: <strong>' . number_format((float) $cliente->saldo_cafe_kg, 3, ',', '.') . ' kg</strong>.');
     }
 
     private function ensureSameFarm(Customer $customer): void
