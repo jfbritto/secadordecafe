@@ -7,7 +7,12 @@ use App\Models\Dryer;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Farm;
+use App\Models\Invitation;
+use App\Models\Movement;
 use App\Models\Secagem;
+use App\Models\SecagemItem;
+use App\Models\Subscription;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Spatie\Activitylog\Models\Activity;
 
@@ -43,6 +48,26 @@ class AuditFormatter
             'label' => 'Categoria de despesa', 'name_field' => 'nome', 'name_prefix' => '',
             'icon' => 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z',
         ],
+        User::class => [
+            'label' => 'Usuário', 'name_field' => 'name', 'name_prefix' => '',
+            'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+        ],
+        Movement::class => [
+            'label' => 'Movimentação', 'name_field' => 'observacao', 'name_prefix' => '',
+            'icon' => 'M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4',
+        ],
+        SecagemItem::class => [
+            'label' => 'Item de secagem', 'name_field' => 'id', 'name_prefix' => '#',
+            'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+        ],
+        Subscription::class => [
+            'label' => 'Assinatura', 'name_field' => 'status', 'name_prefix' => '',
+            'icon' => 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
+        ],
+        Invitation::class => [
+            'label' => 'Convite', 'name_field' => 'email', 'name_prefix' => '',
+            'icon' => 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+        ],
     ];
 
     /** Verbo amigável por evento. */
@@ -55,6 +80,7 @@ class AuditFormatter
     /** Tradução de nomes de campo para PT-BR. */
     public const FIELDS = [
         'nome' => 'Nome',
+        'name' => 'Nome',
         'farm_name' => 'Nome da fazenda',
         'email' => 'E-mail',
         'telefone' => 'Telefone',
@@ -80,6 +106,32 @@ class AuditFormatter
         'observacoes' => 'Observações',
         'observacao' => 'Observação',
         'concluida_at' => 'Concluída em',
+        // user
+        'is_root' => 'Super-admin',
+        'role' => 'Permissão',
+        'email_verified_at' => 'E-mail verificado em',
+        // movement / secagemItem
+        'tipo' => 'Tipo',
+        'quantidade_kg' => 'Quantidade (kg)',
+        'customer_id' => 'Cliente',
+        'secagem_id' => 'Secagem',
+        'source_type' => 'Origem',
+        'source_id' => 'ID da origem',
+        'occurred_at' => 'Ocorrida em',
+        'quantidade_recebida_kg' => 'Recebida (kg)',
+        'quantidade_seca_kg' => 'Seca (kg)',
+        'comissao_percentual' => 'Comissão (%)',
+        'comissao_kg' => 'Comissão (kg)',
+        'saldo_liquido_kg' => 'Saldo líquido (kg)',
+        // subscription
+        'trial_ends_at' => 'Fim do trial',
+        'current_period_end' => 'Fim do período atual',
+        'asaas_customer_id' => 'ID Asaas (cliente)',
+        'asaas_subscription_id' => 'ID Asaas (assinatura)',
+        // invitation
+        'expires_at' => 'Expira em',
+        'accepted_at' => 'Aceito em',
+        'invited_by' => 'Convidado por',
     ];
 
     /**
@@ -152,17 +204,32 @@ class AuditFormatter
             $name = ExpenseCategory::query()->withoutGlobalScopes()->find($value)?->nome;
             return $name ?? "#{$value}";
         }
+        if ($field === 'customer_id' && is_numeric($value)) {
+            $name = Customer::query()->withoutGlobalScopes()->find($value)?->nome;
+            return $name ?? "#{$value}";
+        }
+        if ($field === 'secagem_id' && is_numeric($value)) {
+            $sec = Secagem::query()->withoutGlobalScopes()->find($value);
+            return $sec ? "Secagem #{$sec->numero}" : "#{$value}";
+        }
+        if ($field === 'invited_by' && is_numeric($value)) {
+            $name = User::query()->find($value)?->name;
+            return $name ?? "#{$value}";
+        }
+        if ($field === 'source_type' && is_string($value) && class_exists($value)) {
+            return self::SUBJECTS[$value]['label'] ?? class_basename($value);
+        }
 
         if ($field === 'data' && is_string($value)) {
             try { return Carbon::parse($value)->format('d/m/Y'); } catch (\Throwable $e) {}
         }
-        if ($field === 'concluida_at' && is_string($value)) {
+        if (in_array($field, ['concluida_at', 'occurred_at', 'email_verified_at', 'expires_at', 'accepted_at', 'trial_ends_at', 'current_period_end'], true) && is_string($value)) {
             try { return Carbon::parse($value)->format('d/m/Y H:i'); } catch (\Throwable $e) {}
         }
         if (in_array($field, ['valor_total', 'valor_unitario'], true) && is_numeric($value)) {
             return 'R$ ' . number_format((float) $value, 2, ',', '.');
         }
-        if (in_array($field, ['saldo_cafe_kg', 'capacidade_kg', 'quantidade'], true) && is_numeric($value)) {
+        if (in_array($field, ['saldo_cafe_kg', 'capacidade_kg', 'quantidade', 'quantidade_kg', 'quantidade_recebida_kg', 'quantidade_seca_kg', 'comissao_kg', 'saldo_liquido_kg'], true) && is_numeric($value)) {
             return number_format((float) $value, 3, ',', '.') . ' kg';
         }
 

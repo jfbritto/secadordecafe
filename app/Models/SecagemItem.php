@@ -6,10 +6,21 @@ use App\Models\Concerns\BelongsToFarm;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class SecagemItem extends Model
 {
-    use HasFactory, BelongsToFarm;
+    use HasFactory, BelongsToFarm, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['secagem_id', 'customer_id', 'quantidade_recebida_kg', 'quantidade_seca_kg', 'comissao_percentual', 'comissao_kg', 'saldo_liquido_kg'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "item de secagem {$event}");
+    }
 
     protected $fillable = [
         'farm_id', 'secagem_id', 'customer_id',
