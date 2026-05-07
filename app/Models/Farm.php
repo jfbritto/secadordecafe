@@ -62,4 +62,11 @@ class Farm extends Model
             && $this->trial_ends_at
             && $this->trial_ends_at->isFuture();
     }
+
+    protected static function booted(): void
+    {
+        static::created(function (Farm $farm) {
+            ExpenseCategory::seedDefaultsForFarm($farm->id);
+        });
+    }
 }

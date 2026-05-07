@@ -14,26 +14,9 @@ class Expense extends Model
 {
     use HasFactory, BelongsToFarm, LogsActivity;
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['data', 'descricao', 'categoria', 'valor_total'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $event) => "despesa {$event}");
-    }
-
-    public const CATEGORIAS = [
-        'combustivel' => 'Combustível',
-        'manutencao' => 'Manutenção',
-        'mao_de_obra' => 'Mão de obra',
-        'impostos' => 'Impostos',
-        'equipamentos' => 'Equipamentos',
-        'outros' => 'Outros',
-    ];
-
     protected $fillable = [
-        'farm_id', 'user_id', 'data', 'descricao', 'categoria',
+        'farm_id', 'user_id', 'expense_category_id',
+        'data', 'descricao',
         'unidade', 'quantidade', 'valor_unitario', 'valor_total', 'observacoes',
     ];
 
@@ -44,7 +27,22 @@ class Expense extends Model
         'valor_total' => 'decimal:2',
     ];
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['data', 'descricao', 'expense_category_id', 'valor_total'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "despesa {$event}");
+    }
+
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function category(): BelongsTo { return $this->belongsTo(ExpenseCategory::class, 'expense_category_id'); }
+
+    public function categoriaNome(): string
+    {
+        return $this->category?->nome ?? '—';
+    }
 
     public function scopeBetween(Builder $q, ?string $from, ?string $to): Builder
     {
@@ -53,8 +51,8 @@ class Expense extends Model
         return $q;
     }
 
-    public function scopeCategoria(Builder $q, ?string $cat): Builder
+    public function scopeCategory(Builder $q, ?int $categoryId): Builder
     {
-        return $cat ? $q->where('categoria', $cat) : $q;
+        return $categoryId ? $q->where('expense_category_id', $categoryId) : $q;
     }
 }

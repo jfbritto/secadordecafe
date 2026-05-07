@@ -11,6 +11,7 @@ use App\Http\Controllers\DryerController;
 use App\Http\Controllers\FarmBlockedController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\InvitationAcceptController;
+use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MovementController;
@@ -73,6 +74,15 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::delete('secagens/{secagem}/items/{item}', [SecagemController::class, 'destroyItem'])->name('secagens.items.destroy');
         Route::post('secagens/{secagem}/concluir', [SecagemController::class, 'conclude'])->name('secagens.conclude');
         Route::get('secagens/{secagem}/pdf', [SecagemController::class, 'pdf'])->name('secagens.pdf');
+
+        // IMPORTANTE: rotas de categorias declaradas ANTES das de despesa/{despesa}
+        // para evitar match de "categorias" como id.
+        Route::get('despesas/categorias', [ExpenseCategoryController::class, 'index'])->name('despesas.categorias.index');
+        Route::get('despesas/categorias/criar', [ExpenseCategoryController::class, 'create'])->name('despesas.categorias.create');
+        Route::post('despesas/categorias', [ExpenseCategoryController::class, 'store'])->name('despesas.categorias.store');
+        Route::get('despesas/categorias/{categoria}/editar', [ExpenseCategoryController::class, 'edit'])->name('despesas.categorias.edit');
+        Route::put('despesas/categorias/{categoria}', [ExpenseCategoryController::class, 'update'])->name('despesas.categorias.update');
+        Route::delete('despesas/categorias/{categoria}', [ExpenseCategoryController::class, 'destroy'])->name('despesas.categorias.destroy');
 
         Route::get('despesas', [ExpenseController::class, 'index'])->name('despesas.index');
         Route::get('despesas/criar', [ExpenseController::class, 'create'])->name('despesas.create');

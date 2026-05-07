@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Expenses\StoreExpenseRequest;
 use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,28 +18,41 @@ class ExpenseController extends Controller
 
         $from = $request->string('from')->toString() ?: null;
         $to = $request->string('to')->toString() ?: null;
-        $cat = $request->string('cat')->toString() ?: null;
+        $catId = $request->integer('cat') ?: null;
 
-        $base = Expense::query()->between($from, $to)->categoria($cat);
+        $base = Expense::query()->between($from, $to)->category($catId);
 
         $totals = (clone $base)
             ->reorder()
-            ->selectRaw('categoria, SUM(valor_total) as total, COUNT(*) as qtd')
-            ->groupBy('categoria')
+            ->join('expense_categories', 'expenses.expense_category_id', '=', 'expense_categories.id')
+            ->selectRaw('expense_categories.id as cat_id, expense_categories.nome as cat_nome, SUM(expenses.valor_total) as total, COUNT(*) as qtd')
+            ->groupBy('expense_categories.id', 'expense_categories.nome')
+            ->orderBy('expense_categories.nome')
             ->get()
-            ->keyBy('categoria');
+            ->keyBy('cat_id');
 
-        $expenses = $base->orderByDesc('data')->paginate(20)->withQueryString();
+        $expenses = $base->with('category')->orderByDesc('data')->paginate(20)->withQueryString();
 
         $totalGeral = $totals->sum('total');
 
-        return view('expenses.index', compact('expenses', 'from', 'to', 'cat', 'totals', 'totalGeral'));
+        // Lista de categorias para o filtro: todas (ativas + inativas em uso)
+        $allCategories = ExpenseCategory::query()->orderBy('nome')->get(['id', 'nome', 'ativo']);
+
+        return view('expenses.index', compact(
+            'expenses', 'from', 'to', 'catId', 'totals', 'totalGeral', 'allCategories'
+        ));
     }
 
     public function create(): View
     {
         $this->authorize('create', Expense::class);
-        return view('expenses.create');
+        $categories = ExpenseCategory::ativo()->orderBy('nome')->get(['id', 'nome']);
+
+        if ($categories->isEmpty()) {
+            return view('expenses.no-category');
+        }
+
+        return view('expenses.create', compact('categories'));
     }
 
     public function store(StoreExpenseRequest $request): RedirectResponse
@@ -54,7 +68,14 @@ class ExpenseController extends Controller
     {
         $this->ensureSameFarm($despesa);
         $this->authorize('update', $despesa);
-        return view('expenses.edit', ['expense' => $despesa]);
+
+        $categories = ExpenseCategory::ativo()->orderBy('nome')->get(['id', 'nome']);
+        // Inclui a categoria atual mesmo se inativa
+        if ($despesa->category && ! $despesa->category->ativo) {
+            $categories->push((object) ['id' => $despesa->category->id, 'nome' => $despesa->category->nome.' (inativa)']);
+        }
+
+        return view('expenses.edit', ['expense' => $despesa, 'categories' => $categories]);
     }
 
     public function update(StoreExpenseRequest $request, Expense $despesa): RedirectResponse

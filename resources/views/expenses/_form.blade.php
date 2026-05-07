@@ -11,11 +11,16 @@
     </div>
     <div>
         <label class="block text-sm font-semibold text-coffee-800 mb-1.5">Categoria *</label>
-        <select name="categoria" required class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-            @foreach(\App\Models\Expense::CATEGORIAS as $key => $label)
-                <option value="{{ $key }}" @selected(old('categoria', $E?->categoria) === $key)>{{ $label }}</option>
+        <select name="expense_category_id" required class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+            <option value="">— selecione —</option>
+            @foreach($categories as $c)
+                <option value="{{ $c->id }}" @selected(old('expense_category_id', $E?->expense_category_id) == $c->id)>{{ $c->nome }}</option>
             @endforeach
         </select>
+        @error('expense_category_id')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+        <p class="mt-1 text-xs text-coffee-500">
+            Não viu a categoria? <a href="{{ route('despesas.categorias.create') }}" class="text-coffee-700 font-semibold hover:underline">Cadastrar nova</a>.
+        </p>
     </div>
 </div>
 
