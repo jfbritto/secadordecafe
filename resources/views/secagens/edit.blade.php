@@ -1,114 +1,122 @@
 @extends('layouts.app')
-@section('title', 'Secagem #'.$secagem->numero)
-@section('content')
 
-<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+@section('title', 'Secagem #'.$secagem->numero)
+
+@section('content')
+<div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
     <div>
-        <h1 class="page" style="margin:0;">Secagem #{{ $secagem->numero }}</h1>
-        <small style="color:#7d6b58;">{{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secador }} · <span class="badge badge-trial">RASCUNHO</span></small>
+        <p class="text-xs text-coffee-500 mb-1"><a href="{{ route('secagens.index') }}" class="hover:underline">Secagens</a></p>
+        <h1 class="text-2xl font-bold text-coffee-900">Secagem #{{ $secagem->numero }}</h1>
+        <p class="text-sm text-coffee-500 mt-0.5">
+            {{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secador }} ·
+            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">RASCUNHO</span>
+        </p>
     </div>
-    <a href="{{ route('secagens.index') }}">← voltar</a>
 </div>
 
-@if(session('flash'))<div class="card" style="margin-bottom:12px; background:#dcfce7;">{{ session('flash') }}</div>@endif
-@if(session('error') || $errors->has('error'))
-    <div class="card" style="margin-bottom:12px; background:#fee2e2; color:#991b1b;">{{ session('error') ?? $errors->first('error') }}</div>
-@endif
-
-<div style="display:grid; gap:16px; grid-template-columns:1fr 1fr;">
-    <form method="POST" action="{{ route('secagens.update', $secagem) }}" class="card">
+<div class="grid lg:grid-cols-2 gap-4 mb-6">
+    <form method="POST" action="{{ route('secagens.update', $secagem) }}" class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6 space-y-4">
         @csrf @method('PUT')
-        <strong>Dados gerais</strong>
-        <div class="field" style="margin-top:10px;">
-            <label>Data</label>
-            <input type="date" name="data" value="{{ old('data', $secagem->data->format('Y-m-d')) }}" required>
+        <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider">Dados gerais</h2>
+
+        <div>
+            <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Data</label>
+            <input type="date" name="data" value="{{ old('data', $secagem->data->format('Y-m-d')) }}" required
+                   class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
         </div>
-        <div class="field">
-            <label>Secador</label>
-            <input type="text" name="secador" value="{{ old('secador', $secagem->secador) }}" maxlength="80" required>
+        <div>
+            <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Secador</label>
+            <input type="text" name="secador" value="{{ old('secador', $secagem->secador) }}" maxlength="80" required
+                   class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
         </div>
-        <div class="field">
-            <label>Observações</label>
-            <textarea name="observacoes" rows="2" style="width:100%; padding:10px 12px; border:1px solid #d6c9b6; border-radius:8px;">{{ old('observacoes', $secagem->observacoes) }}</textarea>
+        <div>
+            <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Observações</label>
+            <textarea name="observacoes" rows="2"
+                      class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">{{ old('observacoes', $secagem->observacoes) }}</textarea>
         </div>
-        <button class="btn btn-primary" style="width:auto; padding:8px 14px;">Salvar</button>
+        <button class="px-4 py-2 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition">Salvar</button>
     </form>
 
-    <form method="POST" action="{{ route('secagens.items.store', $secagem) }}" class="card">
+    <form method="POST" action="{{ route('secagens.items.store', $secagem) }}" class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6 space-y-3">
         @csrf
-        <strong>Adicionar cliente</strong>
-        <div class="field" style="margin-top:10px;">
-            <label>Cliente</label>
-            <select name="customer_id" required>
+        <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider">Adicionar cliente</h2>
+
+        <div>
+            <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Cliente</label>
+            <select name="customer_id" required class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
                 <option value="">— selecionar —</option>
                 @foreach($customers as $c)
                     <option value="{{ $c->id }}">{{ $c->nome }} (saldo {{ number_format($c->saldo_cafe_kg, 3, ',', '.') }} kg)</option>
                 @endforeach
             </select>
-            @error('customer_id')<small class="error">{{ $message }}</small>@enderror
+            @error('customer_id')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
         </div>
-        <div style="display:grid; gap:8px; grid-template-columns:repeat(3, 1fr);">
-            <div class="field">
-                <label>Recebido (kg)</label>
-                <input type="number" step="0.001" min="0.001" name="quantidade_recebida_kg" required>
-            </div>
-            <div class="field">
-                <label>Seco (kg)</label>
-                <input type="number" step="0.001" min="0.001" name="quantidade_seca_kg" required>
-            </div>
-            <div class="field">
-                <label>Comissão (%)</label>
-                <input type="number" step="0.01" min="0" max="100" name="comissao_percentual" value="0">
-            </div>
-        </div>
-        @error('quantidade_recebida_kg')<small class="error">{{ $message }}</small>@enderror
-        @error('quantidade_seca_kg')<small class="error">{{ $message }}</small>@enderror
 
-        <button class="btn btn-primary" style="width:auto; padding:8px 14px;">Adicionar</button>
+        <div class="grid grid-cols-3 gap-2">
+            <div>
+                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Recebido (kg)</label>
+                <input type="number" step="0.001" min="0.001" name="quantidade_recebida_kg" required
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Seco (kg)</label>
+                <input type="number" step="0.001" min="0.001" name="quantidade_seca_kg" required
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Comissão (%)</label>
+                <input type="number" step="0.01" min="0" max="100" name="comissao_percentual" value="0"
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+            </div>
+        </div>
+        @error('quantidade_recebida_kg')<p class="text-xs text-rose-600">{{ $message }}</p>@enderror
+        @error('quantidade_seca_kg')<p class="text-xs text-rose-600">{{ $message }}</p>@enderror
+
+        <button class="px-4 py-2 text-sm font-semibold text-white bg-coffee-600 hover:bg-coffee-700 rounded-lg transition">Adicionar item</button>
     </form>
 </div>
 
-<div class="card" style="margin-top:16px; padding:0; overflow:hidden;">
-    <table style="width:100%; border-collapse:collapse;">
-        <thead style="background:#f9f4ec;">
+<div class="bg-white rounded-xl border border-coffee-100 shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-coffee-50/50 text-coffee-600 text-xs uppercase tracking-wider">
             <tr>
-                <th style="text-align:left; padding:10px 14px;">Cliente</th>
-                <th style="text-align:right; padding:10px 14px;">Recebido (kg)</th>
-                <th style="text-align:right; padding:10px 14px;">Seco (kg)</th>
-                <th style="text-align:right; padding:10px 14px;">Rendimento</th>
-                <th style="text-align:right; padding:10px 14px;">Comissão (kg)</th>
-                <th style="text-align:right; padding:10px 14px;">Líquido (kg)</th>
-                <th style="padding:10px 14px;"></th>
+                <th class="text-left px-4 py-3 font-semibold">Cliente</th>
+                <th class="text-right px-4 py-3 font-semibold">Recebido</th>
+                <th class="text-right px-4 py-3 font-semibold">Seco</th>
+                <th class="text-right px-4 py-3 font-semibold">Rendimento</th>
+                <th class="text-right px-4 py-3 font-semibold">Comissão (kg)</th>
+                <th class="text-right px-4 py-3 font-semibold">Líquido (kg)</th>
+                <th class="px-4 py-3"></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-coffee-100">
             @forelse($secagem->items as $item)
-                <tr style="border-top:1px solid #efe6d6;">
-                    <td style="padding:10px 14px;">{{ $item->customer->nome }}</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }}</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($item->quantidade_seca_kg, 3, ',', '.') }}</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($item->comissao_kg, 3, ',', '.') }}</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }}</td>
-                    <td style="padding:10px 14px; text-align:right;">
-                        <form method="POST" action="{{ route('secagens.items.destroy', [$secagem, $item]) }}" style="display:inline;" onsubmit="return confirm('Remover item?');">
+                <tr>
+                    <td class="px-4 py-3 text-coffee-900 font-medium">{{ $item->customer->nome }}</td>
+                    <td class="px-4 py-3 text-right text-coffee-700">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right text-coffee-700">{{ number_format($item->quantidade_seca_kg, 3, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right text-coffee-700">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
+                    <td class="px-4 py-3 text-right text-coffee-700">{{ number_format($item->comissao_kg, 3, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right font-bold text-coffee-800">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right">
+                        <form method="POST" action="{{ route('secagens.items.destroy', [$secagem, $item]) }}" onsubmit="return confirm('Remover item?');" class="inline">
                             @csrf @method('DELETE')
-                            <button style="background:transparent; border:0; color:#a23b3b; cursor:pointer;">remover</button>
+                            <button class="text-rose-600 text-xs hover:underline">remover</button>
                         </form>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="7" style="padding:24px; text-align:center; color:#7d6b58;">Nenhum item adicionado.</td></tr>
+                <tr><td colspan="7" class="px-6 py-12 text-center text-coffee-500">Nenhum item adicionado.</td></tr>
             @endforelse
         </tbody>
         @if($secagem->items->isNotEmpty())
-            <tfoot style="background:#f9f4ec; font-weight:600;">
+            <tfoot class="bg-coffee-50/50 font-semibold text-coffee-900">
                 <tr>
-                    <td style="padding:10px 14px;">Totais</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($secagem->totalRecebidoKg(), 3, ',', '.') }}</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($secagem->totalSecoKg(), 3, ',', '.') }}</td>
+                    <td class="px-4 py-3">Totais</td>
+                    <td class="px-4 py-3 text-right">{{ number_format($secagem->totalRecebidoKg(), 3, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right">{{ number_format($secagem->totalSecoKg(), 3, ',', '.') }}</td>
                     <td></td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($secagem->totalComissaoKg(), 3, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right">{{ number_format($secagem->totalComissaoKg(), 3, ',', '.') }}</td>
                     <td></td><td></td>
                 </tr>
             </tfoot>
@@ -116,17 +124,17 @@
     </table>
 </div>
 
-<div style="display:flex; gap:8px; margin-top:16px;">
+<div class="flex items-center gap-3 mt-6">
     @can('conclude', $secagem)
         <form method="POST" action="{{ route('secagens.conclude', $secagem) }}" onsubmit="return confirm('Concluir secagem? Os saldos dos clientes serão debitados.');">
             @csrf
-            <button class="btn btn-primary" style="width:auto; padding:9px 18px;">Concluir secagem</button>
+            <button class="px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm">Concluir secagem</button>
         </form>
     @endcan
     @can('delete', $secagem)
         <form method="POST" action="{{ route('secagens.destroy', $secagem) }}" onsubmit="return confirm('Excluir rascunho?');">
             @csrf @method('DELETE')
-            <button style="background:transparent; border:0; color:#a23b3b; cursor:pointer;">Excluir rascunho</button>
+            <button class="px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-lg transition">Excluir rascunho</button>
         </form>
     @endcan
 </div>

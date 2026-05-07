@@ -3,14 +3,16 @@
 @section('title', 'Novo cliente')
 
 @section('content')
-<h1 class="page">Novo cliente</h1>
+<div class="max-w-2xl">
+    <h1 class="text-2xl font-bold text-coffee-900 mb-6">Novo cliente</h1>
 
-<form method="POST" action="{{ route('clientes.store') }}" class="card" style="max-width:640px;">
-    @include('customers._form')
+    <form method="POST" action="{{ route('clientes.store') }}" class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6">
+        @include('customers._form')
 
-    <div style="display:flex; gap:8px; margin-top:8px;">
-        <button type="submit" class="btn btn-primary" style="width:auto; padding:9px 18px;">Salvar</button>
-        <a href="{{ route('clientes.index') }}" style="align-self:center;">cancelar</a>
-    </div>
-</form>
+        <div class="flex items-center gap-3 pt-2">
+            <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">Salvar</button>
+            <a href="{{ route('clientes.index') }}" class="text-sm text-coffee-600 hover:text-coffee-900">Cancelar</a>
+        </div>
+    </form>
+</div>
 @endsection

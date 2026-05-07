@@ -3,56 +3,59 @@
 @section('title', 'Clientes')
 
 @section('content')
-<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:12px; flex-wrap:wrap;">
-    <h1 class="page" style="margin:0;">Clientes</h1>
+<div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
+    <div>
+        <h1 class="text-2xl font-bold text-coffee-900">Clientes</h1>
+        <p class="text-sm text-coffee-500 mt-0.5">Produtores parceiros da fazenda.</p>
+    </div>
     @can('create', App\Models\Customer::class)
-        <a href="{{ route('clientes.create') }}" class="btn btn-primary" style="width:auto; padding:8px 14px;">+ Novo cliente</a>
+        <a href="{{ route('clientes.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Novo cliente
+        </a>
     @endcan
 </div>
 
-@if(session('flash'))
-    <div class="card" style="margin-bottom:12px; background:#dcfce7;">{{ session('flash') }}</div>
-@endif
-
-<form method="GET" class="card" style="margin-bottom:12px;">
-    <div style="display:flex; gap:8px;">
-        <input type="text" name="q" value="{{ $term }}" placeholder="Buscar por nome, telefone, CPF/CNPJ" style="flex:1;">
-        <button type="submit" class="btn btn-primary" style="width:auto; padding:8px 16px;">Buscar</button>
+<form method="GET" class="bg-white rounded-xl border border-coffee-100 p-4 shadow-sm mb-4">
+    <div class="flex gap-2">
+        <input type="text" name="q" value="{{ $term }}" placeholder="Buscar por nome, telefone, CPF/CNPJ"
+               class="flex-1 px-3.5 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500">
+        <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition">Buscar</button>
     </div>
 </form>
 
-<div class="card" style="padding:0; overflow:hidden;">
-    <table style="width:100%; border-collapse:collapse;">
-        <thead style="background:#f9f4ec;">
+<div class="bg-white rounded-xl border border-coffee-100 shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-coffee-50/50 text-coffee-600 text-xs uppercase tracking-wider">
             <tr>
-                <th style="text-align:left; padding:10px 14px;">Nome</th>
-                <th style="text-align:left; padding:10px 14px;">Telefone</th>
-                <th style="text-align:left; padding:10px 14px;">CPF/CNPJ</th>
-                <th style="text-align:right; padding:10px 14px;">Saldo (kg)</th>
-                <th style="padding:10px 14px;"></th>
+                <th class="text-left px-6 py-3 font-semibold">Nome</th>
+                <th class="text-left px-6 py-3 font-semibold">Telefone</th>
+                <th class="text-left px-6 py-3 font-semibold">CPF/CNPJ</th>
+                <th class="text-right px-6 py-3 font-semibold">Saldo (kg)</th>
+                <th class="px-6 py-3"></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-coffee-100">
             @forelse($customers as $c)
-                <tr style="border-top:1px solid #efe6d6;">
-                    <td style="padding:10px 14px;"><a href="{{ route('clientes.show', $c) }}">{{ $c->nome }}</a></td>
-                    <td style="padding:10px 14px;">{{ $c->telefone ?? '—' }}</td>
-                    <td style="padding:10px 14px;">{{ $c->cpf_cnpj ?? '—' }}</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ number_format($c->saldo_cafe_kg, 3, ',', '.') }}</td>
-                    <td style="padding:10px 14px; text-align:right;">
+                <tr class="hover:bg-coffee-50/30 transition">
+                    <td class="px-6 py-3.5">
+                        <a href="{{ route('clientes.show', $c) }}" class="font-semibold text-coffee-800 hover:text-coffee-900 hover:underline">{{ $c->nome }}</a>
+                    </td>
+                    <td class="px-6 py-3.5 text-coffee-600">{{ $c->telefone ?? '—' }}</td>
+                    <td class="px-6 py-3.5 text-coffee-600">{{ $c->cpf_cnpj ?? '—' }}</td>
+                    <td class="px-6 py-3.5 text-right font-bold text-coffee-700">{{ number_format($c->saldo_cafe_kg, 3, ',', '.') }}</td>
+                    <td class="px-6 py-3.5 text-right text-sm">
                         @can('update', $c)
-                            <a href="{{ route('clientes.edit', $c) }}">editar</a>
+                            <a href="{{ route('clientes.edit', $c) }}" class="text-coffee-600 hover:text-coffee-900 hover:underline">editar</a>
                         @endcan
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="5" style="padding:24px; text-align:center; color:#7d6b58;">Nenhum cliente cadastrado.</td></tr>
+                <tr><td colspan="5" class="px-6 py-12 text-center text-coffee-500">Nenhum cliente cadastrado.</td></tr>
             @endforelse
         </tbody>
     </table>
 </div>
 
-<div style="margin-top:14px;">
-    {{ $customers->links() }}
-</div>
+<div class="mt-4">{{ $customers->links() }}</div>
 @endsection

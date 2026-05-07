@@ -3,45 +3,55 @@
 @section('title', 'Criar conta')
 
 @section('content')
-<div class="auth-card">
-    <h1>Criar fazenda</h1>
-    <p class="muted">Comece com 14 dias de teste grátis.</p>
+<div class="bg-white rounded-2xl shadow-xl shadow-coffee-700/5 border border-coffee-100 p-8">
+    <h1 class="text-2xl font-bold text-coffee-900">Criar fazenda</h1>
+    <p class="text-sm text-coffee-500 mt-1 mb-6">Comece com 14 dias de teste grátis. Sem cartão de crédito.</p>
 
-    <form method="POST" action="{{ route('register') }}" novalidate>
+    <form method="POST" action="{{ route('register') }}" class="space-y-4" novalidate>
         @csrf
 
-        <div class="field">
-            <label for="farm_name">Nome da fazenda</label>
-            <input id="farm_name" name="farm_name" type="text" value="{{ old('farm_name') }}" required autofocus>
-            @error('farm_name')<small class="error">{{ $message }}</small>@enderror
+        <div>
+            <label for="farm_name" class="block text-sm font-semibold text-coffee-800 mb-1.5">Nome da fazenda</label>
+            <input id="farm_name" name="farm_name" type="text" value="{{ old('farm_name') }}" required autofocus
+                   class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500">
+            @error('farm_name')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
         </div>
 
-        <div class="field">
-            <label for="name">Seu nome</label>
-            <input id="name" name="name" type="text" value="{{ old('name') }}" required>
-            @error('name')<small class="error">{{ $message }}</small>@enderror
+        <div>
+            <label for="name" class="block text-sm font-semibold text-coffee-800 mb-1.5">Seu nome</label>
+            <input id="name" name="name" type="text" value="{{ old('name') }}" required
+                   class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500">
+            @error('name')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
         </div>
 
-        <div class="field">
-            <label for="email">E-mail</label>
-            <input id="email" name="email" type="email" value="{{ old('email') }}" required>
-            @error('email')<small class="error">{{ $message }}</small>@enderror
+        <div>
+            <label for="email" class="block text-sm font-semibold text-coffee-800 mb-1.5">E-mail</label>
+            <input id="email" name="email" type="email" value="{{ old('email') }}" required
+                   class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500">
+            @error('email')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
         </div>
 
-        <div class="field">
-            <label for="password">Senha</label>
-            <input id="password" name="password" type="password" required>
-            @error('password')<small class="error">{{ $message }}</small>@enderror
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label for="password" class="block text-sm font-semibold text-coffee-800 mb-1.5">Senha</label>
+                <input id="password" name="password" type="password" required
+                       class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500">
+                @error('password')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="password_confirmation" class="block text-sm font-semibold text-coffee-800 mb-1.5">Confirmar</label>
+                <input id="password_confirmation" name="password_confirmation" type="password" required
+                       class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500">
+            </div>
         </div>
 
-        <div class="field">
-            <label for="password_confirmation">Confirmar senha</label>
-            <input id="password_confirmation" name="password_confirmation" type="password" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Criar conta</button>
+        <button type="submit" class="w-full px-4 py-3 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm shadow-coffee-700/20">
+            Criar conta
+        </button>
     </form>
 
-    <p class="auth-footer">Já tem conta? <a href="{{ route('login') }}">Entrar</a></p>
+    <p class="text-center text-sm text-coffee-500 mt-6">
+        Já tem conta? <a href="{{ route('login') }}" class="text-coffee-700 font-semibold hover:underline">Entrar</a>
+    </p>
 </div>
 @endsection

@@ -1,30 +1,45 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>@yield('title', config('app.name'))</title>
-    <style>
-        :root { --pri:#5a3a22; --bg:#f6f1ea; --err:#a23b3b; --txt:#2b2218; }
-        *,*::before,*::after { box-sizing:border-box; }
-        body { font-family: system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--txt); margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
-        .auth-card { background:#fff; padding:32px; border-radius:12px; box-shadow:0 4px 24px rgba(0,0,0,.08); width:100%; max-width:420px; }
-        h1 { margin:0 0 4px; color:var(--pri); }
-        .muted { color:#7d6b58; margin-top:0; font-size:14px; }
-        .field { margin-bottom:14px; }
-        label { display:block; font-size:13px; margin-bottom:4px; font-weight:600; }
-        input[type=text],input[type=email],input[type=password] { width:100%; padding:10px 12px; border:1px solid #d6c9b6; border-radius:8px; font-size:14px; background:#fff; }
-        input:focus { outline:2px solid var(--pri); outline-offset:1px; }
-        .inline { display:flex; align-items:center; gap:6px; font-size:13px; margin-bottom:16px; }
-        .btn { display:inline-block; width:100%; padding:11px; border:0; border-radius:8px; font-weight:600; cursor:pointer; font-size:14px; }
-        .btn-primary { background:var(--pri); color:#fff; }
-        .btn-primary:hover { background:#3f2814; }
-        small.error { color:var(--err); display:block; margin-top:4px; }
-        .auth-footer { text-align:center; margin-top:18px; font-size:13px; color:#7d6b58; }
-        .auth-footer a { color:var(--pri); }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Acesso') — secadordecafe</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M17 8h1a4 4 0 010 8h-1m0-8H3v9a4 4 0 004 4h6a4 4 0 004-4V8z' stroke='%235a3a22' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { coffee: {
+            50:'#faf6f1',100:'#f1e6d6',200:'#e1c8a4',300:'#cca572',400:'#a87a47',
+            500:'#8a5a2f',600:'#6e4322',700:'#5a3a22',800:'#3f2814',900:'#2b1c0e',
+        } }, fontFamily: { sans: ['Inter','system-ui','sans-serif'] } } } }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
 </head>
-<body>
-    @yield('content')
+<body class="min-h-screen bg-gradient-to-br from-coffee-50 via-white to-coffee-100 flex flex-col">
+
+    <header class="px-6 py-5">
+        <a href="/" class="inline-flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-lg bg-coffee-700 flex items-center justify-center shadow-md shadow-coffee-700/20">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h1a4 4 0 010 8h-1"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 4l1 2M11 4l1 2M15 4l1 2"/>
+                </svg>
+            </div>
+            <span class="text-xl font-bold text-coffee-900">secadordecafe</span>
+        </a>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center px-4 py-8">
+        <div class="w-full max-w-md">
+            @yield('content')
+        </div>
+    </main>
+
+    <footer class="text-center text-xs text-coffee-500 py-6">
+        © {{ date('Y') }} secadordecafe · gestão de fazendas e secagem de café
+    </footer>
 </body>
 </html>

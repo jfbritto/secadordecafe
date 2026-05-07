@@ -13,11 +13,14 @@ use App\Http\Controllers\InvitationAcceptController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MovementController;
+use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\SecagemController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('dashboard'));
+Route::get('/', [PublicSiteController::class, 'home'])->name('home');
+Route::get('/termos', [PublicSiteController::class, 'termos'])->name('termos');
+Route::get('/privacidade', [PublicSiteController::class, 'privacidade'])->name('privacidade');
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisterController::class, 'show'])->name('register');

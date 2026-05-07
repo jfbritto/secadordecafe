@@ -1,47 +1,71 @@
 @extends('layouts.app')
-@section('title', 'Dashboard ROOT')
-@section('content')
-<h1 class="page">Painel ROOT</h1>
 
-<div class="grid">
-    <div class="card metric"><h3>Total fazendas</h3><div class="value">{{ $totalFarms }}</div></div>
-    <div class="card metric"><h3>Ativas</h3><div class="value" style="color:#166534;">{{ $farmsActive }}</div></div>
-    <div class="card metric"><h3>Trial</h3><div class="value" style="color:#92400e;">{{ $farmsTrial }}</div></div>
-    <div class="card metric"><h3>Pendentes</h3><div class="value" style="color:#a23b3b;">{{ $farmsPastDue }}</div></div>
-    <div class="card metric"><h3>Bloqueadas</h3><div class="value" style="color:#991b1b;">{{ $farmsBlocked }}</div></div>
-    <div class="card metric"><h3>Usuários totais</h3><div class="value">{{ $totalUsers }}</div></div>
-    <div class="card metric"><h3>Novos cadastros (30d)</h3><div class="value">{{ $newFarms30d }}</div></div>
+@section('title', 'Painel ROOT')
+
+@section('content')
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-coffee-900">Painel ROOT</h1>
+    <p class="text-sm text-coffee-500 mt-0.5">Visão geral da plataforma.</p>
 </div>
 
-<div style="display:grid; gap:16px; grid-template-columns:1fr 1fr; margin-top:24px;">
-    <div class="card">
-        <strong>Assinaturas por status</strong>
-        <ul style="margin-top:12px; padding-left:18px;">
-            @foreach(['trial','active','past_due','canceled','blocked'] as $st)
-                <li><strong>{{ ucfirst(str_replace('_',' ', $st)) }}:</strong> {{ $subscriptions[$st] ?? 0 }}</li>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-6">
+    @php
+        $rootCards = [
+            ['label'=>'Total fazendas', 'value'=>$totalFarms, 'tone'=>'coffee'],
+            ['label'=>'Ativas', 'value'=>$farmsActive, 'tone'=>'emerald'],
+            ['label'=>'Trial', 'value'=>$farmsTrial, 'tone'=>'amber'],
+            ['label'=>'Pendentes', 'value'=>$farmsPastDue, 'tone'=>'orange'],
+            ['label'=>'Bloqueadas', 'value'=>$farmsBlocked, 'tone'=>'rose'],
+            ['label'=>'Usuários', 'value'=>$totalUsers, 'tone'=>'sky'],
+            ['label'=>'Novos (30d)', 'value'=>$newFarms30d, 'tone'=>'indigo'],
+        ];
+        $tones = [
+            'coffee'=>'text-coffee-700','emerald'=>'text-emerald-600','amber'=>'text-amber-600',
+            'orange'=>'text-orange-600','rose'=>'text-rose-600','sky'=>'text-sky-600','indigo'=>'text-indigo-600',
+        ];
+    @endphp
+    @foreach($rootCards as $c)
+        <div class="bg-white rounded-xl border border-coffee-100 p-4 shadow-sm">
+            <p class="text-[10px] font-semibold uppercase tracking-wider text-coffee-500">{{ $c['label'] }}</p>
+            <p class="text-2xl font-bold mt-1 {{ $tones[$c['tone']] }}">{{ $c['value'] }}</p>
+        </div>
+    @endforeach
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6">
+        <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider mb-4">Assinaturas por status</h2>
+        <ul class="space-y-2">
+            @foreach(['trial'=>'Trial','active'=>'Ativas','past_due'=>'Em atraso','canceled'=>'Canceladas','blocked'=>'Bloqueadas'] as $st => $label)
+                <li class="flex items-center justify-between py-2 border-b border-coffee-50 last:border-0">
+                    <span class="text-sm text-coffee-700">{{ $label }}</span>
+                    <span class="text-sm font-bold text-coffee-900">{{ $subscriptions[$st] ?? 0 }}</span>
+                </li>
             @endforeach
         </ul>
     </div>
 
-    <div class="card" style="padding:0; overflow:hidden;">
-        <div style="padding:16px 20px;"><strong>Fazendas recentes</strong></div>
-        <table style="width:100%; border-collapse:collapse;">
-            <thead style="background:#f9f4ec;">
+    <div class="bg-white rounded-xl border border-coffee-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-coffee-100">
+            <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider">Fazendas recentes</h2>
+        </div>
+        <table class="w-full text-sm">
+            <thead class="bg-coffee-50/50 text-coffee-600 text-xs uppercase tracking-wider">
                 <tr>
-                    <th style="text-align:left; padding:8px 14px;">Fazenda</th>
-                    <th style="text-align:left; padding:8px 14px;">Status</th>
-                    <th style="text-align:left; padding:8px 14px;">Criada em</th>
+                    <th class="text-left px-6 py-2 font-semibold">Fazenda</th>
+                    <th class="text-left px-6 py-2 font-semibold">Status</th>
+                    <th class="text-left px-6 py-2 font-semibold">Criada</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-coffee-100">
                 @foreach($recentFarms as $f)
-                    <tr style="border-top:1px solid #efe6d6;">
-                        <td style="padding:8px 14px;">{{ $f->nome }}</td>
-                        <td style="padding:8px 14px;">
-                            @php $cls = match($f->status){'active'=>'badge-active','blocked'=>'badge-blocked', default => 'badge-trial'}; @endphp
-                            <span class="badge {{ $cls }}">{{ strtoupper($f->status) }}</span>
+                    <tr>
+                        <td class="px-6 py-2.5 text-coffee-900">{{ $f->nome }}</td>
+                        <td class="px-6 py-2.5">
+                            @php $cls = match($f->status){'active'=>'bg-emerald-100 text-emerald-700','blocked'=>'bg-rose-100 text-rose-700','past_due'=>'bg-amber-100 text-amber-700', default=>'bg-amber-100 text-amber-700'}; @endphp
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $cls }}">{{ strtoupper($f->status) }}</span>
                         </td>
-                        <td style="padding:8px 14px;">{{ $f->created_at->format('d/m/Y') }}</td>
+                        <td class="px-6 py-2.5 text-coffee-500">{{ $f->created_at->format('d/m/Y') }}</td>
                     </tr>
                 @endforeach
             </tbody>

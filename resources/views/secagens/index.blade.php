@@ -3,55 +3,59 @@
 @section('title', 'Secagens')
 
 @section('content')
-<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-    <h1 class="page" style="margin:0;">Secagens</h1>
+<div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
+    <div>
+        <h1 class="text-2xl font-bold text-coffee-900">Secagens</h1>
+        <p class="text-sm text-coffee-500 mt-0.5">Operações de secagem com cálculo automático de rendimento e comissão.</p>
+    </div>
     @can('create', App\Models\Secagem::class)
-        <a href="{{ route('secagens.create') }}" class="btn btn-primary" style="width:auto; padding:8px 14px;">+ Nova secagem</a>
+        <a href="{{ route('secagens.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Nova secagem
+        </a>
     @endcan
 </div>
 
-@if(session('flash'))<div class="card" style="margin-bottom:12px; background:#dcfce7;">{{ session('flash') }}</div>@endif
-
-<div class="card" style="padding:0; overflow:hidden;">
-    <table style="width:100%; border-collapse:collapse;">
-        <thead style="background:#f9f4ec;">
+<div class="bg-white rounded-xl border border-coffee-100 shadow-sm overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-coffee-50/50 text-coffee-600 text-xs uppercase tracking-wider">
             <tr>
-                <th style="text-align:left; padding:10px 14px;">#</th>
-                <th style="text-align:left; padding:10px 14px;">Data</th>
-                <th style="text-align:left; padding:10px 14px;">Secador</th>
-                <th style="text-align:right; padding:10px 14px;">Itens</th>
-                <th style="text-align:left; padding:10px 14px;">Status</th>
-                <th style="padding:10px 14px;"></th>
+                <th class="text-left px-6 py-3 font-semibold">#</th>
+                <th class="text-left px-6 py-3 font-semibold">Data</th>
+                <th class="text-left px-6 py-3 font-semibold">Secador</th>
+                <th class="text-right px-6 py-3 font-semibold">Itens</th>
+                <th class="text-left px-6 py-3 font-semibold">Status</th>
+                <th class="px-6 py-3"></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-coffee-100">
             @forelse($secagens as $s)
-                <tr style="border-top:1px solid #efe6d6;">
-                    <td style="padding:10px 14px;"><a href="{{ route('secagens.show', $s) }}">#{{ $s->numero }}</a></td>
-                    <td style="padding:10px 14px;">{{ $s->data->format('d/m/Y') }}</td>
-                    <td style="padding:10px 14px;">{{ $s->secador }}</td>
-                    <td style="padding:10px 14px; text-align:right;">{{ $s->items_count }}</td>
-                    <td style="padding:10px 14px;">
+                <tr class="hover:bg-coffee-50/30 transition">
+                    <td class="px-6 py-3 font-bold text-coffee-700"><a href="{{ route('secagens.show', $s) }}" class="hover:underline">#{{ $s->numero }}</a></td>
+                    <td class="px-6 py-3 text-coffee-700">{{ $s->data->format('d/m/Y') }}</td>
+                    <td class="px-6 py-3 text-coffee-700">{{ $s->secador }}</td>
+                    <td class="px-6 py-3 text-right text-coffee-700">{{ $s->items_count }}</td>
+                    <td class="px-6 py-3">
                         @if($s->isConcluida())
-                            <span class="badge badge-active">CONCLUÍDA</span>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">CONCLUÍDA</span>
                         @else
-                            <span class="badge badge-trial">RASCUNHO</span>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">RASCUNHO</span>
                         @endif
                     </td>
-                    <td style="padding:10px 14px; text-align:right;">
+                    <td class="px-6 py-3 text-right text-sm">
                         @if($s->isRascunho())
-                            @can('update', $s)<a href="{{ route('secagens.edit', $s) }}">editar</a>@endcan
+                            @can('update', $s)<a href="{{ route('secagens.edit', $s) }}" class="text-coffee-600 hover:text-coffee-900 hover:underline">editar</a>@endcan
                         @else
-                            <a href="{{ route('secagens.show', $s) }}">ver</a>
+                            <a href="{{ route('secagens.show', $s) }}" class="text-coffee-600 hover:text-coffee-900 hover:underline">ver</a>
                         @endif
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="6" style="padding:24px; text-align:center; color:#7d6b58;">Nenhuma secagem registrada.</td></tr>
+                <tr><td colspan="6" class="px-6 py-12 text-center text-coffee-500">Nenhuma secagem registrada.</td></tr>
             @endforelse
         </tbody>
     </table>
 </div>
 
-<div style="margin-top:14px;">{{ $secagens->links() }}</div>
+<div class="mt-4">{{ $secagens->links() }}</div>
 @endsection
