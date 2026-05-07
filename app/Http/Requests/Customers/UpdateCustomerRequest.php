@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customers;
 
+use App\Support\NameNormalizer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -10,6 +11,13 @@ class UpdateCustomerRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user()?->can('update', $this->route('cliente')) ?? false;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('nome')) {
+            $this->merge(['nome' => NameNormalizer::normalize($this->input('nome'))]);
+        }
     }
 
     public function rules(): array

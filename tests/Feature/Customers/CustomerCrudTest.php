@@ -73,6 +73,27 @@ it('cria movement de entrada "Saldo inicial" quando saldo informado > 0', functi
     expect($m->user_id)->toBe($admin->id);
 });
 
+it('normaliza nome no cadastro (capitaliza palavras, preserva conectivos)', function () {
+    $admin = makeFarmUser('admin');
+
+    $this->actingAs($admin)
+        ->post('/clientes', ['nome' => 'joão da silva', 'saldo_cafe_kg' => 0])
+        ->assertRedirect('/clientes');
+
+    expect(Customer::first()->nome)->toBe('João da Silva');
+});
+
+it('normaliza nome na edição', function () {
+    $admin = makeFarmUser('admin');
+    $c = Customer::factory()->forFarm($admin->farm)->create(['nome' => 'João da Silva']);
+
+    $this->actingAs($admin)
+        ->put("/clientes/{$c->id}", ['nome' => 'maria dos santos'])
+        ->assertRedirect('/clientes');
+
+    expect($c->fresh()->nome)->toBe('Maria dos Santos');
+});
+
 it('NAO cria movement quando saldo inicial é 0', function () {
     $admin = makeFarmUser('admin');
 

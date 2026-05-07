@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Users;
 
 use App\Models\User;
+use App\Support\NameNormalizer;
 use App\Support\PermissionsMatrix;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -13,6 +14,13 @@ class StoreUserRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user()?->can('create', User::class) ?? false;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('name')) {
+            $this->merge(['name' => NameNormalizer::normalize($this->input('name'))]);
+        }
     }
 
     public function rules(): array

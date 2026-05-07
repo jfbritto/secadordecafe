@@ -14,6 +14,20 @@ beforeEach(function () {
     Role::findOrCreate('visualizador', 'web');
 });
 
+it('normaliza nome do admin no registro da fazenda', function () {
+    Mail::fake();
+
+    $this->post('/register', [
+        'farm_name' => 'Fazenda Teste',
+        'name' => 'joão da silva',
+        'email' => 'jds@fazenda.test',
+        'password' => 'senha12345',
+        'password_confirmation' => 'senha12345',
+    ])->assertRedirect('/dashboard');
+
+    expect(User::where('email', 'jds@fazenda.test')->first()->name)->toBe('João da Silva');
+});
+
 it('registers a farm with admin user atomically', function () {
     Mail::fake();
 

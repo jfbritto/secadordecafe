@@ -23,6 +23,22 @@ it('admin can directly create a user with password', function () {
     expect($u->hasRole('operador'))->toBeTrue();
 });
 
+it('normaliza nome do usuário ao cadastrar (capitaliza e respeita conectivos)', function () {
+    $admin = makeFarmUser('admin');
+
+    $this->actingAs($admin)
+        ->post('/usuarios', [
+            'name' => 'maria das dores',
+            'email' => 'mdd@x.test',
+            'role' => 'operador',
+            'password' => 'senha12345',
+            'password_confirmation' => 'senha12345',
+        ])
+        ->assertRedirect('/usuarios');
+
+    expect(User::where('email', 'mdd@x.test')->first()->name)->toBe('Maria das Dores');
+});
+
 it('rejects duplicate email', function () {
     $admin = makeFarmUser('admin');
     User::factory()->forFarm($admin->farm)->create(['email' => 'taken@x.test']);
