@@ -19,15 +19,16 @@ class ExpenseController extends Controller
         $to = $request->string('to')->toString() ?: null;
         $cat = $request->string('cat')->toString() ?: null;
 
-        $query = Expense::query()->between($from, $to)->categoria($cat)->orderByDesc('data');
+        $base = Expense::query()->between($from, $to)->categoria($cat);
 
-        $totals = (clone $query)
+        $totals = (clone $base)
+            ->reorder()
             ->selectRaw('categoria, SUM(valor_total) as total, COUNT(*) as qtd')
             ->groupBy('categoria')
             ->get()
             ->keyBy('categoria');
 
-        $expenses = $query->paginate(20)->withQueryString();
+        $expenses = $base->orderByDesc('data')->paginate(20)->withQueryString();
 
         $totalGeral = $totals->sum('total');
 
