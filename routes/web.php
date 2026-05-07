@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AsaasWebhookController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FarmBlockedController;
@@ -31,6 +33,9 @@ Route::post('logout', [LoginController::class, 'destroy'])
 // Aceitação de convite — pública (token-based)
 Route::get('convite/{token}', [InvitationAcceptController::class, 'show'])->name('convite.show');
 Route::post('convite/{token}', [InvitationAcceptController::class, 'store'])->name('convite.store');
+
+// Webhook Asaas — público, autenticado por token de header
+Route::post('webhooks/asaas', AsaasWebhookController::class)->name('webhooks.asaas');
 
 Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('farm/blocked', [FarmBlockedController::class, 'show'])->name('farm.blocked');
@@ -65,6 +70,8 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
         Route::get('fazenda', [FarmController::class, 'edit'])->name('fazenda.edit');
         Route::put('fazenda', [FarmController::class, 'update'])->name('fazenda.update');
+
+        Route::get('assinatura', [BillingController::class, 'show'])->name('assinatura.show');
 
         Route::get('usuarios', [UserController::class, 'index'])->name('usuarios.index');
         Route::put('usuarios/{usuario}/role', [UserController::class, 'updateRole'])->name('usuarios.role.update');

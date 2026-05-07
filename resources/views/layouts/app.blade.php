@@ -38,6 +38,7 @@
             @if(auth()->user()->hasRole('admin') || auth()->user()->isRoot())
                 <a href="{{ route('usuarios.index') }}">Usuários</a>
                 <a href="{{ route('fazenda.edit') }}">Fazenda</a>
+                @auth<a href="{{ route('assinatura.show') }}">Assinatura</a>@endauth
             @endif
             <span style="opacity:.6;">|</span>
             <span>{{ auth()->user()->name }}@if(auth()->user()->farm) — {{ auth()->user()->farm->nome }}@endif</span>
