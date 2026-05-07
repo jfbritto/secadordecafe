@@ -3,29 +3,42 @@
 @section('title', 'Editar categoria')
 
 @section('content')
-<div class="max-w-2xl">
-    <h1 class="text-2xl font-bold text-coffee-900 mb-6">Editar categoria</h1>
-    <form method="POST" action="{{ route('despesas.categorias.update', $category) }}" class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6">
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <p class="text-xs text-coffee-500 mb-1">
+            <a href="{{ route('despesas.index') }}" class="hover:underline">Despesas</a> ·
+            <a href="{{ route('despesas.categorias.index') }}" class="hover:underline">Categorias</a> ·
+            <span class="text-coffee-700">{{ $category->nome }}</span>
+        </p>
+        <h1 class="text-2xl font-bold text-coffee-900">Editar categoria</h1>
+    </div>
+
+    <form method="POST" action="{{ route('despesas.categorias.update', $category) }}" class="bg-white rounded-2xl border border-coffee-100 shadow-sm p-6 sm:p-8">
         @method('PUT')
         @include('expense-categories._form')
-        <div class="flex items-center gap-3 pt-2">
-            <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">Salvar</button>
-            <a href="{{ route('despesas.categorias.index') }}" class="px-4 py-2.5 text-sm text-coffee-600 hover:text-coffee-900">Cancelar</a>
+
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center gap-3 pt-6 border-t border-coffee-100">
+            <button type="submit" class="px-6 py-3 text-base font-bold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm w-full sm:w-auto">
+                Salvar alterações
+            </button>
+            <a href="{{ route('despesas.categorias.index') }}" class="text-center sm:text-left px-4 py-3 sm:py-0 text-sm font-semibold text-coffee-600 hover:text-coffee-900">Cancelar</a>
             @can('delete', $category)
-                <span class="flex-1"></span>
-                <form method="POST" action="{{ route('despesas.categorias.destroy', $category) }}" onsubmit="return confirm('Excluir esta categoria? (Só é possível se não houver despesas vinculadas.)');" class="inline">
+                <span class="hidden sm:flex flex-1"></span>
+                <form method="POST" action="{{ route('despesas.categorias.destroy', $category) }}" onsubmit="return confirm('Excluir esta categoria? Só é possível se não houver despesas vinculadas. Para tirar de circulação, desmarque \'Categoria ativa\' em vez de excluir.');" class="w-full sm:w-auto">
                     @csrf @method('DELETE')
-                    <button class="px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition">Excluir</button>
+                    <button class="w-full sm:w-auto px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
+                        Excluir categoria
+                    </button>
                 </form>
             @endcan
         </div>
     </form>
 
     @if($category->expenses()->exists())
-        <p class="mt-4 text-xs text-coffee-500">
-            Esta categoria possui {{ $category->expenses()->count() }} despesa(s) registrada(s).
-            Para impedir uso em novas despesas, desmarque <strong>"Categoria ativa"</strong> em vez de excluir.
-        </p>
+        <div class="mt-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-900">
+            Esta categoria possui <strong>{{ $category->expenses()->count() }}</strong> despesa(s) registrada(s).
+            Para tirá-la de circulação sem perder o histórico, desmarque <strong>"Categoria ativa"</strong> em vez de excluir.
+        </div>
     @endif
 </div>
 @endsection

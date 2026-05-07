@@ -3,98 +3,152 @@
 @section('title', 'Extrato — '.$customer->nome)
 
 @section('content')
-<div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
-    <div>
-        <p class="text-xs text-coffee-500 mb-1">
-            <a href="{{ route('clientes.index') }}" class="hover:underline">Clientes</a> ·
-            <a href="{{ route('clientes.show', $customer) }}" class="hover:underline">{{ $customer->nome }}</a>
-        </p>
-        <h1 class="text-2xl font-bold text-coffee-900">Extrato — {{ $customer->nome }}</h1>
-    </div>
-    <div class="bg-coffee-700 text-white px-5 py-3 rounded-xl shadow-md text-right">
-        <p class="text-[10px] uppercase tracking-wider text-coffee-200">Saldo atual</p>
-        <p class="text-2xl font-bold">{{ number_format($customer->saldo_cafe_kg, 3, ',', '.') }} <span class="text-sm font-normal text-coffee-200">kg</span></p>
-    </div>
-</div>
-
-<div class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6 mb-6" x-data="{ tipo: 'entrada' }">
-    <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider mb-4">Nova movimentação</h2>
-    <form method="POST" action="{{ route('clientes.movimentacoes.store', $customer) }}">
-        @csrf
-        <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-            <div>
-                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Tipo</label>
-                <select name="tipo" x-model="tipo" class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-                    <option value="entrada">Entrada</option>
-                    @if(auth()->user()->hasAnyRole(['admin','operador']))<option value="ajuste">Ajuste</option>@endif
-                    @if(auth()->user()->hasRole('admin'))<option value="saida">Saída</option>@endif
-                </select>
-            </div>
-            <div x-show="tipo === 'ajuste'" x-cloak>
-                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Direção</label>
-                <select name="direcao" class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-                    <option value="+">+ Crédito</option>
-                    <option value="-">− Débito</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Quantidade (kg)</label>
-                <input type="number" step="0.001" min="0.001" name="quantidade" required
-                       class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-            </div>
-            <div class="lg:col-span-2">
-                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Observação</label>
-                <input type="text" name="observacao" maxlength="500"
-                       class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-            </div>
-            <div>
-                <button type="submit" class="w-full px-4 py-2 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition">Registrar</button>
-            </div>
+<div class="max-w-6xl mx-auto">
+    <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
+        <div>
+            <p class="text-xs text-coffee-500 mb-1">
+                <a href="{{ route('clientes.index') }}" class="hover:underline">Clientes</a> ·
+                <a href="{{ route('clientes.show', $customer) }}" class="hover:underline">{{ $customer->nome }}</a> ·
+                <span class="text-coffee-700">Extrato</span>
+            </p>
+            <h1 class="text-2xl font-bold text-coffee-900">Extrato — {{ $customer->nome }}</h1>
         </div>
-        @error('tipo')<p class="mt-2 text-xs text-rose-600">{{ $message }}</p>@enderror
-        @error('quantidade')<p class="mt-2 text-xs text-rose-600">{{ $message }}</p>@enderror
-    </form>
-</div>
+        <div class="bg-coffee-700 text-white px-5 py-3 rounded-xl shadow-md text-right">
+            <p class="text-[10px] uppercase tracking-wider text-coffee-200">Saldo atual</p>
+            <p class="text-2xl font-bold">{{ number_format($customer->saldo_cafe_kg, 3, ',', '.') }} <span class="text-sm font-normal text-coffee-200">kg</span></p>
+        </div>
+    </div>
 
-<div class="bg-white rounded-xl border border-coffee-100 shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
-        <thead class="bg-coffee-50/50 text-coffee-600 text-xs uppercase tracking-wider">
-            <tr>
-                <th class="text-left px-6 py-3 font-semibold">Quando</th>
-                <th class="text-left px-6 py-3 font-semibold">Tipo</th>
-                <th class="text-right px-6 py-3 font-semibold">Qtd. (kg)</th>
-                <th class="text-left px-6 py-3 font-semibold">Observação</th>
-                <th class="text-left px-6 py-3 font-semibold">Por</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-coffee-100">
-            @forelse($movements as $m)
-                <tr class="hover:bg-coffee-50/30 transition">
-                    <td class="px-6 py-3 text-coffee-700">{{ $m->occurred_at->format('d/m/Y H:i') }}</td>
-                    <td class="px-6 py-3">
-                        @php
-                            $cls = match($m->tipo) {
-                                'entrada' => 'bg-emerald-100 text-emerald-700',
-                                'secagem' => 'bg-coffee-100 text-coffee-700',
-                                'ajuste'  => 'bg-amber-100 text-amber-700',
-                                'saida'   => 'bg-rose-100 text-rose-700',
-                                default   => 'bg-gray-100 text-gray-700',
-                            };
-                        @endphp
-                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ $m->tipo }}</span>
-                    </td>
-                    <td class="px-6 py-3 text-right font-bold {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
-                        {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }}
-                    </td>
-                    <td class="px-6 py-3 text-coffee-700">{{ $m->observacao ?? '—' }}</td>
-                    <td class="px-6 py-3 text-coffee-500">{{ $m->user?->name ?? '—' }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="5" class="px-6 py-12 text-center text-coffee-500">Sem movimentações.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+    <div class="bg-white rounded-2xl border border-coffee-100 shadow-sm p-6 mb-6" x-data="{ tipo: 'entrada' }">
+        <div class="border-b border-coffee-100 pb-4 mb-5">
+            <h2 class="text-base font-bold text-coffee-900">Nova movimentação</h2>
+            <p class="text-sm text-coffee-500 mt-0.5">Use para registrar entradas (cliente trouxe café), ajustes ou saídas avulsas.</p>
+        </div>
 
-<div class="mt-4">{{ $movements->links() }}</div>
+        <form method="POST" action="{{ route('clientes.movimentacoes.store', $customer) }}">
+            @csrf
+
+            <div class="mb-5">
+                <label class="block text-sm font-bold text-coffee-900 mb-3">
+                    Tipo <span class="text-rose-500">*</span>
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label class="flex items-start gap-3 p-4 rounded-lg border-2 border-coffee-200 cursor-pointer hover:bg-coffee-50/50 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+                        <input type="radio" name="tipo" value="entrada" x-model="tipo" checked
+                               class="mt-0.5 w-5 h-5 border-coffee-300 text-emerald-600 focus:ring-emerald-500">
+                        <div>
+                            <span class="block text-sm font-bold text-coffee-900">+ Entrada</span>
+                            <span class="block text-xs text-coffee-500 mt-0.5">Cliente trouxe café para a fazenda. Soma ao saldo.</span>
+                        </div>
+                    </label>
+
+                    @if(auth()->user()->hasAnyRole(['admin','operador']))
+                    <label class="flex items-start gap-3 p-4 rounded-lg border-2 border-coffee-200 cursor-pointer hover:bg-coffee-50/50 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
+                        <input type="radio" name="tipo" value="ajuste" x-model="tipo"
+                               class="mt-0.5 w-5 h-5 border-coffee-300 text-amber-600 focus:ring-amber-500">
+                        <div>
+                            <span class="block text-sm font-bold text-coffee-900">± Ajuste</span>
+                            <span class="block text-xs text-coffee-500 mt-0.5">Correção de saldo. Pode ser para mais (+) ou para menos (−).</span>
+                        </div>
+                    </label>
+                    @endif
+
+                    @if(auth()->user()->hasRole('admin'))
+                    <label class="flex items-start gap-3 p-4 rounded-lg border-2 border-coffee-200 cursor-pointer hover:bg-coffee-50/50 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50">
+                        <input type="radio" name="tipo" value="saida" x-model="tipo"
+                               class="mt-0.5 w-5 h-5 border-coffee-300 text-rose-600 focus:ring-rose-500">
+                        <div>
+                            <span class="block text-sm font-bold text-coffee-900">− Saída</span>
+                            <span class="block text-xs text-coffee-500 mt-0.5">Café retirado pelo cliente sem secagem. Subtrai do saldo.</span>
+                        </div>
+                    </label>
+                    @endif
+                </div>
+                @error('tipo')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="grid sm:grid-cols-12 gap-4">
+                <div class="sm:col-span-3" x-show="tipo === 'ajuste'" x-cloak>
+                    <label for="direcao" class="block text-sm font-bold text-coffee-900 mb-2">Direção</label>
+                    <select id="direcao" name="direcao"
+                            class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition bg-white">
+                        <option value="+">+ Crédito (somar)</option>
+                        <option value="-">− Débito (subtrair)</option>
+                    </select>
+                </div>
+
+                <div :class="tipo === 'ajuste' ? 'sm:col-span-3' : 'sm:col-span-4'">
+                    <label for="quantidade" class="block text-sm font-bold text-coffee-900 mb-2">
+                        Quantidade <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input id="quantidade" type="number" step="0.001" min="0.001" inputmode="decimal" name="quantidade" required
+                               placeholder="0,000"
+                               class="w-full pl-4 pr-12 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-coffee-500 pointer-events-none">kg</span>
+                    </div>
+                    @error('quantidade')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div :class="tipo === 'ajuste' ? 'sm:col-span-4' : 'sm:col-span-6'">
+                    <label for="observacao" class="block text-sm font-bold text-coffee-900 mb-2">Observação</label>
+                    <input id="observacao" type="text" name="observacao" maxlength="500"
+                           placeholder="Ex: Lote do dia 5, ajuste de balança…"
+                           class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
+                </div>
+
+                <div class="sm:col-span-2 flex items-end">
+                    <button type="submit" class="w-full px-4 py-3 text-base font-bold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">Registrar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-coffee-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-coffee-100">
+            <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider">Histórico</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-coffee-50/50 text-coffee-600 text-xs uppercase tracking-wider">
+                    <tr>
+                        <th class="text-left px-6 py-3 font-semibold">Quando</th>
+                        <th class="text-left px-6 py-3 font-semibold">Tipo</th>
+                        <th class="text-right px-6 py-3 font-semibold">Qtd. (kg)</th>
+                        <th class="text-left px-6 py-3 font-semibold">Observação</th>
+                        <th class="text-left px-6 py-3 font-semibold">Por</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-coffee-100">
+                    @forelse($movements as $m)
+                        <tr class="hover:bg-coffee-50/30 transition">
+                            <td class="px-6 py-3 text-coffee-700">{{ $m->occurred_at->format('d/m/Y H:i') }}</td>
+                            <td class="px-6 py-3">
+                                @php
+                                    $cls = match($m->tipo) {
+                                        'entrada' => 'bg-emerald-100 text-emerald-700',
+                                        'secagem' => 'bg-coffee-100 text-coffee-700',
+                                        'ajuste'  => 'bg-amber-100 text-amber-700',
+                                        'saida'   => 'bg-rose-100 text-rose-700',
+                                        default   => 'bg-gray-100 text-gray-700',
+                                    };
+                                @endphp
+                                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ $m->tipo }}</span>
+                            </td>
+                            <td class="px-6 py-3 text-right font-bold {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
+                                {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-3 text-coffee-700">{{ $m->observacao ?? '—' }}</td>
+                            <td class="px-6 py-3 text-coffee-500">{{ $m->user?->name ?? '—' }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5" class="px-6 py-12 text-center text-coffee-500">Sem movimentações.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">{{ $movements->links() }}</div>
+</div>
 @endsection

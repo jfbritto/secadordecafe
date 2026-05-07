@@ -3,29 +3,40 @@
 @section('title', 'Editar secador')
 
 @section('content')
-<div class="max-w-2xl">
-    <h1 class="text-2xl font-bold text-coffee-900 mb-6">Editar secador</h1>
-    <form method="POST" action="{{ route('secadores.update', $dryer) }}" class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6">
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <p class="text-xs text-coffee-500 mb-1">
+            <a href="{{ route('secadores.index') }}" class="hover:underline">Secadores</a> · <span class="text-coffee-700">{{ $dryer->nome }}</span>
+        </p>
+        <h1 class="text-2xl font-bold text-coffee-900">Editar secador</h1>
+    </div>
+
+    <form method="POST" action="{{ route('secadores.update', $dryer) }}" class="bg-white rounded-2xl border border-coffee-100 shadow-sm p-6 sm:p-8">
         @method('PUT')
         @include('dryers._form')
-        <div class="flex items-center gap-3 pt-2">
-            <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">Salvar</button>
-            <a href="{{ route('secadores.index') }}" class="px-4 py-2.5 text-sm text-coffee-600 hover:text-coffee-900">Cancelar</a>
+
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center gap-3 pt-6 border-t border-coffee-100">
+            <button type="submit" class="px-6 py-3 text-base font-bold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm w-full sm:w-auto">
+                Salvar alterações
+            </button>
+            <a href="{{ route('secadores.index') }}" class="text-center sm:text-left px-4 py-3 sm:py-0 text-sm font-semibold text-coffee-600 hover:text-coffee-900">Cancelar</a>
             @can('delete', $dryer)
-                <span class="flex-1"></span>
-                <form method="POST" action="{{ route('secadores.destroy', $dryer) }}" onsubmit="return confirm('Excluir este secador? (Só é possível se não houver secagens vinculadas.)');" class="inline">
+                <span class="hidden sm:flex flex-1"></span>
+                <form method="POST" action="{{ route('secadores.destroy', $dryer) }}" onsubmit="return confirm('Excluir este secador? Só é possível se não houver secagens vinculadas. Para tirar de circulação, desmarque \'Secador ativo\' em vez de excluir.');" class="w-full sm:w-auto">
                     @csrf @method('DELETE')
-                    <button class="px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition">Excluir</button>
+                    <button class="w-full sm:w-auto px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
+                        Excluir secador
+                    </button>
                 </form>
             @endcan
         </div>
     </form>
 
     @if($dryer->secagens()->exists())
-        <p class="mt-4 text-xs text-coffee-500">
-            Este secador possui {{ $dryer->secagens()->count() }} secagem(ns) registrada(s).
-            Para impedir uso em novas secagens, desmarque <strong>"Secador ativo"</strong> em vez de excluir.
-        </p>
+        <div class="mt-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-900">
+            Este secador possui <strong>{{ $dryer->secagens()->count() }}</strong> secagem(ns) registrada(s).
+            Para tirá-lo de circulação sem perder o histórico, desmarque <strong>"Secador ativo"</strong> em vez de excluir.
+        </div>
     @endif
 </div>
 @endsection

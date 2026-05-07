@@ -3,46 +3,89 @@
 @section('title', 'Configurações da fazenda')
 
 @section('content')
-<div class="max-w-2xl">
-    <h1 class="text-2xl font-bold text-coffee-900 mb-6">Configurações da fazenda</h1>
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-coffee-900">Configurações da fazenda</h1>
+        <p class="text-sm text-coffee-500 mt-1">Dados que aparecem no dashboard, em e-mails e nos relatórios.</p>
+    </div>
 
-    <form method="POST" action="{{ route('fazenda.update') }}" class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6 space-y-4">
+    <form method="POST" action="{{ route('fazenda.update') }}" class="bg-white rounded-2xl border border-coffee-100 shadow-sm p-6 sm:p-8">
         @csrf @method('PUT')
 
-        <div>
-            <label class="block text-sm font-semibold text-coffee-800 mb-1.5">Nome *</label>
-            <input type="text" name="nome" value="{{ old('nome', $farm->nome) }}" required maxlength="150"
-                   class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-            @error('nome')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+        <div class="border-b border-coffee-100 pb-5 mb-6">
+            <h2 class="text-base font-bold text-coffee-900">Identificação</h2>
+            <p class="text-sm text-coffee-500 mt-0.5">Como sua fazenda é exibida no sistema.</p>
         </div>
 
-        <div>
-            <label class="block text-sm font-semibold text-coffee-800 mb-1.5">Telefone</label>
-            <input type="text" name="telefone" value="{{ old('telefone', $farm->telefone) }}" maxlength="30"
-                   class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+        <div class="space-y-5 mb-6">
+            <div>
+                <label for="nome" class="block text-sm font-bold text-coffee-900 mb-2">
+                    Nome da fazenda <span class="text-rose-500">*</span>
+                </label>
+                <input id="nome" type="text" name="nome" value="{{ old('nome', $farm->nome) }}" required maxlength="150" autofocus
+                       placeholder="ex: Fazenda Paraíso"
+                       class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
+                <p class="mt-1.5 text-sm text-coffee-500">Aparece no topo do sistema e nos relatórios em PDF.</p>
+                @error('nome')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label for="telefone" class="block text-sm font-bold text-coffee-900 mb-2">Telefone</label>
+                <input id="telefone" type="tel" name="telefone" maxlength="20" inputmode="numeric"
+                       data-mask="phone"
+                       value="{{ old('telefone', $farm->telefone) }}"
+                       placeholder="(00) 00000-0000"
+                       class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
+                <p class="mt-1.5 text-sm text-coffee-500">Telefone de contato. Opcional.</p>
+            </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="border-b border-coffee-100 pb-5 mb-6">
+            <h2 class="text-base font-bold text-coffee-900">Localização</h2>
+            <p class="text-sm text-coffee-500 mt-0.5">Cidade e estado da propriedade.</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 mb-6">
             <div class="col-span-2">
-                <label class="block text-sm font-semibold text-coffee-800 mb-1.5">Cidade</label>
-                <input type="text" name="cidade" value="{{ old('cidade', $farm->cidade) }}" maxlength="120"
-                       class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+                <label for="cidade" class="block text-sm font-bold text-coffee-900 mb-2">Cidade</label>
+                <input id="cidade" type="text" name="cidade" value="{{ old('cidade', $farm->cidade) }}" maxlength="120"
+                       placeholder="ex: Manhuaçu"
+                       class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
             </div>
             <div>
-                <label class="block text-sm font-semibold text-coffee-800 mb-1.5">UF</label>
-                <input type="text" name="estado" value="{{ old('estado', $farm->estado) }}" maxlength="2"
-                       class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500 uppercase">
+                <label for="estado" class="block text-sm font-bold text-coffee-900 mb-2">UF</label>
+                <input id="estado" type="text" name="estado" maxlength="2" data-mask="uf"
+                       value="{{ old('estado', $farm->estado) }}"
+                       placeholder="MG"
+                       class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition uppercase">
+                <p class="mt-1.5 text-xs text-coffee-500">2 letras</p>
             </div>
         </div>
 
-        <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">Salvar</button>
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center gap-3 pt-6 border-t border-coffee-100">
+            <button type="submit" class="px-6 py-3 text-base font-bold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm w-full sm:w-auto">
+                Salvar alterações
+            </button>
+        </div>
     </form>
 
-    <div class="mt-4 bg-white rounded-xl border border-coffee-100 p-5 text-sm text-coffee-600">
-        <strong class="text-coffee-900">Status atual:</strong>
-        @php $cls = match($farm->status){'active'=>'bg-emerald-100 text-emerald-700','blocked'=>'bg-rose-100 text-rose-700','past_due'=>'bg-amber-100 text-amber-700', default=>'bg-amber-100 text-amber-700'}; @endphp
-        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $cls }} ml-1">{{ strtoupper($farm->status) }}</span>
-        <span class="block text-xs text-coffee-500 mt-1">Slug: {{ $farm->slug }} · Criada em {{ $farm->created_at->format('d/m/Y') }}</span>
+    <div class="mt-5 bg-white rounded-2xl border border-coffee-100 p-6 text-sm">
+        <h3 class="text-sm font-bold text-coffee-900 uppercase tracking-wider mb-3">Informações do sistema</h3>
+        <dl class="grid sm:grid-cols-3 gap-4 text-sm">
+            <div>
+                <dt class="text-xs text-coffee-500 font-semibold uppercase">Status</dt>
+                @php $cls = match($farm->status){'active'=>'bg-emerald-100 text-emerald-700','blocked'=>'bg-rose-100 text-rose-700','past_due'=>'bg-amber-100 text-amber-700', default=>'bg-amber-100 text-amber-700'}; @endphp
+                <dd class="mt-1"><span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold {{ $cls }}">{{ strtoupper($farm->status) }}</span></dd>
+            </div>
+            <div>
+                <dt class="text-xs text-coffee-500 font-semibold uppercase">Slug</dt>
+                <dd class="text-coffee-700 font-mono text-xs mt-1">{{ $farm->slug }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs text-coffee-500 font-semibold uppercase">Criada em</dt>
+                <dd class="text-coffee-700 mt-1">{{ $farm->created_at->format('d/m/Y') }}</dd>
+            </div>
+        </dl>
     </div>
 </div>
 @endsection

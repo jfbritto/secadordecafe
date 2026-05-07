@@ -8,25 +8,35 @@
     <p class="text-sm text-coffee-500 mt-0.5">Gerencie quem tem acesso e suas permissões.</p>
 </div>
 
-<div class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6 mb-6">
-    <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider mb-4">Convidar novo usuário</h2>
+<div class="bg-white rounded-2xl border border-coffee-100 shadow-sm p-6 mb-6">
+    <div class="border-b border-coffee-100 pb-4 mb-5">
+        <h2 class="text-base font-bold text-coffee-900">Convidar novo usuário</h2>
+        <p class="text-sm text-coffee-500 mt-0.5">A pessoa recebe um e-mail com link para criar a conta. Convite válido por 7 dias.</p>
+    </div>
     <form method="POST" action="{{ route('convites.store') }}">
         @csrf
-        <div class="grid sm:grid-cols-3 gap-3">
-            <input type="email" name="email" placeholder="email@exemplo.com" required
-                   class="sm:col-span-2 px-3.5 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-            <div class="flex gap-2">
-                <select name="role" class="flex-1 px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-                    <option value="operador">Operador</option>
-                    <option value="financeiro">Financeiro</option>
-                    <option value="visualizador">Visualizador</option>
-                    <option value="admin">Administrador</option>
+        <div class="grid sm:grid-cols-12 gap-4">
+            <div class="sm:col-span-6">
+                <label for="invite_email" class="block text-sm font-bold text-coffee-900 mb-2">E-mail</label>
+                <input id="invite_email" type="email" name="email" placeholder="exemplo@email.com" required
+                       class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
+                @error('email')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+            </div>
+            <div class="sm:col-span-4">
+                <label for="invite_role" class="block text-sm font-bold text-coffee-900 mb-2">Permissão</label>
+                <select id="invite_role" name="role"
+                        class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition bg-white">
+                    <option value="operador">Operador (registra clientes e secagens)</option>
+                    <option value="financeiro">Financeiro (cadastra despesas)</option>
+                    <option value="visualizador">Visualizador (só consulta)</option>
+                    <option value="admin">Administrador (acesso total)</option>
                 </select>
-                <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition">Enviar</button>
+                @error('role')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+            </div>
+            <div class="sm:col-span-2 flex items-end">
+                <button type="submit" class="w-full px-4 py-3 text-base font-bold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">Enviar</button>
             </div>
         </div>
-        @error('email')<p class="mt-2 text-xs text-rose-600">{{ $message }}</p>@enderror
-        @error('role')<p class="mt-2 text-xs text-rose-600">{{ $message }}</p>@enderror
     </form>
 </div>
 

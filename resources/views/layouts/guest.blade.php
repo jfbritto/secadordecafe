@@ -41,5 +41,32 @@
     <footer class="text-center text-xs text-coffee-500 py-6">
         © {{ date('Y') }} secadordecafe · gestão de fazendas e secagem de café
     </footer>
+<script>
+(function () {
+    const masks = {
+        cpfcnpj(v) {
+            v = (v || '').replace(/\D/g, '').slice(0, 14);
+            if (!v) return '';
+            if (v.length <= 11) return v.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            return v.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+        },
+        phone(v) {
+            v = (v || '').replace(/\D/g, '').slice(0, 11);
+            if (!v) return '';
+            if (v.length <= 10) return v.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d{1,4})$/, '$1-$2');
+            return v.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+        },
+        uf(v) { return (v || '').replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 2); },
+    };
+    document.addEventListener('input', function (e) {
+        const t = e.target, m = t && t.dataset && t.dataset.mask;
+        if (!m || !masks[m]) return;
+        const before = t.value.length, pos = t.selectionStart;
+        t.value = masks[m](t.value);
+        try { const diff = t.value.length - before; t.setSelectionRange(pos + diff, pos + diff); } catch (_) {}
+    });
+    document.querySelectorAll('[data-mask]').forEach(el => { if (el.dataset.mask in masks && el.value) el.value = masks[el.dataset.mask](el.value); });
+})();
+</script>
 </body>
 </html>
