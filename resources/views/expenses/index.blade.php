@@ -23,30 +23,72 @@
     </div>
 </div>
 
-<form method="GET" class="bg-white rounded-xl border border-coffee-100 shadow-sm p-4 mb-4">
-    <div class="grid sm:grid-cols-4 gap-3 items-end">
-        <div>
-            <label class="block text-xs font-semibold text-coffee-700 mb-1.5">De</label>
-            <input type="date" name="from" value="{{ $from }}"
-                   class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+@php
+    $hoje = now();
+    $mesAtualLabel = $hoje->translatedFormat('F') . ' de ' . $hoje->year;
+    $mesPassado = $hoje->copy()->subMonthNoOverflow();
+    $isMesAtual = ! $verTudo && $from === $hoje->copy()->startOfMonth()->toDateString() && $to === $hoje->copy()->endOfMonth()->toDateString() && ! $catId;
+    $isMesPassado = ! $verTudo && $from === $mesPassado->copy()->startOfMonth()->toDateString() && $to === $mesPassado->copy()->endOfMonth()->toDateString() && ! $catId;
+
+    $periodoLabel = match (true) {
+        $verTudo => 'Todo o histórico',
+        $isMesAtual => ucfirst($mesAtualLabel),
+        $isMesPassado => ucfirst($mesPassado->translatedFormat('F') . ' de ' . $mesPassado->year),
+        $from && $to => \Carbon\Carbon::parse($from)->format('d/m/Y') . ' a ' . \Carbon\Carbon::parse($to)->format('d/m/Y'),
+        $from => 'A partir de ' . \Carbon\Carbon::parse($from)->format('d/m/Y'),
+        $to => 'Até ' . \Carbon\Carbon::parse($to)->format('d/m/Y'),
+        default => 'Todo o histórico',
+    };
+@endphp
+
+<div class="bg-white rounded-xl border border-coffee-100 shadow-sm p-4 mb-4">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-3">
+        <div class="flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4 text-coffee-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span class="text-coffee-500">Mostrando:</span>
+            <span class="font-bold text-coffee-900">{{ $periodoLabel }}</span>
         </div>
-        <div>
-            <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Até</label>
-            <input type="date" name="to" value="{{ $to }}"
-                   class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+        <div class="flex items-center gap-2 text-xs">
+            <a href="{{ route('despesas.index') }}"
+               class="px-3 py-1.5 rounded-md font-semibold transition {{ $isMesAtual ? 'bg-coffee-700 text-white' : 'bg-coffee-50 text-coffee-700 hover:bg-coffee-100' }}">
+                Este mês
+            </a>
+            <a href="{{ route('despesas.index', ['from' => $mesPassado->copy()->startOfMonth()->toDateString(), 'to' => $mesPassado->copy()->endOfMonth()->toDateString()]) }}"
+               class="px-3 py-1.5 rounded-md font-semibold transition {{ $isMesPassado ? 'bg-coffee-700 text-white' : 'bg-coffee-50 text-coffee-700 hover:bg-coffee-100' }}">
+                Mês passado
+            </a>
+            <a href="{{ route('despesas.index', ['all' => 1]) }}"
+               class="px-3 py-1.5 rounded-md font-semibold transition {{ $verTudo ? 'bg-coffee-700 text-white' : 'bg-coffee-50 text-coffee-700 hover:bg-coffee-100' }}">
+                Todo o histórico
+            </a>
         </div>
-        <div>
-            <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Categoria</label>
-            <select name="cat" class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-                <option value="">— todas —</option>
-                @foreach($allCategories as $c)
-                    <option value="{{ $c->id }}" @selected($catId == $c->id)>{{ $c->nome }}{{ $c->ativo ? '' : ' (inativa)' }}</option>
-                @endforeach
-            </select>
-        </div>
-        <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition">Filtrar</button>
     </div>
-</form>
+
+    <form method="GET">
+        <div class="grid sm:grid-cols-4 gap-3 items-end">
+            <div>
+                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">De</label>
+                <input type="date" name="from" value="{{ $from }}"
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Até</label>
+                <input type="date" name="to" value="{{ $to }}"
+                       class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Categoria</label>
+                <select name="cat" class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+                    <option value="">— todas —</option>
+                    @foreach($allCategories as $c)
+                        <option value="{{ $c->id }}" @selected($catId == $c->id)>{{ $c->nome }}{{ $c->ativo ? '' : ' (inativa)' }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="px-5 py-2 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition">Filtrar período personalizado</button>
+        </div>
+    </form>
+</div>
 
 <div class="bg-white rounded-xl border border-coffee-100 shadow-sm p-6 mb-4">
     <div class="flex items-baseline justify-between mb-4">

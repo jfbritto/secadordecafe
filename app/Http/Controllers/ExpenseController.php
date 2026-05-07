@@ -16,8 +16,20 @@ class ExpenseController extends Controller
     {
         $this->authorize('viewAny', Expense::class);
 
-        $from = $request->string('from')->toString() ?: null;
-        $to = $request->string('to')->toString() ?: null;
+        // Filtro padrão: mês corrente. Se a URL não traz NENHUM filtro,
+        // assume from=início do mês e to=fim do mês. Pra ver tudo, o
+        // botão "Todo o histórico" envia ?all=1 (limpa o default).
+        $hasAnyParam = $request->filled('from') || $request->filled('to') || $request->filled('cat') || $request->boolean('all');
+        $verTudo = $request->boolean('all');
+
+        if (! $hasAnyParam) {
+            $from = now()->startOfMonth()->toDateString();
+            $to = now()->endOfMonth()->toDateString();
+        } else {
+            $from = $verTudo ? null : ($request->string('from')->toString() ?: null);
+            $to = $verTudo ? null : ($request->string('to')->toString() ?: null);
+        }
+
         $catId = $request->integer('cat') ?: null;
 
         $base = Expense::query()->between($from, $to)->category($catId);
@@ -39,7 +51,7 @@ class ExpenseController extends Controller
         $allCategories = ExpenseCategory::query()->orderBy('nome')->get(['id', 'nome', 'ativo']);
 
         return view('expenses.index', compact(
-            'expenses', 'from', 'to', 'catId', 'totals', 'totalGeral', 'allCategories'
+            'expenses', 'from', 'to', 'catId', 'totals', 'totalGeral', 'allCategories', 'verTudo'
         ));
     }
 

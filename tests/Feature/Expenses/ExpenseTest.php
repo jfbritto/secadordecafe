@@ -63,8 +63,9 @@ it('lists expenses with totals by category', function () {
     Expense::factory()->category($combustivel)->state(['valor_total' => 100])->create();
     Expense::factory()->category($manutencao)->state(['valor_total' => 250])->create();
 
+    // ?all=1 desativa o filtro padrão de mês corrente para ver o histórico todo.
     $this->actingAs($admin)
-        ->get('/despesas')
+        ->get('/despesas?all=1')
         ->assertOk()
         ->assertSee('R$ 350,00');
 });
@@ -94,8 +95,8 @@ it('expenses are tenant-scoped', function () {
     Expense::factory()->category($catA)->state(['descricao' => 'A only'])->create();
     Expense::factory()->category($catB)->state(['descricao' => 'B only'])->create();
 
-    $this->actingAs($a)->get('/despesas')->assertSee('A only')->assertDontSee('B only');
-    $this->actingAs($b)->get('/despesas')->assertSee('B only')->assertDontSee('A only');
+    $this->actingAs($a)->get('/despesas?all=1')->assertSee('A only')->assertDontSee('B only');
+    $this->actingAs($b)->get('/despesas?all=1')->assertSee('B only')->assertDontSee('A only');
 });
 
 it('rejects category from another farm', function () {
@@ -122,6 +123,48 @@ it('rejects inactive category', function () {
             'expense_category_id' => $cat->id, 'valor_total' => 100,
         ])
         ->assertSessionHasErrors('expense_category_id');
+});
+
+it('default sem filtro mostra apenas o mês corrente', function () {
+    $admin = makeFarmUser('admin');
+    $cat = defaultCategory($admin);
+
+    // Despesa NO mês atual
+    Expense::factory()->category($cat)->state([
+        'data' => now()->startOfMonth()->addDays(2)->toDateString(),
+        'descricao' => 'MES_ATUAL',
+        'valor_total' => 111,
+    ])->create();
+
+    // Despesa em mês anterior
+    Expense::factory()->category($cat)->state([
+        'data' => now()->subMonthNoOverflow()->startOfMonth()->toDateString(),
+        'descricao' => 'MES_ANTERIOR',
+        'valor_total' => 999,
+    ])->create();
+
+    $this->actingAs($admin)
+        ->get('/despesas')
+        ->assertOk()
+        ->assertSee('MES_ATUAL')
+        ->assertDontSee('MES_ANTERIOR');
+});
+
+it('botão "Todo o histórico" via ?all=1 mostra tudo', function () {
+    $admin = makeFarmUser('admin');
+    $cat = defaultCategory($admin);
+
+    Expense::factory()->category($cat)->state([
+        'data' => now()->subMonths(3)->toDateString(),
+        'descricao' => 'TRES_MESES_ATRAS',
+        'valor_total' => 50,
+    ])->create();
+
+    $this->actingAs($admin)
+        ->get('/despesas?all=1')
+        ->assertOk()
+        ->assertSee('TRES_MESES_ATRAS')
+        ->assertSee('Todo o histórico');
 });
 
 it('shows no-category page when there are no active categories', function () {
