@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FarmBlockedController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\InvitationAcceptController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\SecagemController;
@@ -54,6 +55,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::post('secagens/{secagem}/items', [SecagemController::class, 'storeItem'])->name('secagens.items.store');
         Route::delete('secagens/{secagem}/items/{item}', [SecagemController::class, 'destroyItem'])->name('secagens.items.destroy');
         Route::post('secagens/{secagem}/concluir', [SecagemController::class, 'conclude'])->name('secagens.conclude');
+
+        Route::get('despesas', [ExpenseController::class, 'index'])->name('despesas.index');
+        Route::get('despesas/criar', [ExpenseController::class, 'create'])->name('despesas.create');
+        Route::post('despesas', [ExpenseController::class, 'store'])->name('despesas.store');
+        Route::get('despesas/{despesa}/editar', [ExpenseController::class, 'edit'])->name('despesas.edit');
+        Route::put('despesas/{despesa}', [ExpenseController::class, 'update'])->name('despesas.update');
+        Route::delete('despesas/{despesa}', [ExpenseController::class, 'destroy'])->name('despesas.destroy');
 
         Route::get('fazenda', [FarmController::class, 'edit'])->name('fazenda.edit');
         Route::put('fazenda', [FarmController::class, 'update'])->name('fazenda.update');

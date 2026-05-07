@@ -32,6 +32,9 @@
             <a href="{{ route('dashboard') }}">Dashboard</a>
             <a href="{{ route('clientes.index') }}">Clientes</a>
             <a href="{{ route('secagens.index') }}">Secagens</a>
+            @if(auth()->user()->hasAnyRole(['admin','financeiro','visualizador']) || auth()->user()->isRoot())
+                <a href="{{ route('despesas.index') }}">Despesas</a>
+            @endif
             @if(auth()->user()->hasRole('admin') || auth()->user()->isRoot())
                 <a href="{{ route('usuarios.index') }}">Usuários</a>
                 <a href="{{ route('fazenda.edit') }}">Fazenda</a>
