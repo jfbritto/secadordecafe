@@ -14,6 +14,40 @@ class Expense extends Model
 {
     use HasFactory, BelongsToFarm, LogsActivity;
 
+    /**
+     * Catálogo de unidades de medida sugeridas.
+     * `discreta = true` -> só aceita quantidades inteiras (un, cx, pç, pct).
+     */
+    public const UNIDADES = [
+        'L'    => ['label' => 'Litro',          'discreta' => false],
+        'mL'   => ['label' => 'Mililitro',      'discreta' => false],
+        'kg'   => ['label' => 'Quilograma',     'discreta' => false],
+        'g'    => ['label' => 'Grama',          'discreta' => false],
+        't'    => ['label' => 'Tonelada',       'discreta' => false],
+        'saca' => ['label' => 'Saca (60 kg)',   'discreta' => false],
+        'h'    => ['label' => 'Hora',           'discreta' => false],
+        'dia'  => ['label' => 'Dia',            'discreta' => false],
+        'un'   => ['label' => 'Unidade',        'discreta' => true],
+        'pç'   => ['label' => 'Peça',           'discreta' => true],
+        'cx'   => ['label' => 'Caixa',          'discreta' => true],
+        'pct'  => ['label' => 'Pacote',         'discreta' => true],
+        'm'    => ['label' => 'Metro',          'discreta' => false],
+        'm²'   => ['label' => 'Metro quadrado', 'discreta' => false],
+        'm³'   => ['label' => 'Metro cúbico',   'discreta' => false],
+        'km'   => ['label' => 'Quilômetro',     'discreta' => false],
+    ];
+
+    public static function unidadesDiscretas(): array
+    {
+        return array_keys(array_filter(self::UNIDADES, fn ($u) => $u['discreta']));
+    }
+
+    public static function unidadeEhDiscreta(?string $unidade): bool
+    {
+        if (! $unidade) return false;
+        return self::UNIDADES[$unidade]['discreta'] ?? false;
+    }
+
     protected $fillable = [
         'farm_id', 'user_id', 'expense_category_id',
         'data', 'descricao',

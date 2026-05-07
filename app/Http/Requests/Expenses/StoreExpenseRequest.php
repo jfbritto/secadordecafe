@@ -15,6 +15,9 @@ class StoreExpenseRequest extends FormRequest
 
     public function rules(): array
     {
+        $unidade = $this->input('unidade');
+        $isDiscrete = Expense::unidadeEhDiscreta($unidade);
+
         return [
             'data' => ['required', 'date'],
             'descricao' => ['required', 'string', 'min:2', 'max:200'],
@@ -24,7 +27,9 @@ class StoreExpenseRequest extends FormRequest
                     ->where(fn ($q) => $q->where('farm_id', $this->user()->farm_id)->where('ativo', true)),
             ],
             'unidade' => ['nullable', 'string', 'max:20'],
-            'quantidade' => ['nullable', 'numeric', 'gt:0'],
+            'quantidade' => $isDiscrete
+                ? ['nullable', 'integer', 'gt:0']
+                : ['nullable', 'numeric', 'gt:0'],
             'valor_unitario' => ['nullable', 'numeric', 'min:0'],
             'valor_total' => ['required', 'numeric', 'min:0.01'],
             'observacoes' => ['nullable', 'string', 'max:1000'],
@@ -33,10 +38,15 @@ class StoreExpenseRequest extends FormRequest
 
     public function messages(): array
     {
-        return [
+        $unidade = $this->input('unidade');
+        $msgs = [
             'expense_category_id.required' => 'Selecione uma categoria.',
             'expense_category_id.exists' => 'Categoria inválida.',
         ];
+        if (Expense::unidadeEhDiscreta($unidade)) {
+            $msgs['quantidade.integer'] = "Para a unidade \"{$unidade}\" a quantidade deve ser um número inteiro.";
+        }
+        return $msgs;
     }
 
     public function prepareForValidation(): void

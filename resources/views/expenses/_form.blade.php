@@ -1,6 +1,11 @@
 @csrf
 
-@php $E = $expense ?? null; @endphp
+@php
+    $E = $expense ?? null;
+    $unidadesDiscretas = \App\Models\Expense::unidadesDiscretas();
+    $unidadeAtual = old('unidade', $E?->unidade);
+    $quantidadeAtual = old('quantidade', $E?->quantidade ?? 1);
+@endphp
 
 <div class="border-b border-coffee-100 pb-5 mb-6">
     <h2 class="text-base font-bold text-coffee-900">Lançamento</h2>
@@ -59,24 +64,48 @@
     </p>
 </div>
 
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-    <div>
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-6"
+     x-data="{
+         unidade: @js($unidadeAtual),
+         discretas: @js($unidadesDiscretas),
+         get isDiscrete() { return this.unidade && this.discretas.includes(this.unidade); }
+     }">
+
+    <div class="sm:col-span-3">
         <label for="unidade" class="block text-sm font-bold text-coffee-900 mb-2">Unidade</label>
         <input id="unidade" type="text" name="unidade" maxlength="20"
-               value="{{ old('unidade', $E?->unidade) }}"
-               placeholder="L, kg, h"
+               list="unidades-list" autocomplete="off"
+               x-model="unidade"
+               value="{{ $unidadeAtual }}"
+               placeholder="ex: L, kg, un"
                class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
-        <p class="mt-1.5 text-xs text-coffee-500">L, kg, h, un…</p>
+        <datalist id="unidades-list">
+            @foreach(\App\Models\Expense::UNIDADES as $sigla => $u)
+                <option value="{{ $sigla }}">{{ $u['label'] }}{{ $u['discreta'] ? ' (inteiro)' : '' }}</option>
+            @endforeach
+        </datalist>
+        <p class="mt-1.5 text-xs text-coffee-500">Comece a digitar pra escolher</p>
     </div>
-    <div>
+
+    <div class="sm:col-span-3">
         <label for="quantidade" class="block text-sm font-bold text-coffee-900 mb-2">Quantidade</label>
-        <input id="quantidade" type="number" step="0.001" min="0.001" inputmode="decimal" name="quantidade"
-               value="{{ old('quantidade', $E?->quantidade ?? 1) }}"
+        <input id="quantidade" type="number" inputmode="decimal" name="quantidade"
+               x-bind:step="isDiscrete ? '1' : '0.001'"
+               x-bind:min="isDiscrete ? '1' : '0.001'"
+               x-bind:inputmode="isDiscrete ? 'numeric' : 'decimal'"
+               x-on:input="if (isDiscrete) $el.value = $el.value.replace(/[.,]/g, '').replace(/\D/g, '')"
+               value="{{ $quantidadeAtual }}"
                placeholder="1"
                class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
-        <p class="mt-1.5 text-xs text-coffee-500">Quanto comprou</p>
+        <p class="mt-1.5 text-xs text-coffee-500">
+            <span x-show="isDiscrete">Apenas números inteiros (ex: 5)</span>
+            <span x-show="!isDiscrete && unidade">Decimais permitidos (ex: 2,5)</span>
+            <span x-show="!unidade">Quanto comprou</span>
+        </p>
+        @error('quantidade')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
     </div>
-    <div>
+
+    <div class="sm:col-span-3">
         <label for="valor_unitario" class="block text-sm font-bold text-coffee-900 mb-2">Vlr. unitário</label>
         <div class="relative">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-coffee-500 pointer-events-none">R$</span>
@@ -87,7 +116,8 @@
         </div>
         <p class="mt-1.5 text-xs text-coffee-500">Por unidade</p>
     </div>
-    <div>
+
+    <div class="sm:col-span-3">
         <label for="valor_total" class="block text-sm font-bold text-coffee-900 mb-2">
             Vlr. total <span class="text-rose-500">*</span>
         </label>
