@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>secadordecafe — Gestão de fazendas e secagem de café</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M17 8h1a4 4 0 010 8h-1m0-8H3v9a4 4 0 004 4h6a4 4 0 004-4V8z' stroke='%235a3a22' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.svg') }}">
     <link rel="canonical" href="{{ url('/') }}">
     <meta name="description" content="Plataforma SaaS para gestão de fazendas de café — clientes, secagens multi-cliente, controle de saldos, financeiro e dashboards. Teste grátis por 14 dias.">
     <meta name="keywords" content="gestão de fazenda café, secagem de café, controle de café, software para fazenda, planilha secagem café, gestão de produtores, sistema cafeicultura">
