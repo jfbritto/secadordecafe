@@ -3,15 +3,23 @@
 @section('title', 'Usuários')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-coffee-900">Usuários da fazenda</h1>
-    <p class="text-sm text-coffee-500 mt-0.5">Gerencie quem tem acesso e suas permissões.</p>
+<div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
+    <div>
+        <h1 class="text-2xl font-bold text-coffee-900">Usuários da fazenda</h1>
+        <p class="text-sm text-coffee-500 mt-0.5">Gerencie quem tem acesso e suas permissões.</p>
+    </div>
+    @can('create', App\Models\User::class)
+        <a href="{{ route('usuarios.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-coffee-700 hover:bg-coffee-800 rounded-lg transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Cadastrar usuário
+        </a>
+    @endcan
 </div>
 
 <div class="bg-white rounded-2xl border border-coffee-100 shadow-sm p-6 mb-6">
     <div class="border-b border-coffee-100 pb-4 mb-5">
-        <h2 class="text-base font-bold text-coffee-900">Convidar novo usuário</h2>
-        <p class="text-sm text-coffee-500 mt-0.5">A pessoa recebe um e-mail com link para criar a conta. Convite válido por 7 dias.</p>
+        <h2 class="text-base font-bold text-coffee-900">Convidar novo usuário (por e-mail)</h2>
+        <p class="text-sm text-coffee-500 mt-0.5">A pessoa recebe um e-mail com link para criar a própria senha. Convite válido por 7 dias. <strong>Use "Cadastrar usuário"</strong> acima se preferir definir a senha agora.</p>
     </div>
     <form method="POST" action="{{ route('convites.store') }}">
         @csrf

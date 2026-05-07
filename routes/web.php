@@ -99,6 +99,8 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::get('auditoria', [AuditController::class, 'index'])->name('auditoria.index');
 
         Route::get('usuarios', [UserController::class, 'index'])->name('usuarios.index');
+        Route::get('usuarios/criar', [UserController::class, 'create'])->name('usuarios.create');
+        Route::post('usuarios', [UserController::class, 'store'])->name('usuarios.store');
         Route::put('usuarios/{usuario}/role', [UserController::class, 'updateRole'])->name('usuarios.role.update');
         Route::delete('usuarios/{usuario}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 

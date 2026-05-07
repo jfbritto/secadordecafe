@@ -11,6 +11,11 @@ class UserPolicy
         return $user->hasRole('admin');
     }
 
+    public function create(User $user): bool
+    {
+        return $user->hasRole('admin');
+    }
+
     public function view(User $user, User $target): bool
     {
         return $user->farm_id === $target->farm_id && $user->hasRole('admin');

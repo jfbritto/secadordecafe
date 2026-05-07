@@ -18,6 +18,7 @@ class User extends Authenticatable
         'farm_id',
         'name',
         'email',
+        'email_verified_at',
         'password',
         'is_root',
     ];
