@@ -18,9 +18,17 @@
 
         <div>
             <label class="block text-sm font-semibold text-coffee-800 mb-1.5">Secador *</label>
-            <input type="text" name="secador" value="{{ old('secador') }}" required maxlength="80" placeholder="Ex: Secador 1"
-                   class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
-            @error('secador')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+            <select name="dryer_id" required
+                    class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+                <option value="">— selecione —</option>
+                @foreach($dryers as $d)
+                    <option value="{{ $d->id }}" @selected(old('dryer_id') == $d->id)>{{ $d->nome }}</option>
+                @endforeach
+            </select>
+            @error('dryer_id')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
+            <p class="mt-1 text-xs text-coffee-500">
+                Não viu o secador? <a href="{{ route('secadores.create') }}" class="text-coffee-700 font-semibold hover:underline">Cadastrar novo</a>.
+            </p>
         </div>
 
         <div>

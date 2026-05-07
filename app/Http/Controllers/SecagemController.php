@@ -7,6 +7,7 @@ use App\Actions\Secagens\CreateSecagemAction;
 use App\Http\Requests\Secagens\StoreSecagemItemRequest;
 use App\Http\Requests\Secagens\StoreSecagemRequest;
 use App\Models\Customer;
+use App\Models\Dryer;
 use App\Models\Secagem;
 use App\Models\SecagemItem;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -23,7 +24,7 @@ class SecagemController extends Controller
         $this->authorize('viewAny', Secagem::class);
 
         $secagens = Secagem::query()
-            ->with('user')
+            ->with('user', 'dryer')
             ->withCount('items')
             ->orderByDesc('data')
             ->orderByDesc('numero')
@@ -35,7 +36,13 @@ class SecagemController extends Controller
     public function create(): View
     {
         $this->authorize('create', Secagem::class);
-        return view('secagens.create');
+        $dryers = Dryer::ativo()->orderBy('nome')->get(['id', 'nome']);
+
+        if ($dryers->isEmpty()) {
+            return view('secagens.no-dryer');
+        }
+
+        return view('secagens.create', compact('dryers'));
     }
 
     public function store(StoreSecagemRequest $request, CreateSecagemAction $action): RedirectResponse
@@ -49,7 +56,7 @@ class SecagemController extends Controller
     {
         $this->ensureSameFarm($secagem);
         $this->authorize('view', $secagem);
-        $secagem->load('items.customer', 'user');
+        $secagem->load('items.customer', 'user', 'dryer');
 
         return view('secagens.show', compact('secagem'));
     }
@@ -58,10 +65,15 @@ class SecagemController extends Controller
     {
         $this->ensureSameFarm($secagem);
         $this->authorize('update', $secagem);
-        $secagem->load('items.customer');
+        $secagem->load('items.customer', 'dryer');
         $customers = Customer::orderBy('nome')->get(['id', 'nome', 'saldo_cafe_kg']);
+        $dryers = Dryer::ativo()->orderBy('nome')->get(['id', 'nome']);
+        // Inclui o secador atual se ele estiver inativo
+        if ($secagem->dryer && ! $secagem->dryer->ativo) {
+            $dryers->push($secagem->dryer->only(['id', 'nome']));
+        }
 
-        return view('secagens.edit', compact('secagem', 'customers'));
+        return view('secagens.edit', compact('secagem', 'customers', 'dryers'));
     }
 
     public function update(StoreSecagemRequest $request, Secagem $secagem): RedirectResponse
@@ -123,7 +135,7 @@ class SecagemController extends Controller
     {
         $this->ensureSameFarm($secagem);
         $this->authorize('view', $secagem);
-        $secagem->load('items.customer', 'farm');
+        $secagem->load('items.customer', 'farm', 'dryer');
 
         $pdf = Pdf::loadView('secagens.pdf', compact('secagem'))->setPaper('a4', 'landscape');
         return $pdf->download("secagem-{$secagem->numero}.pdf");

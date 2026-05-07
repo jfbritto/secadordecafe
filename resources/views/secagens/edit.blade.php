@@ -8,7 +8,7 @@
         <p class="text-xs text-coffee-500 mb-1"><a href="{{ route('secagens.index') }}" class="hover:underline">Secagens</a></p>
         <h1 class="text-2xl font-bold text-coffee-900">Secagem #{{ $secagem->numero }}</h1>
         <p class="text-sm text-coffee-500 mt-0.5">
-            {{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secador }} ·
+            {{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secadorNome() }} ·
             <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">RASCUNHO</span>
         </p>
     </div>
@@ -26,8 +26,12 @@
         </div>
         <div>
             <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Secador</label>
-            <input type="text" name="secador" value="{{ old('secador', $secagem->secador) }}" maxlength="80" required
-                   class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+            <select name="dryer_id" required class="w-full px-3 py-2 text-sm rounded-lg border border-coffee-200 focus:outline-none focus:ring-2 focus:ring-coffee-500">
+                @foreach($dryers as $d)
+                    <option value="{{ $d->id }}" @selected(old('dryer_id', $secagem->dryer_id) == $d->id)>{{ $d->nome }}</option>
+                @endforeach
+            </select>
+            @error('dryer_id')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
         </div>
         <div>
             <label class="block text-xs font-semibold text-coffee-700 mb-1.5">Observações</label>

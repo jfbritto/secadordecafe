@@ -17,19 +17,10 @@ class Secagem extends Model
     public const STATUS_RASCUNHO = 'rascunho';
     public const STATUS_CONCLUIDA = 'concluida';
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['numero', 'data', 'secador', 'status'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $event) => "secagem {$event}");
-    }
-
     protected $table = 'secagens';
 
     protected $fillable = [
-        'farm_id', 'user_id', 'numero', 'data', 'secador',
+        'farm_id', 'user_id', 'dryer_id', 'numero', 'data',
         'observacoes', 'status', 'concluida_at',
     ];
 
@@ -38,8 +29,23 @@ class Secagem extends Model
         'concluida_at' => 'datetime',
     ];
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['numero', 'data', 'dryer_id', 'status'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "secagem {$event}");
+    }
+
     public function items(): HasMany { return $this->hasMany(SecagemItem::class); }
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function dryer(): BelongsTo { return $this->belongsTo(Dryer::class); }
+
+    public function secadorNome(): string
+    {
+        return $this->dryer?->nome ?? '—';
+    }
 
     public function isRascunho(): bool { return $this->status === self::STATUS_RASCUNHO; }
     public function isConcluida(): bool { return $this->status === self::STATUS_CONCLUIDA; }

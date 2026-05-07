@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DryerController;
 use App\Http\Controllers\FarmBlockedController;
 use App\Http\Controllers\FarmController;
 use App\Http\Controllers\InvitationAcceptController;
@@ -53,6 +54,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
             ->name('clientes.movimentacoes.index');
         Route::post('clientes/{cliente}/movimentacoes', [MovementController::class, 'store'])
             ->name('clientes.movimentacoes.store');
+
+        Route::get('secadores', [DryerController::class, 'index'])->name('secadores.index');
+        Route::get('secadores/criar', [DryerController::class, 'create'])->name('secadores.create');
+        Route::post('secadores', [DryerController::class, 'store'])->name('secadores.store');
+        Route::get('secadores/{secador}/editar', [DryerController::class, 'edit'])->name('secadores.edit');
+        Route::put('secadores/{secador}', [DryerController::class, 'update'])->name('secadores.update');
+        Route::delete('secadores/{secador}', [DryerController::class, 'destroy'])->name('secadores.destroy');
 
         Route::get('secagens', [SecagemController::class, 'index'])->name('secagens.index');
         Route::get('secagens/criar', [SecagemController::class, 'create'])->name('secagens.create');

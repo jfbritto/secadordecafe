@@ -23,7 +23,7 @@
 <div class="header">
     <div>
         <h1>Secagem #{{ $secagem->numero }}</h1>
-        <div class="muted">{{ $secagem->farm->nome }} · {{ $secagem->data->format('d/m/Y') }} · Secador: {{ $secagem->secador }}</div>
+        <div class="muted">{{ $secagem->farm->nome }} · {{ $secagem->data->format('d/m/Y') }} · Secador: {{ $secagem->secadorNome() }}</div>
     </div>
     <div>
         @if($secagem->isConcluida())

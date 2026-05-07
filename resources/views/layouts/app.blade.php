@@ -116,6 +116,7 @@
                 <div class="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Operação</div>
                 @php $nav('clientes.index', 'Clientes', 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'clientes.*'); @endphp
                 @php $nav('secagens.index', 'Secagens', 'M5 8h14M5 12h14M5 16h14M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z', 'secagens.*'); @endphp
+                @php $nav('secadores.index', 'Secadores', 'M9 17v-2a4 4 0 014-4h6m-4-4l4 4-4 4M3 7v10a2 2 0 002 2h6a2 2 0 002-2v-2', 'secadores.*'); @endphp
 
                 @if($canFinanceiro)
                     <div class="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Financeiro</div>

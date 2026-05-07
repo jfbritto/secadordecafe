@@ -19,9 +19,9 @@ class CreateSecagemAction
             return Secagem::create([
                 'farm_id' => $user->farm_id,
                 'user_id' => $user->id,
+                'dryer_id' => $data['dryer_id'],
                 'numero' => $next,
                 'data' => $data['data'],
-                'secador' => $data['secador'],
                 'observacoes' => $data['observacoes'] ?? null,
                 'status' => Secagem::STATUS_RASCUNHO,
             ]);

@@ -33,7 +33,7 @@
                 <tr class="hover:bg-coffee-50/30 transition">
                     <td class="px-6 py-3 font-bold text-coffee-700"><a href="{{ route('secagens.show', $s) }}" class="hover:underline">#{{ $s->numero }}</a></td>
                     <td class="px-6 py-3 text-coffee-700">{{ $s->data->format('d/m/Y') }}</td>
-                    <td class="px-6 py-3 text-coffee-700">{{ $s->secador }}</td>
+                    <td class="px-6 py-3 text-coffee-700">{{ $s->secadorNome() }}</td>
                     <td class="px-6 py-3 text-right text-coffee-700">{{ $s->items_count }}</td>
                     <td class="px-6 py-3">
                         @if($s->isConcluida())
