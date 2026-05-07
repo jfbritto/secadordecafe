@@ -96,10 +96,13 @@ it('conclude secagem debits customer saldos and creates movements', function () 
 });
 
 it('conclude blocks if any customer has insufficient saldo', function () {
+    // Simula cenário em que o saldo do cliente foi reduzido APÓS o item ser adicionado
+    // (ex.: outra secagem concluída no meio). A validação no conclude funciona como
+    // defesa em profundidade — a validação primária acontece no item-add.
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
     $c1 = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
-    $c2 = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 50]);
+    $c2 = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s = Secagem::first();
@@ -109,6 +112,9 @@ it('conclude blocks if any customer has insufficient saldo', function () {
     $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
         'customer_id' => $c2->id, 'quantidade_recebida_kg' => 100, 'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
     ]);
+
+    // Reduz saldo do c2 fora do fluxo de adição
+    $c2->update(['saldo_cafe_kg' => 50]);
 
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/concluir")
@@ -242,6 +248,42 @@ it('mesmo cliente PODE estar em secagens diferentes', function () {
         ->assertRedirect();
 
     expect(SecagemItem::count())->toBe(2);
+});
+
+it('rejeita item com quantidade_recebida_kg maior que o saldo do cliente', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+
+    $this->actingAs($admin)
+        ->post("/secagens/{$s->id}/items", [
+            'customer_id' => $c->id, 'quantidade_recebida_kg' => 150,
+            'quantidade_seca_kg' => 90, 'comissao_percentual' => 0,
+        ])
+        ->assertSessionHasErrors('quantidade_recebida_kg');
+
+    expect(SecagemItem::count())->toBe(0);
+});
+
+it('aceita item com quantidade_recebida_kg igual ao saldo do cliente', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+
+    $this->actingAs($admin)
+        ->post("/secagens/{$s->id}/items", [
+            'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
+            'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
+        ])
+        ->assertRedirect();
+
+    expect(SecagemItem::count())->toBe(1);
 });
 
 it('apos remover, da pra readicionar o mesmo cliente', function () {
