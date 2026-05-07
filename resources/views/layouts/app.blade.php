@@ -27,14 +27,21 @@
 <body>
     <header>
         <div class="brand">{{ config('app.name') }}</div>
+        @auth
         <nav>
-            @auth
-                <span>{{ auth()->user()->name }}@if(auth()->user()->farm) — {{ auth()->user()->farm->nome }}@endif</span>
-                <form method="POST" action="{{ route('logout') }}">@csrf
-                    <button type="submit">Sair</button>
-                </form>
-            @endauth
+            <a href="{{ route('dashboard') }}">Dashboard</a>
+            <a href="{{ route('clientes.index') }}">Clientes</a>
+            @if(auth()->user()->hasRole('admin') || auth()->user()->isRoot())
+                <a href="{{ route('usuarios.index') }}">Usuários</a>
+                <a href="{{ route('fazenda.edit') }}">Fazenda</a>
+            @endif
+            <span style="opacity:.6;">|</span>
+            <span>{{ auth()->user()->name }}@if(auth()->user()->farm) — {{ auth()->user()->farm->nome }}@endif</span>
+            <form method="POST" action="{{ route('logout') }}" style="display:inline;">@csrf
+                <button type="submit">Sair</button>
+            </form>
         </nav>
+        @endauth
     </header>
     <main>
         @yield('content')

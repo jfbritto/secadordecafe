@@ -2,7 +2,7 @@
 
 Plataforma SaaS multi-tenant para gestão de fazendas e secagem de café.
 
-> **Status:** Fase 1 (Fundação + Auth Multi-tenant) concluída. Roadmap completo em [docs/superpowers/specs/2026-05-06-master-roadmap.md](docs/superpowers/specs/2026-05-06-master-roadmap.md).
+> **Status:** Fases 1 e 2 concluídas (Fundação + Auth Multi-tenant + Cadastros Base). Roadmap completo em [docs/superpowers/specs/2026-05-06-master-roadmap.md](docs/superpowers/specs/2026-05-06-master-roadmap.md).
 
 ## Stack
 
@@ -84,18 +84,25 @@ bin/dev test
 bin/dev pest
 ```
 
-Testes usam SQLite in-memory (configurado em [phpunit.xml](phpunit.xml)) com `RefreshDatabase`. Suite atual: 16 testes / 58 assertions.
+Testes usam SQLite in-memory (configurado em [phpunit.xml](phpunit.xml)) com `RefreshDatabase`. Suite atual: **49 testes / 153 assertions**.
 
 - Auth/RegisterFarm (cadastro atômico, slug único, validações)
 - Auth/Login (login/logout/credenciais inválidas)
 - Tenancy/FarmStatusGate (bloqueio de fazenda inativa)
 - Tenancy/RootUser (root bypassa scope e gates)
+- Customers/CustomerCrud (CRUD, busca, paginação, unique cpf por fazenda)
+- Customers/CustomerTenancy (scope automático, root atravessa)
+- Customers/CustomerPolicy (admin/operador/financeiro/visualizador)
+- Farms/FarmSettings (admin edita; non-admin 403)
+- Users/UserManagement (listar, alterar role, deletar, proteção self/last-admin)
+- Invitations/InvitationFlow (enviar, aceitar, expirado, já aceito, cancelar)
 
 ## Documentação
 
 - [Roadmap mestre (8 fases)](docs/superpowers/specs/2026-05-06-master-roadmap.md)
-- [Spec da Fase 1](docs/superpowers/specs/2026-05-06-phase-1-foundation-auth-design.md)
-- [Plano de implementação Fase 1](docs/superpowers/plans/2026-05-06-phase-1-implementation-plan.md)
+- [Spec Fase 1 — Fundação + Auth](docs/superpowers/specs/2026-05-06-phase-1-foundation-auth-design.md)
+- [Plano Fase 1](docs/superpowers/plans/2026-05-06-phase-1-implementation-plan.md)
+- [Spec Fase 2 — Cadastros Base](docs/superpowers/specs/2026-05-06-phase-2-base-crud-design.md)
 - [Prompt original do projeto](prompt-secagem-cafe.md)
 
 ## Arquitetura

@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Events\FarmRegistered;
+use App\Events\InvitationCreated;
+use App\Listeners\SendInvitationEmail;
 use App\Listeners\SendWelcomeEmail;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
@@ -23,5 +25,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Event::listen(FarmRegistered::class, SendWelcomeEmail::class);
+        Event::listen(InvitationCreated::class, SendInvitationEmail::class);
     }
 }
