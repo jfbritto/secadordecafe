@@ -33,13 +33,13 @@
     }
     </script>
 
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { theme: { extend: { colors: { coffee: {
             50:'#faf6f1',100:'#f1e6d6',200:'#e1c8a4',300:'#cca572',400:'#a87a47',
             500:'#8a5a2f',600:'#6e4322',700:'#5a3a22',800:'#3f2814',900:'#2b1c0e',
         } }, fontFamily: { sans: ['Inter','system-ui','sans-serif'] } } } }
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800,900&display=swap" rel="stylesheet">
     <style>
