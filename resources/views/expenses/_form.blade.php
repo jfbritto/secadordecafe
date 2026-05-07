@@ -73,18 +73,14 @@
 
     <div class="sm:col-span-3">
         <label for="unidade" class="block text-sm font-bold text-coffee-900 mb-2">Unidade</label>
-        <input id="unidade" type="text" name="unidade" maxlength="20"
-               list="unidades-list" autocomplete="off"
-               x-model="unidade"
-               value="{{ $unidadeAtual }}"
-               placeholder="ex: L, kg, un"
-               class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 placeholder-coffee-300 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition">
-        <datalist id="unidades-list">
+        <select id="unidade" name="unidade" x-model="unidade"
+                class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition bg-white">
+            <option value="">— sem unidade —</option>
             @foreach(\App\Models\Expense::UNIDADES as $sigla => $u)
-                <option value="{{ $sigla }}">{{ $u['label'] }}{{ $u['discreta'] ? ' (inteiro)' : '' }}</option>
+                <option value="{{ $sigla }}" @selected($unidadeAtual === $sigla)>{{ $sigla }} — {{ $u['label'] }}{{ $u['discreta'] ? ' (inteiro)' : '' }}</option>
             @endforeach
-        </datalist>
-        <p class="mt-1.5 text-xs text-coffee-500">Comece a digitar pra escolher</p>
+        </select>
+        <p class="mt-1.5 text-xs text-coffee-500">Selecione se aplicável</p>
     </div>
 
     <div class="sm:col-span-3">

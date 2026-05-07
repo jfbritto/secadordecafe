@@ -26,7 +26,7 @@ class StoreExpenseRequest extends FormRequest
                 Rule::exists('expense_categories', 'id')
                     ->where(fn ($q) => $q->where('farm_id', $this->user()->farm_id)->where('ativo', true)),
             ],
-            'unidade' => ['nullable', 'string', 'max:20'],
+            'unidade' => ['nullable', Rule::in(array_keys(Expense::UNIDADES))],
             'quantidade' => $isDiscrete
                 ? ['nullable', 'integer', 'gt:0']
                 : ['nullable', 'numeric', 'gt:0'],

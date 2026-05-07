@@ -72,15 +72,29 @@ it('aceita unidade vazia (sem regra de discreta)', function () {
         ->assertRedirect('/despesas');
 });
 
-it('formulário de criar despesa renderiza datalist com unidades sugeridas', function () {
+it('formulário de criar despesa renderiza select de unidades fechado', function () {
     $admin = makeFarmUser('admin');
 
     $html = $this->actingAs($admin)->get('/despesas/criar')->getContent();
 
-    expect($html)->toContain('id="unidades-list"');
+    // Select fechado (não datalist)
+    expect($html)->toContain('<select id="unidade"');
+    expect($html)->toContain('— sem unidade —');
     expect($html)->toContain('value="L"');
     expect($html)->toContain('value="kg"');
     expect($html)->toContain('value="un"');
     expect($html)->toContain('Quilograma');
     expect($html)->toContain('(inteiro)'); // marcador nas discretas
+});
+
+it('rejeita unidade fora do catálogo (não permite valor custom)', function () {
+    $admin = makeFarmUser('admin');
+    $cat = ExpenseCategory::query()->where('farm_id', $admin->farm_id)->first();
+
+    $this->actingAs($admin)
+        ->post('/despesas', [
+            'data' => '2026-05-07', 'descricao' => 'Teste', 'expense_category_id' => $cat->id,
+            'unidade' => 'unidade-inventada', 'quantidade' => 1, 'valor_total' => 100,
+        ])
+        ->assertSessionHasErrors('unidade');
 });
