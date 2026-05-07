@@ -2,38 +2,50 @@
 
 Plataforma SaaS multi-tenant para gestão de fazendas e secagem de café.
 
-> **Status:** Fases 1 e 2 concluídas (Fundação + Auth Multi-tenant + Cadastros Base). Roadmap completo em [docs/superpowers/specs/2026-05-06-master-roadmap.md](docs/superpowers/specs/2026-05-06-master-roadmap.md).
+> **Status:** Fases 1–8 concluídas. MVP completo, com integração Asaas, auditoria, PDFs e infra de deploy. Roadmap: [docs/superpowers/specs/2026-05-06-master-roadmap.md](docs/superpowers/specs/2026-05-06-master-roadmap.md).
+
+## Funcionalidades
+
+| Fase | Entregue |
+|------|---------|
+| **1 — Fundação + Auth** | Docker stack, Laravel 11, Spatie Permission (teams), cadastro fazenda+admin atômico, login, multi-tenancy, root user |
+| **2 — Cadastros** | Clientes (CRUD + busca), gestão de usuários, convites por e-mail, settings da fazenda |
+| **3 — Núcleo** | Movimentações (ledger append-only), secagens multi-cliente, cálculos de rendimento/comissão, saldos protegidos |
+| **4 — Financeiro** | CRUD de despesas, filtros, totais por categoria |
+| **5 — Dashboards** | Dashboard fazenda (saldo, secagens, despesas, top clientes, últimas mov.) + dashboard ROOT |
+| **6 — Cobrança Asaas** | Webhook idempotente, sync de status, comando para bloquear inadimplentes, tela de assinatura |
+| **7 — Auditoria + PDF + Hardening** | Activitylog scopado, página de auditoria, PDF de secagem, headers de segurança, rate limit |
+| **8 — Deploy + Infra** | Scripts de provisão Ubuntu, deploy/rollback/backup, Nginx, Supervisor, Cron, CI GitHub Actions |
 
 ## Stack
 
 - Laravel 11 + PHP 8.3 + Blade
 - MySQL 8.4
 - Redis 7 (cache + queue + session)
-- Mailhog (dev mail capture)
-- Nginx 1.27
 - Spatie Permission (com teams scopados por `farm_id`)
 - Spatie Activitylog
-- AdminLTE (jeroennoten/laravel-adminlte)
-- Pest 3 (testes)
-- Tudo em containers Docker
+- Barryvdh DomPDF
+- Pest 3 — **86 testes / 265 assertions passando**
+- Mailhog (dev mail capture)
+- Docker (dev) + Ubuntu 22.04 nativo (produção, ver Fase 8)
 
-## Pré-requisitos
+## Pré-requisitos (dev)
 
 - Docker Desktop (ou compatível)
 - git
-- macOS / Linux (testado em macOS arm64)
+- macOS / Linux
 
-## Setup inicial
+## Setup local
 
 ```bash
-git clone <repo> secadordecafe
+git clone https://github.com/jfbritto/secadordecafe.git
 cd secadordecafe
 cp .env.example .env
 bin/dev build
 bin/dev up
-bin/dev composer install      # se vendor não foi commitado
+bin/dev composer install
 bin/dev art key:generate
-bin/dev fresh                 # migrate:fresh --seed (cria root user)
+bin/dev fresh                  # migrate:fresh --seed
 ```
 
 URLs:
@@ -41,110 +53,126 @@ URLs:
 | Serviço | URL |
 |---------|-----|
 | Aplicação | http://localhost:8080 |
-| Mailhog (inbox dev) | http://localhost:8025 |
-| MySQL | localhost:3307 (user `secadordecafe` / pw `secret`) |
+| Mailhog | http://localhost:8025 |
+| MySQL | localhost:3307 |
 | Redis | localhost:6380 |
 
-Usuário root padrão (apenas em `local`/`testing`):
+Credenciais root (dev/test apenas):
 - e-mail: `root@secadordecafe.test`
 - senha: `root12345`
 
-## Comandos do `bin/dev`
-
-```
-bin/dev up              # sobe stack
-bin/dev down            # derruba
-bin/dev shell           # shell no container app
-bin/dev art <args>      # php artisan <args>
-bin/dev composer <args> # composer <args>
-bin/dev npm <args>      # npm <args> no container node
-bin/dev test            # php artisan test
-bin/dev pest            # ./vendor/bin/pest
-bin/dev fresh           # migrate:fresh --seed
-bin/dev logs [svc]      # logs (default app)
-bin/dev build           # rebuild imagens
-bin/dev bootstrap       # cria projeto Laravel inicial (uso único — já feito)
-```
-
-## Workers de Queue
-
-E-mails (boas-vindas etc) e jobs assíncronos rodam em queue Redis. Em dev, rode num terminal separado:
-
+Worker de queue (em terminal separado):
 ```bash
 bin/dev art queue:work --queue=emails,default
 ```
 
-Em produção, isso será gerenciado pelo Supervisor (Fase 8).
+## Comandos `bin/dev`
+
+```
+up | down | restart | ps | logs | shell | art <cmd> | composer <cmd> | npm <cmd>
+test | pest | fresh | build | bootstrap
+```
 
 ## Testes
 
 ```bash
-bin/dev test
-# ou diretamente
-bin/dev pest
+bin/dev test     # ou bin/dev pest
 ```
 
-Testes usam SQLite in-memory (configurado em [phpunit.xml](phpunit.xml)) com `RefreshDatabase`. Suite atual: **49 testes / 153 assertions**.
+86 testes / 265 assertions passando, cobrindo:
+- Auth (cadastro fazenda atômico, login, slugs únicos)
+- Tenancy (scope automático, root bypass, fazenda bloqueada)
+- Customers (CRUD, policies por role, busca)
+- Users + Invitations (convites, aceite, expirado, last-admin protection)
+- Movements (saldos, sinais, débito/crédito, prevenção de saldo negativo)
+- Secagens (rascunho, conclusão atômica multi-cliente, números sequenciais por fazenda)
+- Expenses (CRUD, filtros, policies)
+- Billing (webhook Asaas, idempotência, bloqueio por inadimplência)
+- Audit + PDF + Security headers
 
-- Auth/RegisterFarm (cadastro atômico, slug único, validações)
-- Auth/Login (login/logout/credenciais inválidas)
-- Tenancy/FarmStatusGate (bloqueio de fazenda inativa)
-- Tenancy/RootUser (root bypassa scope e gates)
-- Customers/CustomerCrud (CRUD, busca, paginação, unique cpf por fazenda)
-- Customers/CustomerTenancy (scope automático, root atravessa)
-- Customers/CustomerPolicy (admin/operador/financeiro/visualizador)
-- Farms/FarmSettings (admin edita; non-admin 403)
-- Users/UserManagement (listar, alterar role, deletar, proteção self/last-admin)
-- Invitations/InvitationFlow (enviar, aceitar, expirado, já aceito, cancelar)
+## Deploy (produção)
+
+Documentação completa: [docs/superpowers/specs/2026-05-06-phase-8-deploy-infra.md](docs/superpowers/specs/2026-05-06-phase-8-deploy-infra.md)
+
+Resumo:
+
+```bash
+# 1. No VPS Ubuntu 22.04+ como root:
+sudo bash bin/deploy/provision.sh
+
+# 2. Crie DB + usuário deploy + cole .env em /var/www/secadordecafe/shared/.env
+
+# 3. Como deploy:
+bin/deploy/setup-app.sh
+
+# 4. Configure infra/nginx, infra/supervisor, infra/cron e SSL via certbot
+
+# 5. Releases subsequentes (do desenvolvedor, via SSH):
+bin/deploy/deploy.sh
+bin/deploy/rollback.sh         # volta uma release
+```
+
+Webhook Asaas: configure no painel para `https://app.dominio/webhooks/asaas` com header `asaas-access-token` igual a `ASAAS_WEBHOOK_TOKEN`.
+
+CI: pipeline em `.github/workflows/ci.yml` roda Pest em cada push/PR contra `main`.
 
 ## Documentação
 
 - [Roadmap mestre (8 fases)](docs/superpowers/specs/2026-05-06-master-roadmap.md)
 - [Spec Fase 1 — Fundação + Auth](docs/superpowers/specs/2026-05-06-phase-1-foundation-auth-design.md)
 - [Plano Fase 1](docs/superpowers/plans/2026-05-06-phase-1-implementation-plan.md)
-- [Spec Fase 2 — Cadastros Base](docs/superpowers/specs/2026-05-06-phase-2-base-crud-design.md)
-- [Prompt original do projeto](prompt-secagem-cafe.md)
+- [Spec Fase 2 — Cadastros](docs/superpowers/specs/2026-05-06-phase-2-base-crud-design.md)
+- [Spec Fase 3 — Núcleo](docs/superpowers/specs/2026-05-06-phase-3-core-secagens-design.md)
+- [Spec Fase 8 — Deploy](docs/superpowers/specs/2026-05-06-phase-8-deploy-infra.md)
+- [Prompt original](prompt-secagem-cafe.md)
 
-## Arquitetura
+## Arquitetura (resumo)
 
 ```
 app/
-├── Actions/Auth/RegisterFarmAction.php   # caso de uso atômico
-├── DTOs/RegisterFarmData.php
-├── Events/FarmRegistered.php
-├── Listeners/SendWelcomeEmail.php
-├── Mail/WelcomeFarmMail.php
-├── Models/
-│   ├── Farm.php
-│   ├── User.php
-│   ├── Subscription.php
-│   └── Concerns/BelongsToFarm.php        # trait + global scope para multi-tenant
+├── Actions/                  # casos de uso atômicos (RegisterFarm, ConcludeSecagem, RegisterMovement, SendInvitation)
+├── DTOs/
+├── Events/Listeners/Mail/
+├── Exceptions/DomainException.php
 ├── Http/
-│   ├── Controllers/Auth/{Register,Login}Controller.php
-│   ├── Controllers/{Dashboard,FarmBlocked}Controller.php
-│   ├── Middleware/{SetTenantContext,EnsureFarmActive}.php
-│   └── Requests/Auth/RegisterFarmRequest.php
-└── Providers/AppServiceProvider.php       # Gate::before para is_root + event wiring
+│   ├── Controllers/          # Auth, Customer, Secagem, Movement, Expense, Dashboard, Billing, Audit, AsaasWebhook
+│   ├── Middleware/           # SetTenantContext, EnsureFarmActive, SecurityHeaders
+│   └── Requests/             # Form Requests (validação + authorize)
+├── Models/                   # Farm, User, Customer, Movement, Secagem, SecagemItem, Expense, Subscription, Invitation, WebhookEvent
+│   └── Concerns/BelongsToFarm.php   # global scope + auto-fill + activitylog inject
+├── Policies/
+├── Services/Asaas/           # AsaasClient, AsaasWebhookHandler
+└── Console/Commands/         # subscriptions:block-overdue (scheduled daily)
+
+bin/
+├── dev                       # atalhos Docker (dev)
+└── deploy/                   # provision/setup/deploy/rollback/backup/restore (prod)
+
+infra/
+├── nginx/                    # site config
+├── supervisor/               # workers
+└── cron/                     # scheduler + backup
+
+docker/                       # imagens dev (PHP-FPM, php.ini, opcache.ini, nginx)
+.github/workflows/ci.yml      # CI: composer + npm + Pest
 ```
 
-### Multi-tenancy
+Multi-tenancy:
+- Coluna `farm_id` em todas as entidades de tenant
+- Trait `BelongsToFarm` aplica global scope automático e injeta `farm_id` em activity logs
+- `Gate::before` para `is_root`
+- Spatie Permission com `team_foreign_key = farm_id`
 
-- Coluna `farm_id` em todas as entidades de tenant (próximas fases: customers, secagens, despesas).
-- Trait `BelongsToFarm` aplica global scope automático: queries só retornam linhas do `auth()->user()->farm_id` — exceto root.
-- `farm_id` nunca aceito do request — derivado do usuário autenticado em `creating`.
-- Spatie Permission com teams habilitado e `team_foreign_key = farm_id` — roles scopadas por fazenda.
-- `Gate::before` retorna `true` se `$user->is_root` — root vê tudo.
-- Middleware `farm.active` bloqueia farms com `status=blocked` (preparado para inadimplência da Fase 6).
+## Próximos passos sugeridos (não cobertos no MVP)
 
-### Cadastro
+- App mobile (API REST/GraphQL ainda não exposta)
+- Importação de planilhas históricas (CSV)
+- Saldo seco retornar ao cliente como crédito automático
+- Reverso de secagem (cancelamento)
+- Integração WhatsApp para notificações
+- Multi-unidade (uma fazenda com várias filiais)
+- Refinos UX completos com AdminLTE / Tailwind UI
 
-Fluxo: `POST /register` → `RegisterFarmRequest` → `RegisterFarmAction::execute()`:
-1. Em transação: cria `farm` (status `trial`), `user`, `subscription`.
-2. Atribui role `admin` ao usuário no team da fazenda.
-3. Dispara evento `FarmRegistered`.
-4. Listener `SendWelcomeEmail` (queued, queue `emails`) envia `WelcomeFarmMail`.
-5. Auto-login + redirect `/dashboard`.
+## Licença
 
-## Deploy
-
-Pendente — coberto na Fase 8 (VPS HostGator com Ubuntu, Nginx, PHP-FPM, Supervisor, Let's Encrypt).
+Privado — propriedade do cliente.
