@@ -22,21 +22,29 @@
                 Salvar alterações
             </button>
             <a href="{{ route('clientes.index') }}" class="text-center sm:text-left px-4 py-3 sm:py-0 text-sm font-semibold text-coffee-600 hover:text-coffee-900">Cancelar</a>
-            @can('delete', $customer)
-                <span class="hidden sm:flex flex-1"></span>
+        </div>
+    </form>
+
+    @can('delete', $customer)
+        <div class="mt-6 bg-white rounded-2xl border border-rose-200 shadow-sm p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="flex-1">
+                    <h2 class="text-base font-bold text-rose-900">Zona de exclusão</h2>
+                    <p class="text-sm text-rose-600 mt-0.5">Remover este cliente das listas. As movimentações antigas continuam no histórico.</p>
+                </div>
                 <form method="POST" action="{{ route('clientes.destroy', $customer) }}"
                       data-confirm="Excluir este cliente?"
                       data-confirm-text="Esta ação não pode ser desfeita. As movimentações antigas continuam no histórico, mas o cliente sai das listas."
                       data-confirm-yes="Sim, excluir"
                       class="w-full sm:w-auto">
                     @csrf @method('DELETE')
-                    <button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200">
+                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         Excluir cliente
                     </button>
                 </form>
-            @endcan
+            </div>
         </div>
-    </form>
+    @endcan
 </div>
 @endsection
