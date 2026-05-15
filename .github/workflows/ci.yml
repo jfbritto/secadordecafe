@@ -16,7 +16,7 @@ jobs:
         image: mysql:8.4
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: secadordecafe_test
+          MYSQL_DATABASE: rocanossa_test
         ports:
           - 3306:3306
         options: >-

@@ -19,10 +19,10 @@ class PublicSiteController extends Controller
     {
         $body = <<<'HTML'
 <h2>1. Aceitação dos termos</h2>
-<p>Ao criar uma conta no secadordecafe ("Plataforma"), você concorda com estes Termos de Uso. Se não concordar, não utilize o serviço.</p>
+<p>Ao criar uma conta na Roça Nossa ("Plataforma"), você concorda com estes Termos de Uso. Se não concordar, não utilize o serviço.</p>
 
 <h2>2. Descrição do serviço</h2>
-<p>A Plataforma oferece ferramentas online para gestão de fazendas de café, incluindo cadastros de clientes, controle de saldos, secagens, despesas e relatórios.</p>
+<p>A Plataforma oferece ferramentas online para gestão da roça: cadastro de produtores, controle de saldos, secagens, despesas, equipe e relatórios. Nasceu na cafeicultura e expande para outras culturas conforme o produtor demanda.</p>
 
 <h2>3. Conta de usuário</h2>
 <p>Você é responsável por manter a confidencialidade da sua senha e por todas as atividades realizadas na sua conta. Notifique-nos imediatamente em caso de uso não autorizado.</p>
@@ -43,7 +43,7 @@ class PublicSiteController extends Controller
 <p>Podemos atualizar estes termos. Comunicaremos alterações relevantes por e-mail. O uso continuado após as alterações implica aceitação.</p>
 
 <h2>9. Contato</h2>
-<p>Dúvidas: <a class="text-coffee-700 font-semibold hover:underline" href="mailto:contato@secadordecafe.com.br">contato@secadordecafe.com.br</a></p>
+<p>Dúvidas: <a class="text-coffee-700 font-semibold hover:underline" href="mailto:contato@rocanossa.com.br">contato@rocanossa.com.br</a></p>
 HTML;
 
         return view('pages.legal', ['title' => 'Termos de uso', 'body' => $body]);
@@ -53,16 +53,16 @@ HTML;
     {
         $body = <<<'HTML'
 <h2>1. Quais dados coletamos</h2>
-<p>Coletamos: nome, e-mail, telefone, dados da fazenda (nome, cidade, estado), dados de pagamento (processados pelo Asaas, não armazenados em texto puro), dados de uso (logs de acesso, atividades realizadas).</p>
+<p>Coletamos: nome, e-mail, telefone, dados da roça (nome, cidade, estado), dados de pagamento (processados pelo Asaas, não armazenados em texto puro), dados de uso (logs de acesso, atividades realizadas).</p>
 
 <h2>2. Como usamos seus dados</h2>
-<p>Os dados são usados para prestar o serviço (gestão da fazenda), faturamento, suporte e melhorias do produto. Nunca vendemos ou compartilhamos com terceiros para fins de marketing.</p>
+<p>Os dados são usados para prestar o serviço (gestão da roça), faturamento, suporte e melhorias do produto. Nunca vendemos ou compartilhamos com terceiros para fins de marketing.</p>
 
 <h2>3. Onde armazenamos</h2>
 <p>Dados ficam em servidores no Brasil, com backups diários criptografados. Conexão sempre via HTTPS.</p>
 
 <h2>4. Seus direitos (LGPD)</h2>
-<p>Você pode solicitar a qualquer momento: acesso aos seus dados, correção, exportação ou exclusão. Atendemos em até 15 dias úteis.</p>
+<p>Você pode solicitar a qualquer momento: acesso aos seus dados, correção, exportação ou exclusão. Atendemos em até 15 dias úteis. A roça é sua — os dados também.</p>
 
 <h2>5. Cookies</h2>
 <p>Usamos apenas cookies essenciais para autenticação e segurança. Não usamos cookies de rastreamento de terceiros.</p>
@@ -71,7 +71,7 @@ HTML;
 <p>Asaas (cobrança), provedor de e-mail transacional, hospedagem em VPS. Todos sob acordo de confidencialidade e LGPD.</p>
 
 <h2>7. Contato do encarregado (DPO)</h2>
-<p><a class="text-coffee-700 font-semibold hover:underline" href="mailto:privacidade@secadordecafe.com.br">privacidade@secadordecafe.com.br</a></p>
+<p><a class="text-coffee-700 font-semibold hover:underline" href="mailto:privacidade@rocanossa.com.br">privacidade@rocanossa.com.br</a></p>
 HTML;
 
         return view('pages.legal', ['title' => 'Política de privacidade', 'body' => $body]);

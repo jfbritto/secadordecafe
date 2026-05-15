@@ -3,8 +3,8 @@
 it('renders public landing for guests at /', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSee('secadordecafe', false)
-        ->assertSee('Teste grátis', false);
+        ->assertSee('Roça Nossa', false)
+        ->assertSee('14 dias', false);
 });
 
 it('redirects authenticated user from / to dashboard', function () {

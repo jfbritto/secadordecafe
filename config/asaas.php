@@ -15,7 +15,7 @@ return [
     'plan' => [
         'value' => (float) env('ASAAS_PLAN_VALUE', 99.90),
         'cycle' => env('ASAAS_PLAN_CYCLE', 'MONTHLY'), // MONTHLY, QUARTERLY, YEARLY
-        'description' => env('ASAAS_PLAN_DESCRIPTION', 'Assinatura secadordecafe'),
+        'description' => env('ASAAS_PLAN_DESCRIPTION', 'Assinatura Roça Nossa'),
     ],
 
     // Após quantos dias em past_due bloqueamos a fazenda

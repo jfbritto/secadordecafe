@@ -5,7 +5,7 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-    container_name: secadordecafe_app
+    container_name: rocanossa_app
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
@@ -19,11 +19,11 @@ services:
       mailhog:
         condition: service_started
     networks:
-      - secadordecafe
+      - rocanossa
 
   web:
     image: nginx:1.27-alpine
-    container_name: secadordecafe_web
+    container_name: rocanossa_web
     ports:
       - "8080:80"
     volumes:
@@ -32,16 +32,16 @@ services:
     depends_on:
       - app
     networks:
-      - secadordecafe
+      - rocanossa
 
   mysql:
     image: mysql:8.4
-    container_name: secadordecafe_mysql
+    container_name: rocanossa_mysql
     command: ["--mysql-native-password=ON"]
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: secadordecafe
-      MYSQL_USER: secadordecafe
+      MYSQL_DATABASE: rocanossa
+      MYSQL_USER: rocanossa
       MYSQL_PASSWORD: secret
     ports:
       - "3307:3306"
@@ -53,26 +53,26 @@ services:
       timeout: 5s
       retries: 20
     networks:
-      - secadordecafe
+      - rocanossa
 
   redis:
     image: redis:7-alpine
-    container_name: secadordecafe_redis
+    container_name: rocanossa_redis
     ports:
       - "6380:6379"
     volumes:
       - redis_data:/data
     networks:
-      - secadordecafe
+      - rocanossa
 
   mailhog:
     image: mailhog/mailhog:v1.0.1
-    container_name: secadordecafe_mailhog
+    container_name: rocanossa_mailhog
     ports:
       - "1025:1025"
       - "8025:8025"
     networks:
-      - secadordecafe
+      - rocanossa
 
   queue:
     build:
@@ -80,7 +80,7 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-    container_name: secadordecafe_queue
+    container_name: rocanossa_queue
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
@@ -105,11 +105,11 @@ services:
       mailhog:
         condition: service_started
     networks:
-      - secadordecafe
+      - rocanossa
 
   node:
     image: node:22-alpine
-    container_name: secadordecafe_node
+    container_name: rocanossa_node
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
@@ -117,12 +117,12 @@ services:
       - "5173:5173"
     command: ["sh", "-c", "tail -f /dev/null"]
     networks:
-      - secadordecafe
+      - rocanossa
 
 volumes:
   mysql_data:
   redis_data:
 
 networks:
-  secadordecafe:
+  rocanossa:
     driver: bridge

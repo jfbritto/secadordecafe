@@ -11,7 +11,7 @@ class RootUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = 'root@secadordecafe.test';
+        $email = 'root@rocanossa.com.br';
         if (User::where('email', $email)->exists()) {
             return;
         }

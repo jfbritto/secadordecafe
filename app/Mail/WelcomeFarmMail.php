@@ -19,7 +19,7 @@ class WelcomeFarmMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Bem-vindo ao secadordecafe',
+            subject: 'Bem-vindo à Roça Nossa',
         );
     }
 

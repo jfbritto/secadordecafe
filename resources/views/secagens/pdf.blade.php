@@ -75,7 +75,7 @@
     </tfoot>
 </table>
 
-<p class="muted" style="margin-top:24px;">Documento gerado em {{ now()->format('d/m/Y H:i') }} · secadordecafe</p>
+<p class="muted" style="margin-top:24px;">Documento gerado em {{ now()->format('d/m/Y H:i') }} · Roça Nossa</p>
 
 </body>
 </html>

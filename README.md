@@ -1,6 +1,10 @@
-# secadordecafe
+# Roça Nossa
 
-Plataforma SaaS multi-tenant para gestão de fazendas e secagem de café.
+Plataforma SaaS multi-tenant para acompanhar o produtor rural do plantio ao pagamento — produtores, saldos, secagens, despesas, equipe e auditoria.
+
+> **Domínio:** [rocanossa.com.br](https://rocanossa.com.br) · **App:** app.rocanossa.com.br
+>
+> Nasceu na secagem de café e expande para outras culturas conforme o produtor demanda. O sistema fala a língua do roceiro.
 
 > **Status:** Fases 1–8 concluídas. MVP completo, com integração Asaas, auditoria, PDFs e infra de deploy. Roadmap: [docs/superpowers/specs/2026-05-06-master-roadmap.md](docs/superpowers/specs/2026-05-06-master-roadmap.md).
 
@@ -38,8 +42,8 @@ Plataforma SaaS multi-tenant para gestão de fazendas e secagem de café.
 ## Setup local
 
 ```bash
-git clone https://github.com/jfbritto/secadordecafe.git
-cd secadordecafe
+git clone https://github.com/jfbritto/secadordecafe.git rocanossa
+cd rocanossa
 cp .env.example .env
 bin/dev build
 bin/dev up
@@ -58,10 +62,10 @@ URLs:
 | Redis | localhost:6380 |
 
 Credenciais root (dev/test apenas):
-- e-mail: `root@secadordecafe.test`
+- e-mail: `root@rocanossa.com.br`
 - senha: `root12345`
 
-Worker de queue: roda automaticamente no container `secadordecafe_queue`
+Worker de queue: roda automaticamente no container `rocanossa_queue`
 processando filas `emails,default`. Logs em tempo real:
 ```bash
 bin/dev queue:logs
@@ -105,7 +109,7 @@ Resumo:
 # 1. No VPS Ubuntu 22.04+ como root:
 sudo bash bin/deploy/provision.sh
 
-# 2. Crie DB + usuário deploy + cole .env em /var/www/secadordecafe/shared/.env
+# 2. Crie DB + usuário deploy + cole .env em /var/www/rocanossa/shared/.env
 
 # 3. Como deploy:
 bin/deploy/setup-app.sh

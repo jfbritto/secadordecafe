@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', config('app.name')) — secadordecafe</title>
+    <title>@yield('title', config('app.name')) — Roça Nossa</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.svg') }}">
     <meta name="theme-color" content="#5a3a22">
@@ -76,14 +76,16 @@
             </button>
             <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5">
                 <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h1a4 4 0 010 8h-1"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 4l1 2M11 4l1 2M15 4l1 2"/>
+                    {{-- Logo Roça Nossa: broto saindo da terra --}}
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 20h10"/>
+                        <path d="M12 20V9"/>
+                        <path d="M12 14c-3 0-5-2-5-5 3 0 5 2 5 5z"/>
+                        <path d="M12 11c2.5 0 5-1.5 5-5-2.5 0-5 1.5-5 5z"/>
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-sm font-bold leading-tight">secadordecafe</p>
+                    <p class="text-sm font-bold leading-tight">Roça Nossa</p>
                     @if($farm)
                         <p class="text-[11px] text-white/60 truncate leading-tight mt-0.5">{{ $farm->nome }}</p>
                     @elseif($isRoot)
