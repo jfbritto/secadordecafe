@@ -1,6 +1,7 @@
 #!/bin/bash
 # Script de deploy do Roça Nossa no VPS.
-# Cole este arquivo em /home/deploy/rocanossa-deploy.sh no servidor.
+# Cole este arquivo em /home/deploy/deploy-rocanossa.sh no servidor
+# (padrão deploy-<projeto>.sh, igual deploy-taketicket.sh, deploy-masterveiculos.sh).
 # O workflow do GitHub Actions chama ele via SSH a cada push em main.
 
 set -e

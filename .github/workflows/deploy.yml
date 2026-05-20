@@ -97,4 +97,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: /home/deploy/rocanossa-deploy.sh
+          script: /home/deploy/deploy-rocanossa.sh
