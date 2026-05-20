@@ -94,7 +94,9 @@ it('generates unique slug when name collides', function () {
         'password_confirmation' => 'senha12345',
     ])->assertRedirect('/dashboard');
 
-    $newFarm = Farm::where('id', '>', 1)->first();
+    // Em MySQL com RefreshDatabase (transactions), auto_increment não volta a 1.
+    // Resolvemos a nova fazenda pelo email do usuário criado no /register.
+    $newFarm = User::where('email', 'maria@x.test')->first()->farm;
     expect($newFarm->slug)->toBe('fazenda-teste-2');
 });
 

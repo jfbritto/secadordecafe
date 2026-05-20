@@ -21,12 +21,12 @@ class AuditController extends Controller
             ->orderByDesc('id');
 
         // Filtra por fazenda quando não-root: properties contém farm_id injetado via tapActivity.
-        // LIKE cross-driver (SQLite/MySQL) sobre o JSON serializado.
+        // whereJsonContains é cross-driver e imune a diferenças de serialização JSON
+        // (MySQL serializa com espaços, SQLite sem — o LIKE textual antigo falhava em MySQL).
         if (! $user->isRoot()) {
             $farmId = (int) $user->farm_id;
-            $needle = '%"farm_id":' . $farmId . '%';
-            $query->where(function ($q) use ($needle, $farmId) {
-                $q->where('properties', 'like', $needle)
+            $query->where(function ($q) use ($farmId) {
+                $q->whereJsonContains('properties->farm_id', $farmId)
                   ->orWhere(function ($q2) use ($farmId) {
                       $q2->where('subject_type', \App\Models\Farm::class)
                          ->where('subject_id', $farmId);
