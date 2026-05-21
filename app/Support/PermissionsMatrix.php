@@ -36,6 +36,7 @@ class PermissionsMatrix
         'edit'     => 'Editar',
         'delete'   => 'Excluir',
         'conclude' => 'Concluir',
+        'reopen'   => 'Reabrir',
     ];
 
     /** Papéis disponíveis (chave => [label, descrição curta]) */

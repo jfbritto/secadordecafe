@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Secagens\ConcludeSecagemAction;
 use App\Actions\Secagens\CreateSecagemAction;
+use App\Actions\Secagens\ReopenSecagemAction;
 use App\Http\Requests\Secagens\StoreSecagemItemRequest;
 use App\Http\Requests\Secagens\StoreSecagemRequest;
 use App\Models\Area;
@@ -162,6 +163,21 @@ class SecagemController extends Controller
 
         return redirect()->route('secagens.show', $secagem)
             ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> concluída. Saldos dos clientes atualizados.');
+    }
+
+    /**
+     * Reabre uma secagem concluída pra correção.
+     * Estorna os débitos dos clientes (Movements de ajuste +) e volta status pra rascunho.
+     */
+    public function reopen(Secagem $secagem, ReopenSecagemAction $action): RedirectResponse
+    {
+        $this->ensureSameFarm($secagem);
+        $this->authorize('reopen', $secagem);
+
+        $action->execute($secagem, auth()->user());
+
+        return redirect()->route('secagens.edit', $secagem)
+            ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> reaberta. Débitos estornados — corrija o que precisar e conclua de novo.');
     }
 
     private function ensureSameFarm(Secagem $secagem): void

@@ -83,6 +83,7 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::post('secagens/{secagem}/items', [SecagemController::class, 'storeItem'])->name('secagens.items.store');
         Route::delete('secagens/{secagem}/items/{item}', [SecagemController::class, 'destroyItem'])->name('secagens.items.destroy');
         Route::post('secagens/{secagem}/concluir', [SecagemController::class, 'conclude'])->name('secagens.conclude');
+        Route::post('secagens/{secagem}/reabrir', [SecagemController::class, 'reopen'])->name('secagens.reopen');
         Route::get('secagens/{secagem}/pdf', [SecagemController::class, 'pdf'])->name('secagens.pdf');
 
         // IMPORTANTE: rotas de categorias declaradas ANTES das de despesa/{despesa}

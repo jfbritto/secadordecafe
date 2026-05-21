@@ -20,10 +20,24 @@
             @endif
         </p>
     </div>
-    <a href="{{ route('secagens.pdf', $secagem) }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:bg-leaf-50 rounded-lg transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
-        PDF
-    </a>
+    <div class="flex gap-2 flex-wrap">
+        @can('reopen', $secagem)
+            <form method="POST" action="{{ route('secagens.reopen', $secagem) }}"
+                  data-confirm="Reabrir esta secagem pra corrigir?"
+                  data-confirm-text="O sistema vai estornar os débitos dos clientes (devolver o café no saldo de cada um) e voltar a secagem pra rascunho. Você poderá ajustar e concluir de novo. O extrato vai registrar o estorno."
+                  data-confirm-yes="Sim, reabrir">
+                @csrf
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-amber-800 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+                    Reabrir pra corrigir
+                </button>
+            </form>
+        @endcan
+        <a href="{{ route('secagens.pdf', $secagem) }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:bg-leaf-50 rounded-lg transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+            PDF
+        </a>
+    </div>
 </div>
 
 @if($secagem->observacoes)

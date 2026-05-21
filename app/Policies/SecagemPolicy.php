@@ -42,4 +42,15 @@ class SecagemPolicy
             && $secagem->isRascunho()
             && $user->hasAnyRole(['admin', 'operador']);
     }
+
+    /**
+     * Reabrir uma secagem concluída pra correção. Só admin — operação
+     * com impacto contábil (estorna débitos no saldo dos clientes).
+     */
+    public function reopen(User $user, Secagem $secagem): bool
+    {
+        return $user->farm_id === $secagem->farm_id
+            && $secagem->isConcluida()
+            && $user->hasRole('admin');
+    }
 }
