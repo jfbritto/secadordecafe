@@ -30,6 +30,31 @@ Route::get('/privacidade', [PublicSiteController::class, 'privacidade'])->name('
 // Preview da OG image — pra gerar PNG via screenshot do navegador (uso pontual)
 Route::view('/og-preview', 'og-preview')->name('og.preview');
 
+// Preview dos e-mails (SÓ EM DEV LOCAL — bloqueado em prod por abort_unless).
+// Acessa /dev/email/welcome e /dev/email/invitation no navegador pra ver o HTML
+// renderizado dos templates sem precisar disparar e-mail real.
+Route::prefix('dev/email')->group(function () {
+    Route::get('welcome', function () {
+        abort_unless(app()->environment('local'), 404);
+        $farm = new \App\Models\Farm(['nome' => 'Fazenda Paraíso']);
+        $user = new \App\Models\User(['name' => 'João da Silva']);
+        $user->setRelation('farm', $farm);
+        return new \App\Mail\WelcomeFarmMail($user);
+    });
+    Route::get('invitation', function () {
+        abort_unless(app()->environment('local'), 404);
+        $farm = new \App\Models\Farm(['nome' => 'Fazenda Paraíso']);
+        $invitation = new \App\Models\Invitation([
+            'email' => 'maria@exemplo.com',
+            'role' => 'operador',
+            'token' => 'token-de-exemplo-fake',
+            'expires_at' => now()->addDays(7),
+        ]);
+        $invitation->setRelation('farm', $farm);
+        return new \App\Mail\InvitationMail($invitation);
+    });
+});
+
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisterController::class, 'show'])->name('register');
     Route::post('register', [RegisterController::class, 'store'])->middleware('throttle:5,10');
