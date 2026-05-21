@@ -11,6 +11,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DryerController;
 use App\Http\Controllers\FarmBlockedController;
 use App\Http\Controllers\FarmController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvitationAcceptController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
@@ -102,6 +103,11 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
         Route::get('fazenda', [FarmController::class, 'edit'])->name('fazenda.edit');
         Route::put('fazenda', [FarmController::class, 'update'])->name('fazenda.update');
+
+        // Perfil do usuário logado (qualquer role pode editar o próprio)
+        Route::get('perfil', [ProfileController::class, 'edit'])->name('perfil.edit');
+        Route::put('perfil', [ProfileController::class, 'update'])->name('perfil.update');
+        Route::put('perfil/senha', [ProfileController::class, 'updatePassword'])->name('perfil.senha.update');
 
         Route::get('assinatura', [BillingController::class, 'show'])->name('assinatura.show');
 

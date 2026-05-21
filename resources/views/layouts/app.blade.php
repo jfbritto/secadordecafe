@@ -140,9 +140,12 @@
             @endif
         </nav>
 
-        {{-- User card --}}
+        {{-- User card (clica → meu perfil) --}}
         <div class="p-3 border-t border-white/10 flex-shrink-0">
-            <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg">
+            <a href="{{ route('perfil.edit') }}"
+               @click="sidebarOpen=false"
+               class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/10 transition group {{ request()->routeIs('perfil.*') ? 'bg-white/15' : '' }}"
+               title="Editar meu perfil">
                 <div class="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
                     <span class="text-xs font-bold text-white">{{ $initials ?: '?' }}</span>
                 </div>
@@ -150,7 +153,10 @@
                     <p class="text-sm font-medium leading-tight truncate">{{ $u?->name }}</p>
                     <p class="text-[10px] text-white/50 leading-tight">{{ $roleLabel }}</p>
                 </div>
-            </div>
+                <svg class="w-4 h-4 text-white/40 group-hover:text-white/70 transition flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+            </a>
             <form method="POST" action="{{ route('logout') }}" class="mt-1">
                 @csrf
                 <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/60 hover:text-white hover:bg-white/10 transition">
