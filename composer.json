@@ -11,6 +11,7 @@
         "jeroennoten/laravel-adminlte": "^3.13",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
+        "resend/resend-laravel": "^1.4",
         "spatie/laravel-activitylog": "^4.8",
         "spatie/laravel-permission": "^6.9",
         "symfony/css-selector": "^7.0",
