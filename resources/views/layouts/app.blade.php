@@ -7,17 +7,18 @@
     <title>@yield('title', config('app.name')) — Roça Nossa</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.svg') }}">
-    <meta name="theme-color" content="#5a3a22">
+    <meta name="theme-color" content="#1e5631">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        coffee: {
-                            50:  '#faf6f1', 100: '#f1e6d6', 200: '#e1c8a4', 300: '#cca572',
-                            400: '#a87a47', 500: '#8a5a2f', 600: '#6e4322', 700: '#5a3a22',
-                            800: '#3f2814', 900: '#2b1c0e',
+                        // Paleta Lavoura Verde — verde-folha + creme + verde-noite
+                        leaf: {
+                            50:  '#fdfbf4', 100: '#f4ead4', 200: '#d8c9a8', 300: '#b3c49d',
+                            400: '#8db580', 500: '#5da361', 600: '#2d8a4a', 700: '#1e5631',
+                            800: '#143a23', 900: '#0a2415',
                         },
                     },
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
@@ -34,12 +35,12 @@
         [x-cloak] { display: none !important; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f5f1ea; }
-        ::-webkit-scrollbar-thumb { background: #d6c9b6; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a87a47; }
+        ::-webkit-scrollbar-track { background: #fdfbf4; }
+        ::-webkit-scrollbar-thumb { background: #b3c49d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2d8a4a; }
     </style>
 </head>
-<body class="bg-coffee-50 text-coffee-900">
+<body class="bg-leaf-50 text-leaf-900">
 
 @php
     $u = auth()->user();
@@ -67,7 +68,7 @@
 
     {{-- Sidebar --}}
     <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-           class="fixed inset-y-0 left-0 lg:static z-50 w-64 flex-shrink-0 bg-coffee-700 text-white flex flex-col transition-transform duration-300">
+           class="fixed inset-y-0 left-0 lg:static z-50 w-64 flex-shrink-0 bg-leaf-700 text-white flex flex-col transition-transform duration-300">
 
         {{-- Header sidebar --}}
         <div class="px-5 pt-5 pb-4 border-b border-white/10 relative">
@@ -170,11 +171,11 @@
     {{-- Main column --}}
     <div class="flex-1 flex flex-col overflow-hidden min-w-0">
         {{-- Topbar --}}
-        <header class="bg-white border-b border-coffee-100 px-4 sm:px-6 py-3 flex items-center gap-3 flex-shrink-0 shadow-sm">
-            <button @click="sidebarOpen=true" class="lg:hidden p-2 rounded-md text-coffee-500 hover:text-coffee-700 hover:bg-coffee-50 transition">
+        <header class="bg-white border-b border-leaf-100 px-4 sm:px-6 py-3 flex items-center gap-3 flex-shrink-0 shadow-sm">
+            <button @click="sidebarOpen=true" class="lg:hidden p-2 rounded-md text-leaf-500 hover:text-leaf-700 hover:bg-leaf-50 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
-            <h1 class="text-base font-semibold text-coffee-900 truncate flex-1">@yield('title', 'Painel')</h1>
+            <h1 class="text-base font-semibold text-leaf-900 truncate flex-1">@yield('title', 'Painel')</h1>
             @if($farm)
                 @php $statusCls = match($farm->status){'active'=>'bg-emerald-100 text-emerald-700','blocked'=>'bg-rose-100 text-rose-700','past_due'=>'bg-amber-100 text-amber-700', default=>'bg-amber-100 text-amber-700'}; @endphp
                 <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $statusCls }}">
@@ -242,8 +243,8 @@ document.addEventListener('submit', function (e) {
         showCancelButton: true,
         confirmButtonText: form.dataset.confirmYes || 'Sim, confirmar',
         cancelButtonText: 'Cancelar',
-        confirmButtonColor: form.dataset.confirmDanger === '0' ? '#5a3a22' : '#dc2626',
-        cancelButtonColor: '#a87a47',
+        confirmButtonColor: form.dataset.confirmDanger === '0' ? '#1e5631' : '#dc2626',
+        cancelButtonColor: '#5da361',
         reverseButtons: true,
         focusCancel: true,
     }).then(function (r) {

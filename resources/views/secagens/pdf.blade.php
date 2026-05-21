@@ -5,13 +5,13 @@
     <title>Secagem #{{ $secagem->numero }}</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; color:#222; font-size:12px; }
-        h1 { color:#5a3a22; margin:0 0 4px; font-size:18px; }
+        h1 { color:#1e5631; margin:0 0 4px; font-size:18px; }
         .muted { color:#666; font-size:11px; }
-        .header { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #5a3a22; padding-bottom:8px; margin-bottom:12px; }
+        .header { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #1e5631; padding-bottom:8px; margin-bottom:12px; }
         table { width:100%; border-collapse:collapse; margin-top:10px; }
-        th, td { padding:6px 8px; border-bottom:1px solid #e8dcc7; font-size:11px; }
-        th { background:#f6f1ea; text-align:left; }
-        tfoot td { background:#f6f1ea; font-weight:bold; }
+        th, td { padding:6px 8px; border-bottom:1px solid #d8c9a8; font-size:11px; }
+        th { background:#f4ead4; text-align:left; }
+        tfoot td { background:#f4ead4; font-weight:bold; }
         .right { text-align:right; }
         .badge { padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold; }
         .badge-active { background:#dcfce7; color:#166534; }

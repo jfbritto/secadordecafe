@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
-  <!-- Roça Nossa: broto saindo da terra (apple touch icon 180x180) -->
-  <rect width="180" height="180" rx="40" fill="#5a3a22"/>
+  <!-- Roça Nossa: broto saindo da terra (apple touch icon 180x180, Lavoura Verde) -->
+  <rect width="180" height="180" rx="40" fill="#1e5631"/>
   <!-- terra (faixa escura embaixo) -->
-  <rect x="22" y="135" width="136" height="17" rx="5" fill="#3f2814"/>
+  <rect x="22" y="135" width="136" height="17" rx="5" fill="#0a2415"/>
   <!-- caule central -->
-  <path d="M90 73v62" stroke="#faf6f1" stroke-width="11" stroke-linecap="round"/>
+  <path d="M90 73v62" stroke="#fdfbf4" stroke-width="11" stroke-linecap="round"/>
   <!-- folha esquerda -->
-  <path d="M90 101c-22-3-34-17-34-39 22 3 34 17 34 39z" fill="#faf6f1"/>
+  <path d="M90 101c-22-3-34-17-34-39 22 3 34 17 34 39z" fill="#fdfbf4"/>
   <!-- folha direita -->
-  <path d="M90 79c17-3 28-14 28-34-17 3-28 14-28 34z" fill="#e1c8a4"/>
+  <path d="M90 79c17-3 28-14 28-34-17 3-28 14-28 34z" fill="#8db580"/>
 </svg>

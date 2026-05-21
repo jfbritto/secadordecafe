@@ -4,18 +4,18 @@
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-coffee-900">Dashboard</h1>
-    <p class="text-sm text-coffee-500 mt-0.5">Visão geral da fazenda no mês corrente.</p>
+    <h1 class="text-2xl font-bold text-leaf-900">Dashboard</h1>
+    <p class="text-sm text-leaf-500 mt-0.5">Visão geral da fazenda no mês corrente.</p>
 </div>
 
 @if($farm)
-    <div class="bg-gradient-to-br from-coffee-700 to-coffee-800 text-white rounded-2xl p-6 mb-6 shadow-lg shadow-coffee-700/10">
+    <div class="bg-gradient-to-br from-leaf-700 to-leaf-800 text-white rounded-2xl p-6 mb-6 shadow-lg shadow-leaf-700/10">
         <div class="flex items-center justify-between flex-wrap gap-4">
             <div>
-                <p class="text-xs uppercase tracking-wider text-coffee-200">Fazenda</p>
+                <p class="text-xs uppercase tracking-wider text-leaf-200">Fazenda</p>
                 <p class="text-2xl font-bold mt-1">{{ $farm->nome }}</p>
                 @if($farm->cidade)
-                    <p class="text-sm text-coffee-200 mt-0.5">{{ $farm->cidade }}{{ $farm->estado ? ' / '.$farm->estado : '' }}</p>
+                    <p class="text-sm text-leaf-200 mt-0.5">{{ $farm->cidade }}{{ $farm->estado ? ' / '.$farm->estado : '' }}</p>
                 @endif
             </div>
             <div class="text-right">
@@ -25,7 +25,7 @@
                     {{ strtoupper($farm->status) }}
                 </span>
                 @if($farm->isOnTrial())
-                    <p class="text-xs text-coffee-200 mt-2">Trial até {{ $farm->trial_ends_at->format('d/m/Y') }}</p>
+                    <p class="text-xs text-leaf-200 mt-2">Trial até {{ $farm->trial_ends_at->format('d/m/Y') }}</p>
                 @endif
             </div>
         </div>
@@ -42,7 +42,7 @@
             ['label'=>'Despesas do mês', 'value'=>'R$ '.number_format($metrics['despesasMes'], 2, ',', '.'), 'icon'=>'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'tone'=>'rose'],
         ];
         $tones = [
-            'coffee'=>'bg-coffee-100 text-coffee-700',
+            'coffee'=>'bg-leaf-100 text-leaf-700',
             'amber'=>'bg-amber-100 text-amber-700',
             'emerald'=>'bg-emerald-100 text-emerald-700',
             'sky'=>'bg-sky-100 text-sky-700',
@@ -50,52 +50,52 @@
         ];
     @endphp
     @foreach($metricCards as $m)
-        <div class="bg-white rounded-xl border border-coffee-100 p-5 shadow-sm hover:shadow transition">
+        <div class="bg-white rounded-xl border border-leaf-100 p-5 shadow-sm hover:shadow transition">
             <div class="flex items-center justify-between mb-3">
-                <p class="text-xs font-semibold uppercase tracking-wider text-coffee-500">{{ $m['label'] }}</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-leaf-500">{{ $m['label'] }}</p>
                 <div class="w-8 h-8 rounded-lg {{ $tones[$m['tone']] }} flex items-center justify-center">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $m['icon'] }}"/></svg>
                 </div>
             </div>
-            <p class="text-2xl font-bold text-coffee-900">{{ $m['value'] }}</p>
+            <p class="text-2xl font-bold text-leaf-900">{{ $m['value'] }}</p>
         </div>
     @endforeach
 </div>
 
 <div class="grid lg:grid-cols-2 gap-6">
-    <div class="bg-white rounded-xl border border-coffee-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-coffee-100">
-            <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider">Últimas movimentações</h2>
+    <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-leaf-100">
+            <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Últimas movimentações</h2>
         </div>
-        <div class="divide-y divide-coffee-100">
+        <div class="divide-y divide-leaf-100">
             @forelse($ultimasMovs as $m)
                 <div class="px-6 py-3.5 flex items-center justify-between gap-3">
                     <div class="min-w-0">
-                        <p class="text-sm font-semibold text-coffee-900 truncate">{{ $m->customer?->nome ?? '—' }}</p>
-                        <p class="text-xs text-coffee-500">{{ ucfirst($m->tipo) }} · {{ $m->occurred_at->format('d/m H:i') }}{{ $m->user ? ' · '.$m->user->name : '' }}</p>
+                        <p class="text-sm font-semibold text-leaf-900 truncate">{{ $m->customer?->nome ?? '—' }}</p>
+                        <p class="text-xs text-leaf-500">{{ ucfirst($m->tipo) }} · {{ $m->occurred_at->format('d/m H:i') }}{{ $m->user ? ' · '.$m->user->name : '' }}</p>
                     </div>
                     <span class="text-sm font-bold {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
                         {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }} kg
                     </span>
                 </div>
             @empty
-                <div class="px-6 py-8 text-center text-sm text-coffee-500">Nenhuma movimentação ainda.</div>
+                <div class="px-6 py-8 text-center text-sm text-leaf-500">Nenhuma movimentação ainda.</div>
             @endforelse
         </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-coffee-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-coffee-100">
-            <h2 class="text-sm font-bold text-coffee-900 uppercase tracking-wider">Top clientes por saldo</h2>
+    <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-leaf-100">
+            <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Top clientes por saldo</h2>
         </div>
-        <div class="divide-y divide-coffee-100">
+        <div class="divide-y divide-leaf-100">
             @forelse($topClientes as $c)
-                <a href="{{ route('clientes.show', $c) }}" class="px-6 py-3.5 flex items-center justify-between gap-3 hover:bg-coffee-50 transition">
-                    <span class="text-sm font-semibold text-coffee-900 truncate">{{ $c->nome }}</span>
-                    <span class="text-sm font-bold text-coffee-700">{{ number_format($c->saldo_cafe_kg, 3, ',', '.') }} kg</span>
+                <a href="{{ route('clientes.show', $c) }}" class="px-6 py-3.5 flex items-center justify-between gap-3 hover:bg-leaf-50 transition">
+                    <span class="text-sm font-semibold text-leaf-900 truncate">{{ $c->nome }}</span>
+                    <span class="text-sm font-bold text-leaf-700">{{ number_format($c->saldo_cafe_kg, 3, ',', '.') }} kg</span>
                 </a>
             @empty
-                <div class="px-6 py-8 text-center text-sm text-coffee-500">Sem clientes.</div>
+                <div class="px-6 py-8 text-center text-sm text-leaf-500">Sem clientes.</div>
             @endforelse
         </div>
     </div>
