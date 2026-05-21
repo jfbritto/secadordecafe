@@ -79,7 +79,9 @@ nano .env                              # ajuste APP_KEY, DB_PASSWORD, MAIL_*, AS
 composer install --no-dev --optimize-autoloader --no-interaction
 php artisan key:generate                # gera APP_KEY se vazio
 php artisan migrate --force             # cria schema
-php artisan db:seed --class=RootUserSeeder --force  # cria usuário root (senha aleatória; anota!)
+php artisan db:seed --force             # cria roles Spatie (admin/operador/financeiro/visualizador/root) + usuário root
+                                        # ⚠️ NÃO use --class=RootUserSeeder isolado — vai pular o RoleSeeder
+                                        #    e o cadastro de fazenda quebra com "Role admin doesn't exist"
 
 # Permissões
 sudo chown -R deploy:www-data /var/www/rocanossa
