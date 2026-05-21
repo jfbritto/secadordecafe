@@ -26,6 +26,8 @@ class Farm extends Model
     public const STATUS_ACTIVE = 'active';
     public const STATUS_PAST_DUE = 'past_due';
     public const STATUS_BLOCKED = 'blocked';
+    /** Cortesia concedida pelo root — sem cobrança, sem expiração. */
+    public const STATUS_PARTNER = 'partner';
 
     protected $fillable = [
         'nome',
@@ -49,6 +51,11 @@ class Farm extends Model
     public function subscription(): HasOne
     {
         return $this->hasOne(Subscription::class);
+    }
+
+    public function customers(): HasMany
+    {
+        return $this->hasMany(Customer::class);
     }
 
     public function isBlocked(): bool

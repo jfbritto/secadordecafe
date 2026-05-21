@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\FarmController as AdminFarmController;
 use App\Http\Controllers\AsaasWebhookController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\Auth\LoginController;
@@ -122,5 +123,12 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
         Route::post('convites', [InvitationController::class, 'store'])->name('convites.store');
         Route::delete('convites/{convite}', [InvitationController::class, 'destroy'])->name('convites.destroy');
+    });
+
+    // Painel ROOT — visão global, mudança de plano, etc. Acesso negado em controller.
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('fazendas', [AdminFarmController::class, 'index'])->name('fazendas.index');
+        Route::get('fazendas/{farm}', [AdminFarmController::class, 'show'])->name('fazendas.show');
+        Route::put('fazendas/{farm}/plano', [AdminFarmController::class, 'changePlan'])->name('fazendas.plano');
     });
 });

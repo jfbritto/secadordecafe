@@ -34,6 +34,40 @@ class Subscription extends Model
     public const STATUS_PAST_DUE = 'past_due';
     public const STATUS_CANCELED = 'canceled';
     public const STATUS_BLOCKED = 'blocked';
+    /**
+     * Plano Parceiro — concedido pelo root pra dar acesso total grátis.
+     * Sem cobrança, sem expiração, ignorado pelo job de bloqueio.
+     */
+    public const STATUS_PARTNER = 'partner';
+
+    /** Status que dão acesso ao sistema (não-bloqueados). */
+    public const ALLOWED_STATUSES = [
+        self::STATUS_TRIAL,
+        self::STATUS_ACTIVE,
+        self::STATUS_PARTNER,
+        self::STATUS_PAST_DUE, // mantém acesso até o block-overdue rodar
+    ];
+
+    public function isPartner(): bool
+    {
+        return $this->status === self::STATUS_PARTNER;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function isBlocked(): bool
+    {
+        return in_array($this->status, [self::STATUS_BLOCKED, self::STATUS_CANCELED], true);
+    }
+
+    /** Tem acesso ao sistema? Cobre trial, active, partner e past_due ainda dentro da carência. */
+    public function grantsAccess(): bool
+    {
+        return in_array($this->status, self::ALLOWED_STATUSES, true);
+    }
 
     protected $fillable = [
         'farm_id',

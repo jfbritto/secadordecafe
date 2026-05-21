@@ -118,6 +118,11 @@
             <div class="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Geral</div>
             @php $nav('dashboard', 'Dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'); @endphp
 
+            @if($isRoot)
+                <div class="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-amber-200/70">Administração</div>
+                @php $nav('admin.fazendas.index', 'Fazendas', 'M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01', 'admin.fazendas.*'); @endphp
+            @endif
+
             @if(!$isRoot)
                 <div class="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Operação</div>
                 @php $nav('clientes.index', 'Clientes', 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'clientes.*'); @endphp

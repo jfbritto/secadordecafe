@@ -85,6 +85,7 @@ class DashboardController extends Controller
             'farmsTrial' => Farm::where('status', Farm::STATUS_TRIAL)->count(),
             'farmsPastDue' => Farm::where('status', Farm::STATUS_PAST_DUE)->count(),
             'farmsBlocked' => Farm::where('status', Farm::STATUS_BLOCKED)->count(),
+            'farmsPartner' => Farm::where('status', Farm::STATUS_PARTNER)->count(),
             'totalUsers' => User::where('is_root', false)->count(),
             'newFarms30d' => Farm::where('created_at', '>=', now()->subDays(30))->count(),
             'subscriptions' => Subscription::query()
