@@ -19,13 +19,13 @@
                 @endif
             </div>
             <div class="text-right">
-                @php $cls = match($farm->status){'active'=>'bg-emerald-500/20 text-emerald-100 border-emerald-300/30','blocked'=>'bg-rose-500/20 text-rose-100 border-rose-300/30','past_due'=>'bg-amber-500/20 text-amber-100 border-amber-300/30', default=>'bg-amber-500/20 text-amber-100 border-amber-300/30'}; @endphp
+                @php $cls = match($farm->status){'active'=>'bg-emerald-500/20 text-emerald-100 border-emerald-300/30','partner'=>'bg-purple-500/20 text-purple-100 border-purple-300/30','blocked'=>'bg-rose-500/20 text-rose-100 border-rose-300/30','past_due'=>'bg-orange-500/20 text-orange-100 border-orange-300/30','canceled'=>'bg-gray-500/20 text-gray-100 border-gray-300/30', default=>'bg-amber-500/20 text-amber-100 border-amber-300/30'}; @endphp
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold {{ $cls }}">
                     <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                    {{ strtoupper($farm->status) }}
+                    {{ \App\Support\StatusLabels::farm($farm->status) }}
                 </span>
                 @if($farm->isOnTrial())
-                    <p class="text-xs text-leaf-200 mt-2">Trial até {{ $farm->trial_ends_at->format('d/m/Y') }}</p>
+                    <p class="text-xs text-leaf-200 mt-2">Teste grátis até {{ $farm->trial_ends_at->format('d/m/Y') }}</p>
                 @endif
             </div>
         </div>

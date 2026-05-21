@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <div>
-        <p class="text-xs text-leaf-500 mb-1"><span class="text-amber-700 font-semibold">Painel ROOT</span></p>
+        <p class="text-xs text-leaf-500 mb-1"><span class="text-amber-700 font-semibold">Painel da Plataforma</span></p>
         <h1 class="text-2xl font-bold text-leaf-900">Fazendas da plataforma</h1>
         <p class="text-sm text-leaf-500 mt-0.5">Visão global de todas as roças. Clica em qualquer uma pra ver detalhes e mudar plano.</p>
     </div>

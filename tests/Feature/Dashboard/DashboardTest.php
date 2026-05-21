@@ -27,7 +27,7 @@ it('root dashboard shows platform metrics', function () {
     $this->actingAs($root)
         ->get('/dashboard')
         ->assertOk()
-        ->assertSee('Painel ROOT')
+        ->assertSee('Painel da Plataforma')
         ->assertSee('Total fazendas')
         ->assertSee('Bloqueadas');
 });

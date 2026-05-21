@@ -10,7 +10,6 @@ use App\Models\Farm;
 use App\Models\Movement;
 use App\Models\Secagem;
 use App\Models\Subscription;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -107,7 +106,7 @@ class FarmController extends Controller
     private function statusOptions(): array
     {
         return [
-            Subscription::STATUS_TRIAL    => 'Trial',
+            Subscription::STATUS_TRIAL    => 'Em teste',
             Subscription::STATUS_ACTIVE   => 'Ativa',
             Subscription::STATUS_PARTNER  => 'Parceira',
             Subscription::STATUS_PAST_DUE => 'Em atraso',

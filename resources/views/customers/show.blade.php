@@ -93,7 +93,7 @@
                             default   => 'bg-gray-100 text-gray-700',
                         };
                     @endphp
-                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ $m->tipo }}</span>
+                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ \App\Support\StatusLabels::movementTipo($m->tipo) }}</span>
                     <div class="flex-1 min-w-0">
                         <p class="text-sm text-leaf-900 truncate">
                             @if($m->source instanceof \App\Models\Secagem)

@@ -90,13 +90,13 @@
                     @if($farm)
                         <p class="text-[11px] text-white/60 truncate leading-tight mt-0.5">{{ $farm->nome }}</p>
                     @elseif($isRoot)
-                        <p class="text-[11px] text-amber-200 truncate leading-tight mt-0.5">Painel ROOT</p>
+                        <p class="text-[11px] text-amber-200 truncate leading-tight mt-0.5">Painel da Plataforma</p>
                     @endif
                 </div>
             </a>
             @if($farm && $farm->isOnTrial())
                 <div class="mt-3 px-2 py-1.5 rounded-md bg-amber-400/20 border border-amber-300/30 text-[11px] text-amber-100 text-center">
-                    Trial · até {{ $farm->trial_ends_at->format('d/m') }}
+                    Teste grátis · até {{ $farm->trial_ends_at->format('d/m') }}
                 </div>
             @endif
         </div>
@@ -182,10 +182,10 @@
             </button>
             <h1 class="text-base font-semibold text-leaf-900 truncate flex-1">@yield('title', 'Painel')</h1>
             @if($farm)
-                @php $statusCls = match($farm->status){'active'=>'bg-emerald-100 text-emerald-700','blocked'=>'bg-rose-100 text-rose-700','past_due'=>'bg-amber-100 text-amber-700', default=>'bg-amber-100 text-amber-700'}; @endphp
+                @php $statusCls = match($farm->status){'active'=>'bg-emerald-100 text-emerald-700','partner'=>'bg-purple-100 text-purple-700','blocked'=>'bg-rose-100 text-rose-700','past_due'=>'bg-orange-100 text-orange-700','canceled'=>'bg-gray-100 text-gray-700', default=>'bg-amber-100 text-amber-700'}; @endphp
                 <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $statusCls }}">
                     <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
-                    {{ strtoupper($farm->status) }}
+                    {{ \App\Support\StatusLabels::farm($farm->status) }}
                 </span>
             @endif
         </header>

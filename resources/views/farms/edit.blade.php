@@ -74,8 +74,8 @@
         <dl class="grid sm:grid-cols-3 gap-4 text-sm">
             <div>
                 <dt class="text-xs text-leaf-500 font-semibold uppercase">Status</dt>
-                @php $cls = match($farm->status){'active'=>'bg-emerald-100 text-emerald-700','blocked'=>'bg-rose-100 text-rose-700','past_due'=>'bg-amber-100 text-amber-700', default=>'bg-amber-100 text-amber-700'}; @endphp
-                <dd class="mt-1"><span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold {{ $cls }}">{{ strtoupper($farm->status) }}</span></dd>
+                @php $cls = match($farm->status){'active'=>'bg-emerald-100 text-emerald-700','partner'=>'bg-purple-100 text-purple-700','blocked'=>'bg-rose-100 text-rose-700','past_due'=>'bg-orange-100 text-orange-700','canceled'=>'bg-gray-100 text-gray-700', default=>'bg-amber-100 text-amber-700'}; @endphp
+                <dd class="mt-1"><span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold {{ $cls }}">{{ \App\Support\StatusLabels::farm($farm->status) }}</span></dd>
             </div>
             <div>
                 <dt class="text-xs text-leaf-500 font-semibold uppercase">Slug</dt>

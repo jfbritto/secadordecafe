@@ -135,7 +135,7 @@
                                         default   => 'bg-gray-100 text-gray-700',
                                     };
                                 @endphp
-                                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ $m->tipo }}</span>
+                                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ \App\Support\StatusLabels::movementTipo($m->tipo) }}</span>
                             </td>
                             <td class="px-6 py-3 text-right font-bold whitespace-nowrap {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
                                 {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }}

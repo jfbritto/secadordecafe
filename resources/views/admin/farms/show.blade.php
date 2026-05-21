@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $farm->nome . ' (ROOT)')
+@section('title', $farm->nome)
 
 @section('content')
 @php
@@ -20,7 +20,7 @@
 <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
     <div>
         <p class="text-xs text-leaf-500 mb-1">
-            <span class="text-amber-700 font-semibold">Painel ROOT</span> ·
+            <span class="text-amber-700 font-semibold">Painel da Plataforma</span> ·
             <a href="{{ route('admin.fazendas.index') }}" class="hover:underline">Fazendas</a>
         </p>
         <div class="flex items-center gap-2">
@@ -30,7 +30,7 @@
             </span>
         </div>
         <p class="text-xs text-leaf-500 mt-1">
-            Cadastrada em {{ $farm->created_at->format('d/m/Y') }} · slug: <code class="bg-leaf-100 px-1 rounded">{{ $farm->slug }}</code>
+            Cadastrada em {{ $farm->created_at->format('d/m/Y') }}
         </p>
     </div>
 </div>
@@ -89,7 +89,7 @@
                             <td class="px-6 py-2 text-leaf-600">{{ $u->email }}</td>
                             <td class="px-6 py-2">
                                 @foreach($u->roles as $role)
-                                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-leaf-100 text-leaf-700">{{ $role->name }}</span>
+                                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-leaf-100 text-leaf-700">{{ \App\Support\StatusLabels::role($role->name) }}</span>
                                 @endforeach
                             </td>
                         </tr>
@@ -113,19 +113,19 @@
                 <dl class="space-y-2 text-sm mb-4">
                     @if($sub->trial_ends_at)
                         <div>
-                            <dt class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Trial até</dt>
+                            <dt class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Teste grátis até</dt>
                             <dd class="text-leaf-900">{{ $sub->trial_ends_at->format('d/m/Y') }}</dd>
                         </div>
                     @endif
                     @if($sub->current_period_end)
                         <div>
-                            <dt class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Período atual até</dt>
+                            <dt class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Próxima cobrança</dt>
                             <dd class="text-leaf-900">{{ $sub->current_period_end->format('d/m/Y') }}</dd>
                         </div>
                     @endif
                     @if($sub->asaas_subscription_id)
                         <div>
-                            <dt class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">ID Asaas</dt>
+                            <dt class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Código no sistema de cobrança</dt>
                             <dd class="text-leaf-900 text-xs font-mono">{{ $sub->asaas_subscription_id }}</dd>
                         </div>
                     @endif
@@ -148,7 +148,7 @@
                             $confirmText = match($target) {
                                 'partner'  => 'Conceder plano parceiro? Acesso total sem cobrança nem expiração.',
                                 'active'   => 'Marcar como ativa? Assume pagamento em dia.',
-                                'trial'    => 'Voltar pra trial? Renova o período de teste a partir de hoje.',
+                                'trial'    => 'Voltar pro período de teste? Renova o teste grátis a partir de hoje.',
                                 'blocked'  => 'Bloquear esta fazenda? Acesso suspenso até reativar.',
                                 'canceled' => 'Cancelar a assinatura? A fazenda fica sem acesso.',
                                 'past_due' => 'Marcar como em atraso?',
