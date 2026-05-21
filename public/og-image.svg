@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+    <!-- Open Graph image — 1200x630, padrão Facebook/Twitter/LinkedIn/WhatsApp -->
+
+    <!-- Gradiente verde-mato → verde-noite (paleta Lavoura Verde) -->
+    <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#1e5631"/>
+            <stop offset="100%" stop-color="#0a2415"/>
+        </linearGradient>
+        <radialGradient id="glow" cx="30%" cy="35%" r="55%">
+            <stop offset="0%" stop-color="#2d8a4a" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#1e5631" stop-opacity="0"/>
+        </radialGradient>
+    </defs>
+
+    <rect width="1200" height="630" fill="url(#bg)"/>
+    <rect width="1200" height="630" fill="url(#glow)"/>
+
+    <!-- Faixa de terra decorativa no rodapé -->
+    <rect x="0" y="595" width="1200" height="35" fill="#0a2415" opacity="0.6"/>
+
+    <!-- Folhas decorativas (canto superior direito, sutis) -->
+    <g opacity="0.08" transform="translate(950, 80)">
+        <path d="M0 80c-30-15-40-50-30-90 30 15 40 50 30 90z" fill="#fdfbf4"/>
+        <path d="M40 60c25-20 65-25 105 0-25 20-65 25-105 0z" fill="#fdfbf4"/>
+        <path d="M-40 130c-15-30 5-65 40-80 15 30-5 65-40 80z" fill="#fdfbf4"/>
+    </g>
+
+    <g opacity="0.06" transform="translate(80, 480) rotate(-15)">
+        <path d="M0 0c40 10 70 50 70 100-50-10-80-50-70-100z" fill="#fdfbf4"/>
+        <path d="M80 40c30-30 80-30 110 0-30 30-80 30-110 0z" fill="#fdfbf4"/>
+    </g>
+
+    <!-- Logo: broto saindo da terra (à esquerda) -->
+    <g transform="translate(150, 215)">
+        <!-- Círculo de fundo do logo -->
+        <circle cx="100" cy="100" r="100" fill="#fdfbf4" opacity="0.08"/>
+        <circle cx="100" cy="100" r="80" fill="#fdfbf4" opacity="0.12"/>
+
+        <!-- Broto -->
+        <g transform="translate(100, 100) scale(4.5) translate(-16, -16)">
+            <!-- Caule -->
+            <path d="M16 13v11" stroke="#fdfbf4" stroke-width="2" stroke-linecap="round"/>
+            <!-- Folha esquerda (creme) -->
+            <path d="M16 18c-4-.5-6-3-6-7 4 .5 6 3 6 7z" fill="#fdfbf4"/>
+            <!-- Folha direita (musgo claro) -->
+            <path d="M16 14c3-.5 5-2.5 5-6-3 .5-5 2.5-5 6z" fill="#8db580"/>
+        </g>
+    </g>
+
+    <!-- Texto principal (à direita do logo) -->
+    <g transform="translate(420, 260)">
+        <text x="0" y="0" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="100" font-weight="900" fill="#fdfbf4" letter-spacing="-3">
+            Roça Nossa
+        </text>
+        <text x="0" y="55" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="36" font-weight="400" fill="#b3c49d" letter-spacing="-0.5">
+            A tecnologia que entende a roça
+        </text>
+    </g>
+
+    <!-- Tagline secundária + URL no rodapé -->
+    <g transform="translate(150, 540)">
+        <text x="0" y="0" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" fill="#fdfbf4" opacity="0.9">
+            Acompanhe sua roça do plantio ao pagamento
+        </text>
+        <text x="0" y="32" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="400" fill="#8db580" opacity="0.8">
+            Produtores · Saldo · Secagens · Despesas · Equipe
+        </text>
+    </g>
+
+    <!-- URL canto inferior direito -->
+    <text x="1050" y="572" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#fdfbf4" opacity="0.9" text-anchor="end">
+        rocanossa.com.br
+    </text>
+</svg>

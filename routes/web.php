@@ -27,6 +27,9 @@ Route::get('/', [PublicSiteController::class, 'home'])->name('home');
 Route::get('/termos', [PublicSiteController::class, 'termos'])->name('termos');
 Route::get('/privacidade', [PublicSiteController::class, 'privacidade'])->name('privacidade');
 
+// Preview da OG image — pra gerar PNG via screenshot do navegador (uso pontual)
+Route::view('/og-preview', 'og-preview')->name('og.preview');
+
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisterController::class, 'show'])->name('register');
     Route::post('register', [RegisterController::class, 'store'])->middleware('throttle:5,10');
