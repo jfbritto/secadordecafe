@@ -90,6 +90,21 @@ it('matriz reflete o comportamento real das policies', function () {
             ->toBe(PermissionsMatrix::can($role, 'secadores', 'delete'),
                 "Mismatch role={$role} secadores/delete");
 
+        // Area
+        $area = \App\Models\Area::factory()->forFarm($user->farm)->create();
+        expect($user->can('viewAny', \App\Models\Area::class))
+            ->toBe(PermissionsMatrix::can($role, 'areas', 'view'),
+                "Mismatch role={$role} areas/view");
+        expect($user->can('create', \App\Models\Area::class))
+            ->toBe(PermissionsMatrix::can($role, 'areas', 'create'),
+                "Mismatch role={$role} areas/create");
+        expect($user->can('update', $area))
+            ->toBe(PermissionsMatrix::can($role, 'areas', 'edit'),
+                "Mismatch role={$role} areas/edit");
+        expect($user->can('delete', $area))
+            ->toBe(PermissionsMatrix::can($role, 'areas', 'delete'),
+                "Mismatch role={$role} areas/delete");
+
         // Expense
         expect($user->can('viewAny', Expense::class))
             ->toBe(PermissionsMatrix::can($role, 'despesas', 'view'),

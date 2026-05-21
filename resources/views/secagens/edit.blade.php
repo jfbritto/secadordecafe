@@ -47,6 +47,19 @@
                     @error('dryer_id')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
                 </div>
                 <div>
+                    <label for="area_id" class="block text-sm font-bold text-coffee-900 mb-2">
+                        Área <span class="text-coffee-400 font-normal">(opcional)</span>
+                    </label>
+                    <select id="area_id" name="area_id"
+                            class="w-full px-4 py-3 text-base rounded-lg border border-coffee-200 focus:border-coffee-500 focus:ring-4 focus:ring-coffee-500/15 outline-none transition bg-white">
+                        <option value="">— sem área (secagem própria) —</option>
+                        @foreach($areas as $a)
+                            <option value="{{ $a->id }}" @selected(old('area_id', $secagem->area_id) == $a->id)>{{ $a->nome }}</option>
+                        @endforeach
+                    </select>
+                    @error('area_id')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+                </div>
+                <div>
                     <label for="observacoes" class="block text-sm font-bold text-coffee-900 mb-2">Observações</label>
                     <textarea id="observacoes" name="observacoes" rows="3"
                               placeholder="Tempo de secagem, particularidades…"

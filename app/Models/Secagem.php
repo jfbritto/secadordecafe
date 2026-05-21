@@ -20,7 +20,7 @@ class Secagem extends Model
     protected $table = 'secagens';
 
     protected $fillable = [
-        'farm_id', 'user_id', 'dryer_id', 'numero', 'data',
+        'farm_id', 'user_id', 'dryer_id', 'area_id', 'numero', 'data',
         'observacoes', 'status', 'concluida_at',
     ];
 
@@ -32,7 +32,7 @@ class Secagem extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['numero', 'data', 'dryer_id', 'status'])
+            ->logOnly(['numero', 'data', 'dryer_id', 'area_id', 'status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $event) => "secagem {$event}");
@@ -41,6 +41,7 @@ class Secagem extends Model
     public function items(): HasMany { return $this->hasMany(SecagemItem::class); }
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function dryer(): BelongsTo { return $this->belongsTo(Dryer::class); }
+    public function area(): BelongsTo { return $this->belongsTo(Area::class); }
 
     public function secadorNome(): string
     {

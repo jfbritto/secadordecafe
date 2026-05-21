@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DryerController;
 use App\Http\Controllers\FarmBlockedController;
 use App\Http\Controllers\FarmController;
@@ -62,6 +63,14 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::get('secadores/{secador}/editar', [DryerController::class, 'edit'])->name('secadores.edit');
         Route::put('secadores/{secador}', [DryerController::class, 'update'])->name('secadores.update');
         Route::delete('secadores/{secador}', [DryerController::class, 'destroy'])->name('secadores.destroy');
+
+        Route::get('areas', [AreaController::class, 'index'])->name('areas.index');
+        Route::get('areas/criar', [AreaController::class, 'create'])->name('areas.create');
+        Route::post('areas', [AreaController::class, 'store'])->name('areas.store');
+        Route::get('areas/{area}', [AreaController::class, 'show'])->name('areas.show');
+        Route::get('areas/{area}/editar', [AreaController::class, 'edit'])->name('areas.edit');
+        Route::put('areas/{area}', [AreaController::class, 'update'])->name('areas.update');
+        Route::delete('areas/{area}', [AreaController::class, 'destroy'])->name('areas.destroy');
 
         Route::get('secagens', [SecagemController::class, 'index'])->name('secagens.index');
         Route::get('secagens/criar', [SecagemController::class, 'create'])->name('secagens.create');

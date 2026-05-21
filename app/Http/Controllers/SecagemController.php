@@ -6,6 +6,7 @@ use App\Actions\Secagens\ConcludeSecagemAction;
 use App\Actions\Secagens\CreateSecagemAction;
 use App\Http\Requests\Secagens\StoreSecagemItemRequest;
 use App\Http\Requests\Secagens\StoreSecagemRequest;
+use App\Models\Area;
 use App\Models\Customer;
 use App\Models\Dryer;
 use App\Models\Secagem;
@@ -42,7 +43,9 @@ class SecagemController extends Controller
             return view('secagens.no-dryer');
         }
 
-        return view('secagens.create', compact('dryers'));
+        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome']);
+
+        return view('secagens.create', compact('dryers', 'areas'));
     }
 
     public function store(StoreSecagemRequest $request, CreateSecagemAction $action): RedirectResponse
@@ -56,7 +59,7 @@ class SecagemController extends Controller
     {
         $this->ensureSameFarm($secagem);
         $this->authorize('view', $secagem);
-        $secagem->load('items.customer', 'user', 'dryer');
+        $secagem->load('items.customer', 'user', 'dryer', 'area');
 
         return view('secagens.show', compact('secagem'));
     }
@@ -65,15 +68,20 @@ class SecagemController extends Controller
     {
         $this->ensureSameFarm($secagem);
         $this->authorize('update', $secagem);
-        $secagem->load('items.customer', 'dryer');
+        $secagem->load('items.customer', 'dryer', 'area');
         $customers = Customer::orderBy('nome')->get(['id', 'nome', 'saldo_cafe_kg']);
         $dryers = Dryer::ativo()->orderBy('nome')->get(['id', 'nome']);
         // Inclui o secador atual se ele estiver inativo
         if ($secagem->dryer && ! $secagem->dryer->ativo) {
             $dryers->push($secagem->dryer->only(['id', 'nome']));
         }
+        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome']);
+        // Inclui a área atual se ela estiver inativa (pra não desvincular sem querer)
+        if ($secagem->area && ! $secagem->area->ativo) {
+            $areas->push($secagem->area->only(['id', 'nome']));
+        }
 
-        return view('secagens.edit', compact('secagem', 'customers', 'dryers'));
+        return view('secagens.edit', compact('secagem', 'customers', 'dryers', 'areas'));
     }
 
     public function update(StoreSecagemRequest $request, Secagem $secagem): RedirectResponse

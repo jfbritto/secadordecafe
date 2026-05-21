@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Area;
 use App\Models\Customer;
 use App\Models\Dryer;
 use App\Models\Expense;
@@ -35,6 +36,10 @@ class AuditFormatter
         Dryer::class => [
             'label' => 'Secador', 'name_field' => 'nome', 'name_prefix' => '',
             'icon' => 'M9 17v-2a4 4 0 014-4h6m-4-4l4 4-4 4M3 7v10a2 2 0 002 2h6a2 2 0 002-2v-2',
+        ],
+        Area::class => [
+            'label' => 'Área', 'name_field' => 'nome', 'name_prefix' => '',
+            'icon' => 'M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z',
         ],
         Secagem::class => [
             'label' => 'Secagem', 'name_field' => 'numero', 'name_prefix' => '#',
@@ -92,6 +97,9 @@ class AuditFormatter
         'data' => 'Data',
         'secador' => 'Secador',
         'dryer_id' => 'Secador',
+        'area_id' => 'Área',
+        'latitude' => 'Latitude',
+        'longitude' => 'Longitude',
         'descricao' => 'Descrição',
         'categoria' => 'Categoria',
         'expense_category_id' => 'Categoria',
@@ -198,6 +206,10 @@ class AuditFormatter
         // Resolver IDs em nomes legíveis
         if ($field === 'dryer_id' && is_numeric($value)) {
             $name = Dryer::query()->withoutGlobalScopes()->find($value)?->nome;
+            return $name ?? "#{$value}";
+        }
+        if ($field === 'area_id' && is_numeric($value)) {
+            $name = Area::query()->withoutGlobalScopes()->find($value)?->nome;
             return $name ?? "#{$value}";
         }
         if ($field === 'expense_category_id' && is_numeric($value)) {

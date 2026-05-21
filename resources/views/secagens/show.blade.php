@@ -8,7 +8,11 @@
         <p class="text-xs text-coffee-500 mb-1"><a href="{{ route('secagens.index') }}" class="hover:underline">Secagens</a></p>
         <h1 class="text-2xl font-bold text-coffee-900">Secagem #{{ $secagem->numero }}</h1>
         <p class="text-sm text-coffee-500 mt-0.5">
-            {{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secadorNome() }} ·
+            {{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secadorNome() }}
+            @if($secagem->area)
+                · <a href="{{ route('areas.show', $secagem->area) }}" class="text-coffee-700 font-semibold hover:underline">{{ $secagem->area->nome }}</a>
+            @endif
+            ·
             @if($secagem->isConcluida())
                 <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">CONCLUÍDA em {{ $secagem->concluida_at->format('d/m/Y H:i') }}</span>
             @else
