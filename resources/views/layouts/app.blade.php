@@ -121,8 +121,8 @@
             @if(!$isRoot)
                 <div class="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Operação</div>
                 @php $nav('clientes.index', 'Clientes', 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'clientes.*'); @endphp
-                @php $nav('secagens.index', 'Secagens', 'M5 8h14M5 12h14M5 16h14M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z', 'secagens.*'); @endphp
-                @php $nav('secadores.index', 'Secadores', 'M9 17v-2a4 4 0 014-4h6m-4-4l4 4-4 4M3 7v10a2 2 0 002 2h6a2 2 0 002-2v-2', 'secadores.*'); @endphp
+                @php $nav('secagens.index', 'Secagens', 'M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z', 'secagens.*'); @endphp
+                @php $nav('secadores.index', 'Secadores', 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z', 'secadores.*'); @endphp
                 @php $nav('areas.index', 'Áreas', 'M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z', 'areas.*'); @endphp
 
                 @if($canFinanceiro)

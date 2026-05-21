@@ -37,7 +37,7 @@
         $metricCards = [
             ['label'=>'Clientes', 'value'=>number_format($metrics['clientes'], 0, ',', '.'), 'icon'=>'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'tone'=>'coffee'],
             ['label'=>'Saldo total (kg)', 'value'=>number_format($metrics['saldoCafeKg'], 0, ',', '.'), 'icon'=>'M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z', 'tone'=>'amber'],
-            ['label'=>'Secagens no mês', 'value'=>$metrics['secagensConcluidasMes'].'/'.$metrics['secagensMes'], 'icon'=>'M5 8h14M5 12h14M5 16h14M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z', 'tone'=>'emerald'],
+            ['label'=>'Secagens no mês', 'value'=>$metrics['secagensConcluidasMes'].'/'.$metrics['secagensMes'], 'icon'=>'M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z', 'tone'=>'emerald'],
             ['label'=>'Kg secados no mês', 'value'=>number_format($metrics['kgSecadosMes'], 0, ',', '.'), 'icon'=>'M13 17l5-5-5-5M6 17l5-5-5-5', 'tone'=>'sky'],
             ['label'=>'Despesas do mês', 'value'=>'R$ '.number_format($metrics['despesasMes'], 2, ',', '.'), 'icon'=>'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'tone'=>'rose'],
         ];
