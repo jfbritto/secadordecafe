@@ -52,7 +52,7 @@
                     </label>
                     <select id="area_id" name="area_id"
                             class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                        <option value="">— sem área (secagem própria) —</option>
+                        <option value="">— sem área (secagem pra cliente) —</option>
                         @foreach($areas as $a)
                             <option value="{{ $a->id }}" @selected(old('area_id', $secagem->area_id) == $a->id)>{{ $a->nome }}</option>
                         @endforeach

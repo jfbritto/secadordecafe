@@ -6,7 +6,7 @@
 <div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
     <div>
         <h1 class="text-2xl font-bold text-leaf-900">Áreas</h1>
-        <p class="text-sm text-leaf-500 mt-0.5">Talhões e lotes da sua roça. Cada secagem pode ser vinculada a uma área pra você acompanhar a produção.</p>
+        <p class="text-sm text-leaf-500 mt-0.5">Talhões e lotes da sua roça. Vincule cada secagem do <strong>seu café</strong> a uma área pra acompanhar quanto cada uma produz.</p>
     </div>
     @can('create', App\Models\Area::class)
         <a href="{{ route('areas.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm">

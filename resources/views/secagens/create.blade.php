@@ -55,13 +55,13 @@
             </label>
             <select id="area_id" name="area_id"
                     class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                <option value="">— sem área (secagem própria) —</option>
+                <option value="">— sem área (secagem pra cliente) —</option>
                 @foreach($areas as $a)
                     <option value="{{ $a->id }}" @selected(old('area_id') == $a->id)>{{ $a->nome }}</option>
                 @endforeach
             </select>
             <p class="mt-1.5 text-sm text-leaf-500">
-                Talhão/lote da roça que originou esse café. Deixe em branco quando for secagem pra você mesmo.
+                Selecione quando o café for <strong>da sua roça</strong>. Deixe em branco quando estiver secando café <strong>de cliente</strong> (que veio de outra roça).
                 @if($areas->isEmpty())
                     <a href="{{ route('areas.create') }}" class="text-leaf-700 font-semibold hover:underline">Cadastrar área</a>.
                 @endif

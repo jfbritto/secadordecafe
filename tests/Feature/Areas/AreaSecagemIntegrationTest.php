@@ -19,7 +19,7 @@ it('cria secagem vinculando a uma área', function () {
     expect(Secagem::first()->area_id)->toBe($area->id);
 });
 
-it('cria secagem SEM área (secagem própria)', function () {
+it('cria secagem SEM área (secagem pra cliente — café de outra roça)', function () {
     $admin = makeFarmUser('admin');
     $d = Dryer::factory()->forFarm($admin->farm)->create();
 
