@@ -118,6 +118,7 @@
                         <label for="comissao_pct" class="block text-sm font-bold text-leaf-900 mb-2">Comissão</label>
                         <div class="relative">
                             <input id="comissao_pct" type="number" step="0.01" min="0" max="100" inputmode="decimal" name="comissao_percentual" value="0"
+                                   placeholder="ex: 10"
                                    class="w-full pl-3 pr-8 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
                             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">%</span>
                         </div>

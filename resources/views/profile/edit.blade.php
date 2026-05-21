@@ -26,6 +26,7 @@
                 </label>
                 <input id="name" type="text" name="name" required minlength="2" maxlength="120"
                        value="{{ old('name', $user->name) }}"
+                       placeholder="ex: João da Silva"
                        class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
                 @error('name')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
             </div>
@@ -36,6 +37,7 @@
                 </label>
                 <input id="email" type="email" name="email" required maxlength="180"
                        value="{{ old('email', $user->email) }}"
+                       placeholder="seu@email.com"
                        class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
                 <p class="mt-1.5 text-sm text-leaf-500">Usado para entrar no sistema e receber e-mails da plataforma.</p>
                 @error('email')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
@@ -65,7 +67,8 @@
                     Senha atual <span class="text-rose-500">*</span>
                 </label>
                 <input id="current_password" type="password" name="current_password" required autocomplete="current-password"
-                       class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                       placeholder="A senha que você usa pra entrar hoje"
+                       class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
                 @error('current_password')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
             </div>
 
@@ -75,7 +78,8 @@
                         Nova senha <span class="text-rose-500">*</span>
                     </label>
                     <input id="password" type="password" name="password" required autocomplete="new-password" minlength="8"
-                           class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                           placeholder="Pelo menos 8 caracteres"
+                           class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
                     <p class="mt-1.5 text-sm text-leaf-500">Mínimo 8 caracteres, com letras e números.</p>
                     @error('password')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
                 </div>
@@ -84,7 +88,8 @@
                         Repita a nova senha <span class="text-rose-500">*</span>
                     </label>
                     <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" minlength="8"
-                           class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                           placeholder="Repete a senha nova"
+                           class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
                 </div>
             </div>
         </div>
