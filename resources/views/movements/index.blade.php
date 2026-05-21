@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Extrato — '.$customer->nome)
+@section('title', 'Extrato, '.$customer->nome)
 
 @section('content')
 <div class="max-w-6xl mx-auto">
@@ -11,7 +11,7 @@
                 <a href="{{ route('clientes.show', $customer) }}" class="hover:underline">{{ $customer->nome }}</a> ·
                 <span class="text-leaf-700">Extrato</span>
             </p>
-            <h1 class="text-2xl font-bold text-leaf-900">Extrato — {{ $customer->nome }}</h1>
+            <h1 class="text-2xl font-bold text-leaf-900">Extrato, {{ $customer->nome }}</h1>
         </div>
         <div class="bg-leaf-700 text-white px-5 py-3 rounded-xl shadow-md text-right">
             <p class="text-[10px] uppercase tracking-wider text-leaf-200">Saldo atual</p>

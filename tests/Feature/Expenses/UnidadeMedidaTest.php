@@ -79,7 +79,7 @@ it('formulário de criar despesa renderiza select de unidades fechado', function
 
     // Select fechado (não datalist)
     expect($html)->toContain('<select id="unidade"');
-    expect($html)->toContain('— sem unidade —');
+    expect($html)->toContain('Sem unidade');
     expect($html)->toContain('value="L"');
     expect($html)->toContain('value="kg"');
     expect($html)->toContain('value="un"');

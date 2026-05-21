@@ -20,7 +20,7 @@
             <h1 style="color:#1e5631; margin:0 0 12px; font-size:24px;">Bem-vindo, {{ $userName }}! 🌱</h1>
             <p style="color:#143a23; margin:0 0 14px; line-height:1.55;">
                 Sua roça <strong>{{ $farmName }}</strong> tá no sistema. Você tem <strong>14 dias</strong> de uso completo
-                pra colocar tudo no lugar — produtores, secagens, despesas e equipe.
+                pra colocar tudo no lugar, produtores, secagens, despesas e equipe.
             </p>
             <p style="color:#143a23; margin:0 0 24px; line-height:1.55;">
                 Quando estiver pronto, é só entrar e botar a roda pra girar:
@@ -31,6 +31,6 @@
             <p style="font-size:13px; color:#5da361; margin-top:32px;">Se não foi você que criou esta conta, pode ignorar este e-mail.</p>
         </div>
     </div>
-    <p style="text-align:center; color:#5da361; font-size:12px; margin-top:18px;">© {{ date('Y') }} Roça Nossa — a tecnologia que entende a roça</p>
+    <p style="text-align:center; color:#5da361; font-size:12px; margin-top:18px;">© {{ date('Y') }} Roça Nossa, a tecnologia que entende a roça</p>
 </body>
 </html>

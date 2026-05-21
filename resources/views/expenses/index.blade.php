@@ -79,7 +79,7 @@
             <div>
                 <label class="block text-xs font-semibold text-leaf-700 mb-1.5">Categoria</label>
                 <select name="cat" class="w-full px-3 py-2 text-sm rounded-lg border border-leaf-200 focus:outline-none focus:ring-2 focus:ring-leaf-500">
-                    <option value="">— todas —</option>
+                    <option value="">Todas/option>
                     @foreach($allCategories as $c)
                         <option value="{{ $c->id }}" @selected($catId == $c->id)>{{ $c->nome }}{{ $c->ativo ? '' : ' (inativa)' }}</option>
                     @endforeach

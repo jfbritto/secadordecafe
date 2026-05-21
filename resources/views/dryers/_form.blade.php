@@ -16,7 +16,7 @@
                value="{{ old('nome', $D?->nome) }}"
                placeholder="ex: Secador 1, Secador grande, Pinhalense"
                class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
-        <p class="mt-1.5 text-sm text-leaf-500">Apelido único — escolha algo que toda a equipe reconheça.</p>
+        <p class="mt-1.5 text-sm text-leaf-500">Apelido único, escolha algo que toda a equipe reconheça.</p>
         @error('nome')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
     </div>
 

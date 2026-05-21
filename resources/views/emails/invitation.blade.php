@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><title>Convite — Roça Nossa</title></head>
+<head><meta charset="utf-8"><title>Convite · Roça Nossa</title></head>
 <body style="font-family: system-ui, -apple-system, sans-serif; background:#fdfbf4; padding:32px; margin:0; color:#0a2415;">
     <div style="max-width:560px; margin:0 auto; background:#fff; border-radius:16px; overflow:hidden; border:1px solid #d8c9a8;">
         <!-- Header verde com logo grande -->

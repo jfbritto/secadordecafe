@@ -9,7 +9,7 @@
             <a href="{{ route('areas.index') }}" class="hover:underline">Áreas</a> · <span class="text-leaf-700">Nova</span>
         </p>
         <h1 class="text-2xl font-bold text-leaf-900">Nova área</h1>
-        <p class="text-sm text-leaf-500 mt-1">Cadastre os talhões/lotes da <strong>sua roça</strong>. Ao secar o seu próprio café, você seleciona em qual área foi colhido — assim dá pra acompanhar quanto cada parte da roça produz.</p>
+        <p class="text-sm text-leaf-500 mt-1">Cadastre os talhões/lotes da <strong>sua roça</strong>. Ao secar o seu próprio café, você seleciona em qual área foi colhido, assim dá pra acompanhar quanto cada parte da roça produz.</p>
     </div>
 
     <form method="POST" action="{{ route('areas.store') }}" class="bg-white rounded-2xl border border-leaf-100 shadow-sm p-6 sm:p-8">

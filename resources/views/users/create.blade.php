@@ -73,7 +73,7 @@
         <div class="bg-white rounded-2xl border border-leaf-100 shadow-sm p-6 sm:p-8">
             <div class="border-b border-leaf-100 pb-5 mb-6">
                 <h2 class="text-base font-bold text-leaf-900">Permissão</h2>
-                <p class="text-sm text-leaf-500 mt-0.5">Escolha o papel — abaixo aparece exatamente o que esta pessoa poderá fazer.</p>
+                <p class="text-sm text-leaf-500 mt-0.5">Escolha o papel, abaixo aparece exatamente o que esta pessoa poderá fazer.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">

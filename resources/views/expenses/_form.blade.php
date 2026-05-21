@@ -31,7 +31,7 @@
             </label>
             <select id="expense_category_id" name="expense_category_id" required
                     class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                <option value="">— selecione —</option>
+                <option value="">Selecione/option>
                 @foreach($categories as $c)
                     <option value="{{ $c->id }}" @selected(old('expense_category_id', $E?->expense_category_id) == $c->id)>{{ $c->nome }}</option>
                 @endforeach
@@ -59,7 +59,7 @@
 <div class="border-b border-leaf-100 pb-5 mb-6">
     <h2 class="text-base font-bold text-leaf-900">Valores</h2>
     <p class="text-sm text-leaf-500 mt-0.5">
-        Se for compra por unidade, preencha quantidade e valor unitário — o total é calculado.
+        Se for compra por unidade, preencha quantidade e valor unitário, o total é calculado.
         Se for valor único (ex: imposto), preencha só o <strong>Valor total</strong>.
     </p>
 </div>
@@ -75,9 +75,9 @@
         <label for="unidade" class="block text-sm font-bold text-leaf-900 mb-2">Unidade</label>
         <select id="unidade" name="unidade" x-model="unidade"
                 class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-            <option value="">— sem unidade —</option>
+            <option value="">Sem unidade/option>
             @foreach(\App\Models\Expense::UNIDADES as $sigla => $u)
-                <option value="{{ $sigla }}" @selected($unidadeAtual === $sigla)>{{ $sigla }} — {{ $u['label'] }}{{ $u['discreta'] ? ' (inteiro)' : '' }}</option>
+                <option value="{{ $sigla }}" @selected($unidadeAtual === $sigla)>{{ $sigla }}, {{ $u['label'] }}{{ $u['discreta'] ? ' (inteiro)' : '' }}</option>
             @endforeach
         </select>
         <p class="mt-1.5 text-xs text-leaf-500">Selecione se aplicável</p>

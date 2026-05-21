@@ -37,7 +37,7 @@
                 </label>
                 <select id="dryer_id" name="dryer_id" required
                         class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                    <option value="">— selecione —</option>
+                    <option value="">Selecione/option>
                     @foreach($dryers as $d)
                         <option value="{{ $d->id }}" @selected(old('dryer_id') == $d->id)>{{ $d->nome }}</option>
                     @endforeach
@@ -55,7 +55,7 @@
             </label>
             <select id="area_id" name="area_id"
                     class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                <option value="">— sem área (secagem pra cliente) —</option>
+                <option value="">Sem área (secagem pra cliente)/option>
                 @foreach($areas as $a)
                     <option value="{{ $a->id }}" @selected(old('area_id') == $a->id)>{{ $a->nome }}</option>
                 @endforeach

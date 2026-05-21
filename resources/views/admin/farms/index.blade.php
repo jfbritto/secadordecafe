@@ -24,7 +24,7 @@
             <label class="block text-[10px] uppercase tracking-wider text-leaf-500 font-semibold mb-1.5">Plano</label>
             <select name="status"
                     class="w-full px-3 py-2 text-sm rounded-lg border border-leaf-200 focus:outline-none focus:ring-2 focus:ring-leaf-500 focus:border-leaf-500 bg-white">
-                <option value="">— todos —</option>
+                <option value="">Todos/option>
                 @foreach($statuses as $value => $label)
                     <option value="{{ $value }}" @selected($statusFilter === $value)>{{ $label }}</option>
                 @endforeach

@@ -16,7 +16,7 @@
                value="{{ old('nome', $A?->nome) }}"
                placeholder="ex: Talhão Norte, Cafezal do Morro, Quadra A"
                class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
-        <p class="mt-1.5 text-sm text-leaf-500">Nome único — o que a equipe usa pra se referir a essa parte da roça.</p>
+        <p class="mt-1.5 text-sm text-leaf-500">Nome único, o que a equipe usa pra se referir a essa parte da roça.</p>
         @error('nome')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
     </div>
 
@@ -30,7 +30,7 @@
 
 <div class="border-b border-leaf-100 pb-5 mb-6">
     <h2 class="text-base font-bold text-leaf-900">Localização</h2>
-    <p class="text-sm text-leaf-500 mt-0.5">Opcional. Use o celular dentro da área pra capturar — depois fica fácil achar no mapa.</p>
+    <p class="text-sm text-leaf-500 mt-0.5">Opcional. Use o celular dentro da área pra capturar, depois fica fácil achar no mapa.</p>
 </div>
 
 <div class="mb-6" x-data="{

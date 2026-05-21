@@ -51,7 +51,7 @@
 @if(! $C)
 <div class="border-b border-leaf-100 pb-5 mb-6">
     <h2 class="text-base font-bold text-leaf-900">Saldo de café</h2>
-    <p class="text-sm text-leaf-500 mt-0.5">Já tem café deste cliente em estoque? Informe o valor inicial — vamos registrar como uma entrada no extrato.</p>
+    <p class="text-sm text-leaf-500 mt-0.5">Já tem café deste cliente em estoque? Informe o valor inicial, vamos registrar como uma entrada no extrato.</p>
 </div>
 
 <div class="mb-6">
@@ -64,14 +64,14 @@
         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">kg</span>
     </div>
     <p class="mt-1.5 text-sm text-leaf-500">
-        Use <strong>0</strong> se ainda não há café em estoque. Daqui pra frente, o saldo só muda pelas movimentações (entradas, secagens, ajustes, saídas) — registradas no extrato.
+        Use <strong>0</strong> se ainda não há café em estoque. Daqui pra frente, o saldo só muda pelas movimentações (entradas, secagens, ajustes, saídas), registradas no extrato.
     </p>
 </div>
 @else
 <div class="border-b border-leaf-100 pb-5 mb-6">
     <h2 class="text-base font-bold text-leaf-900">Saldo de café</h2>
     <p class="text-sm text-leaf-500 mt-0.5">
-        O saldo é controlado pelo extrato — entradas, secagens, ajustes e saídas. Saldo atual:
+        O saldo é controlado pelo extrato, entradas, secagens, ajustes e saídas. Saldo atual:
         <strong class="text-leaf-700">{{ number_format($C->saldo_cafe_kg, 3, ',', '.') }} kg</strong>.
         <a href="{{ route('clientes.movimentacoes.index', $C) }}" class="text-leaf-700 font-semibold hover:underline">Abrir extrato</a>.
     </p>

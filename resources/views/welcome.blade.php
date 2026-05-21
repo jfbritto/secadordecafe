@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roça Nossa — a tecnologia que entende a roça</title>
+    <title>Roça Nossa, a tecnologia que entende a roça</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.svg') }}">
     <link rel="canonical" href="{{ url('/') }}">
-    <meta name="description" content="Roça Nossa é o sistema que acompanha o produtor do plantio ao pagamento. Cliente, saldo, secagem, despesas e equipe — tudo no mesmo lugar, na palma da mão. Teste grátis por 14 dias.">
+    <meta name="description" content="Roça Nossa é o sistema que acompanha o produtor do plantio ao pagamento. Cliente, saldo, secagem, despesas e equipe, tudo no mesmo lugar, na palma da mão. Teste grátis por 14 dias.">
     <meta name="keywords" content="roça nossa, gestão de fazenda, controle de produtor rural, software para roça, secagem de café, controle de lavoura, sistema para fazenda, gestão rural, agronegócio">
     <meta name="theme-color" content="#1e5631">
 
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Roça Nossa">
-    <meta property="og:title" content="Roça Nossa — a tecnologia que entende a roça">
-    <meta property="og:description" content="Acompanhe sua roça do plantio ao pagamento. Café, lavoura, despesas e equipe — tudo no mesmo lugar, na palma da mão.">
+    <meta property="og:title" content="Roça Nossa, a tecnologia que entende a roça">
+    <meta property="og:description" content="Acompanhe sua roça do plantio ao pagamento. Café, lavoura, despesas e equipe, tudo no mesmo lugar, na palma da mão.">
     <meta property="og:locale" content="pt_BR">
     <meta property="og:url" content="{{ url('/') }}">
     <meta property="og:image" content="{{ asset('og-image.png') }}">
@@ -22,13 +22,13 @@
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Roça Nossa — A tecnologia que entende a roça">
+    <meta property="og:image:alt" content="Roça Nossa, A tecnologia que entende a roça">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Roça Nossa — a tecnologia que entende a roça">
-    <meta name="twitter:description" content="Acompanhe sua roça do plantio ao pagamento. Café, lavoura, despesas e equipe — tudo no mesmo lugar.">
+    <meta name="twitter:title" content="Roça Nossa, a tecnologia que entende a roça">
+    <meta name="twitter:description" content="Acompanhe sua roça do plantio ao pagamento. Café, lavoura, despesas e equipe, tudo no mesmo lugar.">
     <meta name="twitter:image" content="{{ asset('og-image.png') }}">
-    <meta name="twitter:image:alt" content="Roça Nossa — A tecnologia que entende a roça">
+    <meta name="twitter:image:alt" content="Roça Nossa, A tecnologia que entende a roça">
 
     <script type="application/ld+json">
     {
@@ -38,7 +38,7 @@
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "Web",
         "url": "{{ url('/') }}",
-        "description": "Plataforma SaaS multi-tenant para gestão da roça — produtores, saldos, secagens, despesas e equipe.",
+        "description": "Plataforma SaaS multi-tenant para gestão da roça, produtores, saldos, secagens, despesas e equipe.",
         "offers": {
             "@type": "Offer",
             "price": "99.90",
@@ -116,7 +116,7 @@
                 </h1>
                 <p class="text-lg text-leaf-600 leading-relaxed mb-8 max-w-xl">
                     Acompanhe seus produtores do plantio ao pagamento. Saldo de café, secagens, despesas, equipe e
-                    auditoria — tudo na palma da mão, em uma língua que o roceiro entende.
+                    auditoria, tudo na palma da mão, em uma língua que o roceiro entende.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-3">
                     <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-gradient-to-r from-leaf-700 to-leaf-800 hover:from-leaf-800 hover:to-leaf-900 rounded-xl transition-all shadow-lg shadow-leaf-700/30 hover:-translate-y-0.5">
@@ -206,13 +206,13 @@
             @php
                 $features = [
                     ['title'=>'Cadastro do produtor', 'desc'=>'Ficha completa de cada produtor: contato, CPF/CNPJ, observações e o saldo de café em estoque. Histórico do plantio ao pagamento.', 'icon'=>'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'color'=>'coffee'],
-                    ['title'=>'Secagem multi-produtor', 'desc'=>'Uma secagem com vários da turma. Recebido, seco, comissão e líquido por linha — totalizado automaticamente. Chega de pegar no lápis.', 'icon'=>'M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z', 'color'=>'amber'],
-                    ['title'=>'Extrato da roça', 'desc'=>'Cada produtor tem um extrato como conta de banco. Entrada, secagem, ajuste e saída — saldo após cada lançamento, com link da origem.', 'icon'=>'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'color'=>'emerald'],
-                    ['title'=>'Cálculo automático', 'desc'=>'Rendimento (seco / recebido), comissão em kg e saldo líquido na hora. Se errar a conta, é a tecnologia — você confere e segue.', 'icon'=>'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z', 'color'=>'sky'],
-                    ['title'=>'Despesas da roça', 'desc'=>'Combustível, mão de obra, adubo, manutenção — categorize, filtre por mês e tenha o total na ponta da língua na hora de fechar o caixa.', 'icon'=>'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'color'=>'rose'],
-                    ['title'=>'Equipe na medida', 'desc'=>'Cada um com sua chave. Administrador, operador, financeiro ou só pra ver — você decide quem pode o quê.', 'icon'=>'M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z', 'color'=>'indigo'],
-                    ['title'=>'Convite por e-mail', 'desc'=>'Chame o filho, a esposa, o gerente. Convite com prazo de validade e sem senha compartilhada — cada um faz a sua.', 'icon'=>'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'color'=>'cyan'],
-                    ['title'=>'Relatório em PDF', 'desc'=>'Imprima ou mande no WhatsApp do produtor — a Secagem #42 sai pronta pra entregar, com a sua marca.', 'icon'=>'M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3', 'color'=>'purple'],
+                    ['title'=>'Secagem multi-produtor', 'desc'=>'Uma secagem com vários da turma. Recebido, seco, comissão e líquido por linha, totalizado automaticamente. Chega de pegar no lápis.', 'icon'=>'M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z', 'color'=>'amber'],
+                    ['title'=>'Extrato da roça', 'desc'=>'Cada produtor tem um extrato como conta de banco. Entrada, secagem, ajuste e saída, saldo após cada lançamento, com link da origem.', 'icon'=>'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'color'=>'emerald'],
+                    ['title'=>'Cálculo automático', 'desc'=>'Rendimento (seco / recebido), comissão em kg e saldo líquido na hora. Se errar a conta, é a tecnologia, você confere e segue.', 'icon'=>'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z', 'color'=>'sky'],
+                    ['title'=>'Despesas da roça', 'desc'=>'Combustível, mão de obra, adubo, manutenção, categorize, filtre por mês e tenha o total na ponta da língua na hora de fechar o caixa.', 'icon'=>'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'color'=>'rose'],
+                    ['title'=>'Equipe na medida', 'desc'=>'Cada um com sua chave. Administrador, operador, financeiro ou só pra ver, você decide quem pode o quê.', 'icon'=>'M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z', 'color'=>'indigo'],
+                    ['title'=>'Convite por e-mail', 'desc'=>'Chame o filho, a esposa, o gerente. Convite com prazo de validade e sem senha compartilhada, cada um faz a sua.', 'icon'=>'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'color'=>'cyan'],
+                    ['title'=>'Relatório em PDF', 'desc'=>'Imprima ou mande no WhatsApp do produtor, a Secagem #42 sai pronta pra entregar, com a sua marca.', 'icon'=>'M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3', 'color'=>'purple'],
                     ['title'=>'Tudo registrado', 'desc'=>'Quem mexeu, quando mexeu, o que mudou. Auditoria completa pra você dormir tranquilo sabendo o que aconteceu na roça.', 'icon'=>'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'color'=>'teal'],
                 ];
                 $cm = [
@@ -317,7 +317,7 @@
         <div class="space-y-3">
             @foreach([
                 ['q'=>'Preciso instalar algo na fazenda?','a'=>'Não. A Roça Nossa abre direto no celular, no tablet ou no computador. Só precisa de internet e do navegador.'],
-                ['q'=>'Como funciona o teste de 14 dias?','a'=>'Você cria sua conta e ganha 14 dias com tudo liberado. Sem cartão de crédito. No fim do teste, escolhe um plano ou para por aqui — fica de boas.'],
+                ['q'=>'Como funciona o teste de 14 dias?','a'=>'Você cria sua conta e ganha 14 dias com tudo liberado. Sem cartão de crédito. No fim do teste, escolhe um plano ou para por aqui, fica de boas.'],
                 ['q'=>'Eu trabalho só com café. Serve pra mim?','a'=>'Sim. A Roça Nossa nasceu na secagem de café e tem tudo pronto: cliente, secagem multi-produtor, comissão, rendimento, PDF da secagem. E ainda vai crescer junto com a roça.'],
                 ['q'=>'Posso ter mais de uma roça?','a'=>'Cada conta cuida de uma fazenda. Se você tem mais de uma propriedade ou uma cooperativa, fala com a gente sobre o plano Cooperativa.'],
                 ['q'=>'E os dados, ficam seguros?','a'=>'Sim. Cada roça tem seu espaço isolado, ninguém vê o que é seu. Tem auditoria de tudo, backup diário e conexão criptografada (HTTPS).'],

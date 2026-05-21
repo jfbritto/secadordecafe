@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', config('app.name')) — Roça Nossa</title>
+    <title>@yield('title', config('app.name')) · Roça Nossa</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.svg') }}">
     <meta name="theme-color" content="#1e5631">
@@ -14,7 +14,7 @@
             theme: {
                 extend: {
                     colors: {
-                        // Paleta Lavoura Verde — verde-folha + creme + verde-noite
+                        // Paleta Lavoura Verde, verde-folha + creme + verde-noite
                         leaf: {
                             50:  '#fdfbf4', 100: '#f4ead4', 200: '#d8c9a8', 300: '#b3c49d',
                             400: '#8db580', 500: '#5da361', 600: '#2d8a4a', 700: '#1e5631',
