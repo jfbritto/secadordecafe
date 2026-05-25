@@ -140,7 +140,6 @@
                     <div class="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">Administração</div>
                     @php $nav('usuarios.index', 'Usuários', 'M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z', 'usuarios.*'); @endphp
                     @php $nav('fazenda.edit', 'Fazenda', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h14a1 1 0 001-1V10', 'fazenda.*'); @endphp
-                    @php $nav('assinatura.show', 'Assinatura', 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z', 'assinatura.*'); @endphp
                     @php $nav('auditoria.index', 'Auditoria', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'auditoria.*'); @endphp
                 @endif
             @endif
@@ -189,13 +188,6 @@
                 </span>
             @endif
         </header>
-
-        {{-- Subscription warning --}}
-        @if($farm && in_array($farm->status, ['past_due'], true))
-            <div class="bg-amber-50 border-l-4 border-amber-400 text-amber-900 px-4 py-3 text-sm flex-shrink-0">
-                <strong>Pagamento em atraso.</strong> Regularize sua assinatura em <a href="{{ route('assinatura.show') }}" class="underline font-semibold">Assinatura</a> para evitar bloqueio.
-            </div>
-        @endif
 
         {{-- Content --}}
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">

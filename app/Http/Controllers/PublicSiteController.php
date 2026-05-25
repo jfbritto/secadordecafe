@@ -27,11 +27,11 @@ class PublicSiteController extends Controller
 <h2>3. Conta de usuário</h2>
 <p>Você é responsável por manter a confidencialidade da sua senha e por todas as atividades realizadas na sua conta. Notifique-nos imediatamente em caso de uso não autorizado.</p>
 
-<h2>4. Período de teste e cobrança</h2>
-<p>Oferecemos 14 dias de teste grátis. Após esse período, é necessário escolher um plano para continuar utilizando o serviço. A cobrança é mensal, no cartão de crédito, via Asaas.</p>
+<h2>4. Acesso à plataforma</h2>
+<p>Estamos em fase inicial e o acesso à Roça Nossa é gratuito por tempo indeterminado. Quando definirmos a estrutura de planos e cobrança, você será comunicado por e-mail com antecedência mínima de 30 dias antes de qualquer mudança.</p>
 
 <h2>5. Cancelamento</h2>
-<p>Você pode cancelar sua assinatura a qualquer momento. O acesso continuará disponível até o fim do período já pago. Não há reembolso de períodos parciais.</p>
+<p>Você pode encerrar sua conta a qualquer momento. Seus dados podem ser exportados antes do encerramento.</p>
 
 <h2>6. Propriedade dos dados</h2>
 <p>Os dados inseridos na Plataforma pertencem a você. Disponibilizamos exportação dos seus dados a qualquer tempo, mediante solicitação.</p>
@@ -53,10 +53,10 @@ HTML;
     {
         $body = <<<'HTML'
 <h2>1. Quais dados coletamos</h2>
-<p>Coletamos: nome, e-mail, telefone, dados da roça (nome, cidade, estado), dados de pagamento (processados pelo Asaas, não armazenados em texto puro), dados de uso (logs de acesso, atividades realizadas).</p>
+<p>Coletamos: nome, e-mail, telefone, dados da roça (nome, cidade, estado) e dados de uso (logs de acesso, atividades realizadas).</p>
 
 <h2>2. Como usamos seus dados</h2>
-<p>Os dados são usados para prestar o serviço (gestão da roça), faturamento, suporte e melhorias do produto. Nunca vendemos ou compartilhamos com terceiros para fins de marketing.</p>
+<p>Os dados são usados para prestar o serviço (gestão da roça), suporte e melhorias do produto. Nunca vendemos ou compartilhamos com terceiros para fins de marketing.</p>
 
 <h2>3. Onde armazenamos</h2>
 <p>Dados ficam em servidores no Brasil, com backups diários criptografados. Conexão sempre via HTTPS.</p>
@@ -68,7 +68,7 @@ HTML;
 <p>Usamos apenas cookies essenciais para autenticação e segurança. Não usamos cookies de rastreamento de terceiros.</p>
 
 <h2>6. Subprocessadores</h2>
-<p>Asaas (cobrança), provedor de e-mail transacional, hospedagem em VPS. Todos sob acordo de confidencialidade e LGPD.</p>
+<p>Provedor de e-mail transacional e hospedagem em VPS. Todos sob acordo de confidencialidade e LGPD.</p>
 
 <h2>7. Contato do encarregado (DPO)</h2>
 <p><a class="text-leaf-700 font-semibold hover:underline" href="mailto:privacidade@rocanossa.com.br">privacidade@rocanossa.com.br</a></p>

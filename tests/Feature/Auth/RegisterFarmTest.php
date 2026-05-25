@@ -48,8 +48,8 @@ it('registers a farm with admin user atomically', function () {
     $farm = Farm::first();
     expect($farm->nome)->toBe('Fazenda Teste');
     expect($farm->slug)->toBe('fazenda-teste');
-    expect($farm->status)->toBe(Farm::STATUS_TRIAL);
-    expect($farm->trial_ends_at)->not->toBeNull();
+    expect($farm->status)->toBe(Farm::STATUS_PARTNER);
+    expect($farm->trial_ends_at)->toBeNull();
 
     $user = User::first();
     expect($user->farm_id)->toBe($farm->id);
@@ -59,7 +59,7 @@ it('registers a farm with admin user atomically', function () {
 
     $subscription = Subscription::first();
     expect($subscription->farm_id)->toBe($farm->id);
-    expect($subscription->status)->toBe(Subscription::STATUS_TRIAL);
+    expect($subscription->status)->toBe(Subscription::STATUS_PARTNER);
 
     Mail::assertQueued(WelcomeFarmMail::class, fn ($mail) => $mail->user->email === 'joao@fazenda.test');
 

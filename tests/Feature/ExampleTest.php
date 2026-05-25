@@ -4,7 +4,7 @@ it('renders public landing for guests at /', function () {
     $this->get('/')
         ->assertOk()
         ->assertSee('Roça Nossa', false)
-        ->assertSee('14 dias', false);
+        ->assertSee('Criar minha roça', false);
 });
 
 it('redirects authenticated user from / to dashboard', function () {

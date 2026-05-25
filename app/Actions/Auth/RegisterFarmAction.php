@@ -15,14 +15,14 @@ class RegisterFarmAction
 {
     public function execute(RegisterFarmData $data): User
     {
-        $trialDays = (int) config('farm.trial_days', 14);
-
-        $user = DB::transaction(function () use ($data, $trialDays) {
+        // Enquanto a estrutura de planos/cobrança não está definida, todo registro
+        // entra como parceiro: acesso completo, sem expiração, sem cobrança.
+        $user = DB::transaction(function () use ($data) {
             $farm = Farm::create([
                 'nome' => $data->farmName,
                 'slug' => $this->uniqueSlug($data->farmName),
-                'status' => Farm::STATUS_TRIAL,
-                'trial_ends_at' => now()->addDays($trialDays),
+                'status' => Farm::STATUS_PARTNER,
+                'trial_ends_at' => null,
             ]);
 
             $user = User::create([
@@ -35,8 +35,8 @@ class RegisterFarmAction
 
             Subscription::create([
                 'farm_id' => $farm->id,
-                'status' => Subscription::STATUS_TRIAL,
-                'trial_ends_at' => $farm->trial_ends_at,
+                'status' => Subscription::STATUS_PARTNER,
+                'trial_ends_at' => null,
             ]);
 
             app(PermissionRegistrar::class)->setPermissionsTeamId($farm->id);

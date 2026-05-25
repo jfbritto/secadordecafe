@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.svg') }}">
     <link rel="canonical" href="{{ url('/') }}">
-    <meta name="description" content="Roça Nossa é o sistema que acompanha o produtor do plantio ao pagamento. Cliente, saldo, secagem, despesas e equipe, tudo no mesmo lugar, na palma da mão. Teste grátis por 14 dias.">
+    <meta name="description" content="Roça Nossa é o sistema que acompanha o produtor do plantio ao pagamento. Cliente, saldo, secagem, despesas e equipe, tudo no mesmo lugar, na palma da mão.">
     <meta name="keywords" content="roça nossa, gestão de fazenda, controle de produtor rural, software para roça, secagem de café, controle de lavoura, sistema para fazenda, gestão rural, agronegócio">
     <meta name="theme-color" content="#1e5631">
 
@@ -38,13 +38,7 @@
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "Web",
         "url": "{{ url('/') }}",
-        "description": "Plataforma SaaS multi-tenant para gestão da roça, produtores, saldos, secagens, despesas e equipe.",
-        "offers": {
-            "@type": "Offer",
-            "price": "99.90",
-            "priceCurrency": "BRL",
-            "description": "14 dias de teste grátis. Mensal."
-        }
+        "description": "Plataforma SaaS multi-tenant para gestão da roça, produtores, saldos, secagens, despesas e equipe."
     }
     </script>
 
@@ -82,7 +76,6 @@
             </a>
             <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-leaf-600">
                 <a href="#features" class="hover:text-leaf-900 transition">O que faz</a>
-                <a href="#planos" class="hover:text-leaf-900 transition">Planos</a>
                 <a href="#como-funciona" class="hover:text-leaf-900 transition">Como funciona</a>
                 <a href="#faq" class="hover:text-leaf-900 transition">Dúvidas</a>
             </nav>
@@ -120,14 +113,14 @@
                 </p>
                 <div class="flex flex-col sm:flex-row gap-3">
                     <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-bold text-white bg-gradient-to-r from-leaf-700 to-leaf-800 hover:from-leaf-800 hover:to-leaf-900 rounded-xl transition-all shadow-lg shadow-leaf-700/30 hover:-translate-y-0.5">
-                        Experimente 14 dias grátis
+                        Criar minha roça grátis
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                     </a>
-                    <a href="#planos" class="inline-flex items-center justify-center gap-2 px-6 py-4 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:border-leaf-400 rounded-xl transition-all">
-                        Ver planos
+                    <a href="#features" class="inline-flex items-center justify-center gap-2 px-6 py-4 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:border-leaf-400 rounded-xl transition-all">
+                        Ver o que o sistema faz
                     </a>
                 </div>
-                <p class="mt-4 text-xs text-leaf-500">Sem cartão de crédito no teste. Cancele quando quiser.</p>
+                <p class="mt-4 text-xs text-leaf-500">Sem cartão de crédito. Sem compromisso.</p>
             </div>
 
             <div class="hidden lg:block relative">
@@ -251,7 +244,7 @@
         </div>
         <div class="grid md:grid-cols-3 gap-6">
             @foreach([
-                ['n'=>'01','t'=>'Crie sua roça no sistema','d'=>'Cadastre a fazenda em menos de 1 minuto e ganhe 14 dias pra usar à vontade. Sem cartão, sem compromisso.'],
+                ['n'=>'01','t'=>'Crie sua roça no sistema','d'=>'Cadastre a fazenda em menos de 1 minuto e já pode usar à vontade. Sem cartão, sem compromisso.'],
                 ['n'=>'02','t'=>'Anote os produtores','d'=>'Coloque cada produtor com o saldo de café que ele já tem com você. Convide o resto da turma pelo e-mail.'],
                 ['n'=>'03','t'=>'Bote a roda pra girar','d'=>'Lance secagens com vários produtores juntos. O sistema cuida da conta e o extrato fica em dia sozinho.'],
             ] as $step)
@@ -259,49 +252,6 @@
                     <div class="text-5xl font-extrabold bg-gradient-to-br from-leaf-500 to-leaf-700 bg-clip-text text-transparent mb-3">{{ $step['n'] }}</div>
                     <h3 class="text-lg font-bold text-leaf-900 mb-2">{{ $step['t'] }}</h3>
                     <p class="text-sm text-leaf-500">{{ $step['d'] }}</p>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-
-<section id="planos" class="py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <p class="text-sm font-semibold text-leaf-700 uppercase tracking-wider mb-2">Planos</p>
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-leaf-900 mb-4">Comece grátis. Pague conforme a roça cresce.</h2>
-            <p class="text-lg text-leaf-500 max-w-2xl mx-auto">14 dias de teste em qualquer plano. Mensal, cancele quando quiser.</p>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            @php
-                $plans = [
-                    ['name'=>'Experiência','price'=>'Grátis','period'=>'14 dias','cta'=>'Começar agora','featured'=>false,'features'=>['Acesso completo','1 roça','Sem cartão de crédito','Suporte por e-mail']],
-                    ['name'=>'Roça Cheia','price'=>'R$ 99,90','period'=>'/mês','cta'=>'Começar agora','featured'=>true,'features'=>['1 roça','Equipe ilimitada','Produtores ilimitados','Secagens ilimitadas','PDF das secagens','Auditoria completa','Suporte prioritário']],
-                    ['name'=>'Cooperativa','price'=>'Sob medida','period'=>'','cta'=>'Falar com a gente','featured'=>false,'features'=>['Várias roças no mesmo grupo','SLA dedicado','Importação de planilhas','Treinamento da equipe','Integrações sob medida']],
-                ];
-            @endphp
-            @foreach($plans as $p)
-                <div class="rounded-2xl border {{ $p['featured'] ? 'border-leaf-700 shadow-2xl shadow-leaf-700/15 ring-2 ring-leaf-700' : 'border-leaf-100 shadow-sm' }} bg-white p-7 relative">
-                    @if($p['featured'])
-                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-leaf-700 text-white text-[10px] font-bold uppercase tracking-wider">Mais escolhido</span>
-                    @endif
-                    <h3 class="text-lg font-bold text-leaf-900">{{ $p['name'] }}</h3>
-                    <div class="mt-4 mb-5">
-                        <span class="text-4xl font-extrabold text-leaf-900">{{ $p['price'] }}</span>
-                        <span class="text-sm text-leaf-500 ml-1">{{ $p['period'] }}</span>
-                    </div>
-                    <ul class="space-y-2.5 mb-7 text-sm text-leaf-700">
-                        @foreach($p['features'] as $f)
-                            <li class="flex items-start gap-2">
-                                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                {{ $f }}
-                            </li>
-                        @endforeach
-                    </ul>
-                    <a href="{{ $p['name'] === 'Cooperativa' ? 'mailto:contato@rocanossa.com.br' : route('register') }}" class="block w-full text-center px-4 py-3 text-sm font-semibold rounded-xl transition {{ $p['featured'] ? 'text-white bg-leaf-700 hover:bg-leaf-800 shadow-md shadow-leaf-700/20' : 'text-leaf-700 bg-leaf-50 hover:bg-leaf-100' }}">
-                        {{ $p['cta'] }}
-                    </a>
                 </div>
             @endforeach
         </div>
@@ -317,11 +267,10 @@
         <div class="space-y-3">
             @foreach([
                 ['q'=>'Preciso instalar algo na fazenda?','a'=>'Não. A Roça Nossa abre direto no celular, no tablet ou no computador. Só precisa de internet e do navegador.'],
-                ['q'=>'Como funciona o teste de 14 dias?','a'=>'Você cria sua conta e ganha 14 dias com tudo liberado. Sem cartão de crédito. No fim do teste, escolhe um plano ou para por aqui, fica de boas.'],
+                ['q'=>'Quanto custa?','a'=>'Por enquanto, é grátis. Estamos refinando o sistema com os primeiros produtores e, quando definirmos a estrutura de planos, avisamos com antecedência. Quem entrar agora tem acesso completo.'],
                 ['q'=>'Eu trabalho só com café. Serve pra mim?','a'=>'Sim. A Roça Nossa nasceu na secagem de café e tem tudo pronto: cliente, secagem multi-produtor, comissão, rendimento, PDF da secagem. E ainda vai crescer junto com a roça.'],
-                ['q'=>'Posso ter mais de uma roça?','a'=>'Cada conta cuida de uma fazenda. Se você tem mais de uma propriedade ou uma cooperativa, fala com a gente sobre o plano Cooperativa.'],
+                ['q'=>'Posso ter mais de uma roça?','a'=>'Cada conta cuida de uma fazenda. Se você tem mais de uma propriedade ou uma cooperativa, fala com a gente em contato@rocanossa.com.br.'],
                 ['q'=>'E os dados, ficam seguros?','a'=>'Sim. Cada roça tem seu espaço isolado, ninguém vê o que é seu. Tem auditoria de tudo, backup diário e conexão criptografada (HTTPS).'],
-                ['q'=>'Como pago?','a'=>'Cartão de crédito mensal pela Asaas. A nota fiscal cai no seu e-mail e você cancela quando quiser, sem multa.'],
             ] as $f)
                 <details class="group bg-white rounded-xl border border-leaf-100 overflow-hidden">
                     <summary class="flex items-center justify-between cursor-pointer px-5 py-4 list-none">
@@ -342,7 +291,7 @@
     </div>
     <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
         <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">A roça é sua. A tecnologia, nossa.</h2>
-        <p class="text-leaf-200 text-lg max-w-xl mx-auto mb-8">14 dias grátis pra você botar pra rodar. Sem cartão, sem complicação.</p>
+        <p class="text-leaf-200 text-lg max-w-xl mx-auto mb-8">Grátis pra você botar pra rodar. Sem cartão, sem complicação.</p>
         <a href="{{ route('register') }}" class="inline-flex items-center gap-2 px-8 py-4 text-base font-bold text-leaf-900 bg-white hover:bg-leaf-50 rounded-xl transition-all shadow-lg hover:-translate-y-0.5">
             Criar minha roça
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
@@ -371,7 +320,7 @@
                 <p class="text-xs uppercase font-bold tracking-wider text-leaf-400 mb-3">Produto</p>
                 <ul class="space-y-2 text-sm">
                     <li><a href="#features" class="hover:text-white transition">O que faz</a></li>
-                    <li><a href="#planos" class="hover:text-white transition">Planos</a></li>
+                    <li><a href="#como-funciona" class="hover:text-white transition">Como funciona</a></li>
                     <li><a href="#faq" class="hover:text-white transition">Dúvidas</a></li>
                 </ul>
             </div>

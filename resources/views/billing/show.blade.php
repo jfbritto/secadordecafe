@@ -1,9 +1,9 @@
 @extends('layouts.app')
-@section('title', 'Assinatura')
+@section('title', 'Plano')
 @section('content')
 
 <div class="max-w-3xl">
-    <h1 class="text-2xl font-bold text-leaf-900 mb-6">Assinatura</h1>
+    <h1 class="text-2xl font-bold text-leaf-900 mb-6">Plano</h1>
 
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-6 mb-4">
         <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Fazenda</p>
@@ -12,43 +12,13 @@
         <span class="inline-block mt-2 px-2.5 py-1 rounded-full text-xs font-semibold {{ $cls }}">{{ \App\Support\StatusLabels::farm($farm->status) }}</span>
     </div>
 
-    @if($subscription)
-        <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-6">
-            <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider mb-4">Detalhes da assinatura</h2>
-            <dl class="space-y-3 text-sm">
-                <div class="flex justify-between">
-                    <dt class="text-leaf-500">Status</dt>
-                    <dd class="text-leaf-900 font-semibold">{{ ucfirst(str_replace('_',' ', $subscription->status)) }}</dd>
-                </div>
-                @if($subscription->trial_ends_at)
-                    <div class="flex justify-between">
-                        <dt class="text-leaf-500">Período de teste termina em</dt>
-                        <dd class="text-leaf-900 font-semibold">{{ $subscription->trial_ends_at->format('d/m/Y') }}</dd>
-                    </div>
-                @endif
-                @if($subscription->current_period_end)
-                    <div class="flex justify-between">
-                        <dt class="text-leaf-500">Próximo vencimento</dt>
-                        <dd class="text-leaf-900 font-semibold">{{ $subscription->current_period_end->format('d/m/Y') }}</dd>
-                    </div>
-                @endif
-                @if($subscription->asaas_subscription_id)
-                    <div class="flex justify-between">
-                        <dt class="text-leaf-500">Código de cobrança</dt>
-                        <dd class="text-leaf-700 font-mono text-xs">{{ $subscription->asaas_subscription_id }}</dd>
-                    </div>
-                @endif
-            </dl>
-        </div>
-    @else
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 text-amber-900">
-            Esta fazenda ainda não tem assinatura ativa de cobrança.
-        </div>
-    @endif
-
-    <p class="mt-4 text-xs text-leaf-500">
-        A cobrança é processada automaticamente.
-        Se o pagamento atrasar por mais de {{ config('asaas.block_after_days') }} dias, o acesso é suspenso.
-    </p>
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-6 text-purple-900">
+        <h2 class="text-base font-bold mb-2">Você está no plano Parceiro</h2>
+        <p class="text-sm leading-relaxed">
+            Acesso completo a todas as funções da Roça Nossa, sem cobrança e sem expiração.
+            Estamos refinando o sistema com os primeiros produtores e, quando definirmos a estrutura
+            de planos, você será avisado por e-mail com antecedência.
+        </p>
+    </div>
 </div>
 @endsection

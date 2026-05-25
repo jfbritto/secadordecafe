@@ -7,7 +7,7 @@
 </h1>
 
 <p style="color:#143a23; margin:0 0 14px; font-size:15px; line-height:1.55;">
-    Sua roça <strong>{{ $farmName }}</strong> tá no sistema. Você tem <strong>14 dias</strong> de uso completo
+    Sua roça <strong>{{ $farmName }}</strong> tá no sistema, com acesso completo
     pra colocar tudo no lugar: produtores, secagens, despesas e equipe.
 </p>
 

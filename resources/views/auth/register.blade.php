@@ -5,7 +5,7 @@
 @section('content')
 <div>
     <h1 class="text-3xl font-bold text-leaf-900">Crie sua roça</h1>
-    <p class="text-sm text-leaf-500 mt-2 mb-8">Comece agora com 14 dias grátis. Sem cartão de crédito.</p>
+    <p class="text-sm text-leaf-500 mt-2 mb-8">Acesso completo, grátis. Sem cartão de crédito.</p>
 
     <form method="POST" action="{{ route('register') }}" class="space-y-5" novalidate>
         @csrf
