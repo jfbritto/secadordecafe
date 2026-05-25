@@ -71,10 +71,27 @@
         </div>
 
         <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-leaf-100">
+            <div class="px-4 sm:px-6 py-4 border-b border-leaf-100">
                 <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Usuários ({{ $farm->users->count() }})</h2>
             </div>
-            <table class="w-full text-sm">
+
+            {{-- Mobile: cards --}}
+            <ul class="md:hidden divide-y divide-leaf-100">
+                @foreach($farm->users as $u)
+                    <li class="px-4 py-3">
+                        <p class="font-semibold text-leaf-900 break-words">{{ $u->name }}</p>
+                        <p class="text-xs text-leaf-500 truncate">{{ $u->email }}</p>
+                        <div class="flex gap-1 flex-wrap mt-1.5">
+                            @foreach($u->roles as $role)
+                                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-leaf-100 text-leaf-700">{{ \App\Support\StatusLabels::role($role->name) }}</span>
+                            @endforeach
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+
+            {{-- Desktop: tabela --}}
+            <table class="hidden md:table w-full text-sm">
                 <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
                     <tr>
                         <th class="text-left px-6 py-2 font-semibold">Nome</th>

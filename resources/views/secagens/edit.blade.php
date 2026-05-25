@@ -52,7 +52,7 @@
                     </label>
                     <select id="area_id" name="area_id"
                             class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                        <option value="">Sem área (secagem pra cliente)/option>
+                        <option value="">Sem área (secagem pra cliente)</option>
                         @foreach($areas as $a)
                             <option value="{{ $a->id }}" @selected(old('area_id', $secagem->area_id) == $a->id)>{{ $a->nome }}</option>
                         @endforeach
@@ -85,7 +85,7 @@
                     </label>
                     <select id="customer_id" name="customer_id" required
                             class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                        <option value="">Selecione/option>
+                        <option value="">Selecione</option>
                         @foreach($customers as $c)
                             <option value="{{ $c->id }}">{{ $c->nome }} (saldo {{ number_format($c->saldo_cafe_kg, 3, ',', '.') }} kg)</option>
                         @endforeach
@@ -139,7 +139,72 @@
             <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Itens da secagem</h2>
             <span class="text-xs text-leaf-500">{{ $secagem->items->count() }} item(ns)</span>
         </div>
-        <div class="overflow-x-auto">
+        {{-- Mobile: cards por item --}}
+        <ul class="md:hidden divide-y divide-leaf-100">
+            @forelse($secagem->items as $item)
+                <li class="px-4 py-4">
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <p class="font-semibold text-leaf-900 break-words">{{ $item->customer->nome }}</p>
+                        <form method="POST" action="{{ route('secagens.items.destroy', [$secagem, $item]) }}"
+                              data-confirm="Remover este item da secagem?"
+                              data-confirm-text="O cliente sai da lista. Você pode adicionar de novo enquanto a secagem for rascunho."
+                              data-confirm-yes="Sim, remover" class="flex-shrink-0">
+                            @csrf @method('DELETE')
+                            <button class="inline-flex items-center gap-1 text-rose-600 text-xs font-semibold hover:underline">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                remover
+                            </button>
+                        </form>
+                    </div>
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-leaf-500">Recebido</p>
+                            <p class="text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }} kg</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-leaf-500">Seco</p>
+                            <p class="text-leaf-700">{{ number_format($item->quantidade_seca_kg, 3, ',', '.') }} kg</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-leaf-500">Rendimento</p>
+                            <p class="text-leaf-700">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase tracking-wider text-leaf-500">Comissão</p>
+                            <p class="text-leaf-700">{{ number_format($item->comissao_kg, 3, ',', '.') }} kg</p>
+                        </div>
+                        <div class="col-span-2 pt-1 mt-1 border-t border-leaf-100">
+                            <p class="text-[10px] uppercase tracking-wider text-leaf-500">Líquido</p>
+                            <p class="font-bold text-leaf-800">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }} kg</p>
+                        </div>
+                    </div>
+                </li>
+            @empty
+                <li class="px-4 py-12 text-center text-leaf-500">Adicione clientes usando o formulário acima.</li>
+            @endforelse
+            @if($secagem->items->isNotEmpty())
+                <li class="px-4 py-3 bg-leaf-50/50">
+                    <p class="text-[10px] uppercase tracking-wider text-leaf-500 mb-1 font-semibold">Totais</p>
+                    <div class="grid grid-cols-3 gap-2 text-sm">
+                        <div>
+                            <p class="text-[10px] text-leaf-500">Recebido</p>
+                            <p class="font-bold text-leaf-900">{{ number_format($secagem->totalRecebidoKg(), 3, ',', '.') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-leaf-500">Seco</p>
+                            <p class="font-bold text-leaf-900">{{ number_format($secagem->totalSecoKg(), 3, ',', '.') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-leaf-500">Comissão</p>
+                            <p class="font-bold text-leaf-900">{{ number_format($secagem->totalComissaoKg(), 3, ',', '.') }}</p>
+                        </div>
+                    </div>
+                </li>
+            @endif
+        </ul>
+
+        {{-- Desktop: tabela --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
                     <tr>

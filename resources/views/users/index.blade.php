@@ -3,13 +3,13 @@
 @section('title', 'Usuários')
 
 @section('content')
-<div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
+<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
     <div>
         <h1 class="text-2xl font-bold text-leaf-900">Usuários da fazenda</h1>
         <p class="text-sm text-leaf-500 mt-0.5">Gerencie quem tem acesso e suas permissões.</p>
     </div>
     @can('create', App\Models\User::class)
-        <a href="{{ route('usuarios.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm">
+        <a href="{{ route('usuarios.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm w-full sm:w-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             Cadastrar usuário
         </a>
@@ -49,7 +49,59 @@
 </div>
 
 <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
+    {{-- Mobile: cards --}}
+    <ul class="md:hidden divide-y divide-leaf-100">
+        @foreach($users as $u)
+            <li class="px-4 py-4">
+                <div class="flex items-start justify-between gap-3 mb-2">
+                    <div class="min-w-0 flex-1">
+                        <p class="font-semibold text-leaf-900 break-words">
+                            {{ $u->name }}
+                            @if($u->id === auth()->id())<span class="ml-1 text-xs font-normal text-leaf-500">(você)</span>@endif
+                        </p>
+                        <p class="text-xs text-leaf-500 truncate">{{ $u->email }}</p>
+                    </div>
+                    @if($u->id !== auth()->id())
+                        <form method="POST" action="{{ route('usuarios.destroy', $u) }}"
+                              data-confirm="Remover {{ $u->name }} da fazenda?"
+                              data-confirm-text="A pessoa perde acesso imediatamente. Para dar acesso de novo, será preciso enviar um novo convite."
+                              data-confirm-yes="Sim, remover" class="flex-shrink-0">
+                            @csrf @method('DELETE')
+                            <button class="inline-flex items-center gap-1 text-rose-600 text-xs font-semibold hover:underline">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                remover
+                            </button>
+                        </form>
+                    @endif
+                </div>
+                <div>
+                    <p class="text-[10px] uppercase tracking-wider text-leaf-500 mb-1">Permissão</p>
+                    @if($u->id === auth()->id())
+                        <span class="text-sm text-leaf-700">{{ ucfirst($u->roles->pluck('name')->join(', ') ?: '—') }}</span>
+                    @else
+                        <form method="POST" action="{{ route('usuarios.role.update', $u) }}"
+                              data-confirm="Alterar permissão de {{ $u->name }}?"
+                              data-confirm-text="A nova permissão entra em vigor imediatamente. Confira a opção selecionada antes de confirmar."
+                              data-confirm-icon="question"
+                              data-confirm-yes="Sim, alterar"
+                              data-confirm-danger="0">
+                            @csrf @method('PUT')
+                            <select name="role" data-original="{{ $u->roles->pluck('name')->first() }}"
+                                    onchange="if(this.value !== this.dataset.original) this.form.requestSubmit(); else this.form.dataset.confirmed='1';"
+                                    class="w-full px-2 py-2 text-sm rounded-md border border-leaf-200 focus:outline-none focus:ring-2 focus:ring-leaf-500">
+                                @foreach(['admin','operador','financeiro','visualizador'] as $role)
+                                    <option value="{{ $role }}" @selected($u->hasRole($role))>{{ ucfirst($role) }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                    @endif
+                </div>
+            </li>
+        @endforeach
+    </ul>
+
+    {{-- Desktop: tabela --}}
+    <table class="hidden md:table w-full text-sm">
         <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
             <tr>
                 <th class="text-left px-6 py-3 font-semibold">Nome</th>
@@ -113,7 +165,32 @@
 @if($pendingInvitations->isNotEmpty())
     <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider mt-8 mb-3">Convites pendentes</h2>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-        <table class="w-full text-sm">
+        {{-- Mobile: cards --}}
+        <ul class="md:hidden divide-y divide-leaf-100">
+            @foreach($pendingInvitations as $inv)
+                <li class="px-4 py-4">
+                    <div class="flex items-start justify-between gap-3 mb-1.5">
+                        <p class="font-semibold text-leaf-900 break-words flex-1 min-w-0">{{ $inv->email }}</p>
+                        <form method="POST" action="{{ route('convites.destroy', $inv) }}"
+                              data-confirm="Cancelar convite para {{ $inv->email }}?"
+                              data-confirm-text="O link enviado por e-mail deixa de funcionar. Você pode enviar um novo convite a qualquer momento."
+                              data-confirm-yes="Sim, cancelar" class="flex-shrink-0">
+                            @csrf @method('DELETE')
+                            <button class="inline-flex items-center gap-1 text-rose-600 text-xs font-semibold hover:underline">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                cancelar
+                            </button>
+                        </form>
+                    </div>
+                    <p class="text-xs text-leaf-500">
+                        {{ ucfirst($inv->role) }} · expira {{ $inv->expires_at->format('d/m/Y H:i') }}
+                    </p>
+                </li>
+            @endforeach
+        </ul>
+
+        {{-- Desktop: tabela --}}
+        <table class="hidden md:table w-full text-sm">
             <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
                 <tr>
                     <th class="text-left px-6 py-3 font-semibold">E-mail</th>

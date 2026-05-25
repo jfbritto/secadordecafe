@@ -3,8 +3,8 @@
 @section('title', 'Secagem #'.$secagem->numero)
 
 @section('content')
-<div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
-    <div>
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+    <div class="min-w-0">
         <p class="text-xs text-leaf-500 mb-1"><a href="{{ route('secagens.index') }}" class="hover:underline">Secagens</a></p>
         <h1 class="text-2xl font-bold text-leaf-900">Secagem #{{ $secagem->numero }}</h1>
         <p class="text-sm text-leaf-500 mt-0.5">
@@ -48,7 +48,56 @@
 @endif
 
 <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
+    {{-- Mobile: cards por cliente --}}
+    <ul class="md:hidden divide-y divide-leaf-100">
+        @foreach($secagem->items as $item)
+            <li class="px-4 py-4">
+                <p class="font-semibold text-leaf-900 mb-2">{{ $item->customer->nome }}</p>
+                <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-leaf-500">Recebido</p>
+                        <p class="text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }} kg</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-leaf-500">Seco</p>
+                        <p class="text-leaf-700">{{ number_format($item->quantidade_seca_kg, 3, ',', '.') }} kg</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-leaf-500">Rendimento</p>
+                        <p class="text-leaf-700">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-leaf-500">Comissão</p>
+                        <p class="text-leaf-700">{{ number_format($item->comissao_percentual, 2, ',', '.') }}% ({{ number_format($item->comissao_kg, 3, ',', '.') }} kg)</p>
+                    </div>
+                    <div class="col-span-2 pt-1 mt-1 border-t border-leaf-100">
+                        <p class="text-[10px] uppercase tracking-wider text-leaf-500">Líquido</p>
+                        <p class="font-bold text-leaf-800">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }} kg</p>
+                    </div>
+                </div>
+            </li>
+        @endforeach
+        <li class="px-4 py-3 bg-leaf-50/50">
+            <p class="text-[10px] uppercase tracking-wider text-leaf-500 mb-1 font-semibold">Totais</p>
+            <div class="grid grid-cols-3 gap-2 text-sm">
+                <div>
+                    <p class="text-[10px] text-leaf-500">Recebido</p>
+                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalRecebidoKg(), 3, ',', '.') }}</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-leaf-500">Seco</p>
+                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalSecoKg(), 3, ',', '.') }}</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-leaf-500">Comissão</p>
+                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalComissaoKg(), 3, ',', '.') }}</p>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+    {{-- Desktop: tabela --}}
+    <table class="hidden md:table w-full text-sm">
         <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
             <tr>
                 <th class="text-left px-4 py-3 font-semibold">Cliente</th>

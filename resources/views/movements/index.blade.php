@@ -4,16 +4,16 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto">
-    <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
-        <div>
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
+        <div class="min-w-0">
             <p class="text-xs text-leaf-500 mb-1">
                 <a href="{{ route('clientes.index') }}" class="hover:underline">Clientes</a> ·
                 <a href="{{ route('clientes.show', $customer) }}" class="hover:underline">{{ $customer->nome }}</a> ·
                 <span class="text-leaf-700">Extrato</span>
             </p>
-            <h1 class="text-2xl font-bold text-leaf-900">Extrato, {{ $customer->nome }}</h1>
+            <h1 class="text-2xl font-bold text-leaf-900 break-words">Extrato, {{ $customer->nome }}</h1>
         </div>
-        <div class="bg-leaf-700 text-white px-5 py-3 rounded-xl shadow-md text-right">
+        <div class="bg-leaf-700 text-white px-5 py-3 rounded-xl shadow-md text-right flex-shrink-0">
             <p class="text-[10px] uppercase tracking-wider text-leaf-200">Saldo atual</p>
             <p class="text-2xl font-bold">{{ number_format($customer->saldo_cafe_kg, 3, ',', '.') }} <span class="text-sm font-normal text-leaf-200">kg</span></p>
         </div>
@@ -97,7 +97,7 @@
                            class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
                 </div>
 
-                <div class="sm:col-span-2 flex items-end">
+                <div class="sm:col-span-2 flex items-end col-span-full sm:col-auto">
                     <button type="submit" class="w-full px-4 py-3 text-base font-bold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm">Registrar</button>
                 </div>
             </div>
@@ -108,7 +108,54 @@
         <div class="px-6 py-4 border-b border-leaf-100">
             <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Histórico</h2>
         </div>
-        <div class="overflow-x-auto">
+
+        {{-- Mobile: cards (extrato bancário em formato vertical) --}}
+        <ul class="md:hidden divide-y divide-leaf-100">
+            @forelse($movements as $m)
+                @php
+                    $cls = match($m->tipo) {
+                        'entrada' => 'bg-emerald-100 text-emerald-700',
+                        'secagem' => 'bg-leaf-100 text-leaf-700',
+                        'ajuste'  => 'bg-amber-100 text-amber-700',
+                        'saida'   => 'bg-rose-100 text-rose-700',
+                        default   => 'bg-gray-100 text-gray-700',
+                    };
+                    $sourceLink = null;
+                    if ($m->source instanceof \App\Models\Secagem) {
+                        $sourceLink = ['route' => route('secagens.show', $m->source), 'label' => 'Secagem #'.$m->source->numero];
+                    } elseif ($m->source instanceof \App\Models\SecagemItem && $m->source->secagem) {
+                        $sourceLink = ['route' => route('secagens.show', $m->source->secagem), 'label' => 'Secagem #'.$m->source->secagem->numero];
+                    }
+                @endphp
+                <li class="px-4 py-4">
+                    <div class="flex items-start justify-between gap-3 mb-1.5">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ \App\Support\StatusLabels::movementTipo($m->tipo) }}</span>
+                            <span class="text-xs text-leaf-500">{{ $m->occurred_at->format('d/m/Y H:i') }}</span>
+                        </div>
+                        <span class="font-bold whitespace-nowrap text-sm {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
+                            {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }} kg
+                        </span>
+                    </div>
+                    @if($sourceLink)
+                        <a href="{{ $sourceLink['route'] }}" class="text-sm font-semibold text-leaf-700 hover:underline">{{ $sourceLink['label'] }} →</a>
+                    @elseif($m->observacao)
+                        <p class="text-sm text-leaf-700">{{ $m->observacao }}</p>
+                    @endif
+                    <div class="flex items-center justify-between text-xs text-leaf-500 mt-1.5">
+                        <span>{{ $m->user?->name ? 'Por '.$m->user->name : '—' }}</span>
+                        @isset($m->saldo_apos)
+                            <span>Saldo após: <strong class="text-leaf-900">{{ number_format($m->saldo_apos, 3, ',', '.') }} kg</strong></span>
+                        @endisset
+                    </div>
+                </li>
+            @empty
+                <li class="px-4 py-12 text-center text-leaf-500">Sem movimentações.</li>
+            @endforelse
+        </ul>
+
+        {{-- Desktop: tabela --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
                     <tr>

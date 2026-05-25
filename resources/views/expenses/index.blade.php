@@ -3,19 +3,19 @@
 @section('title', 'Despesas')
 
 @section('content')
-<div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
     <div>
         <h1 class="text-2xl font-bold text-leaf-900">Despesas</h1>
         <p class="text-sm text-leaf-500 mt-0.5">Lançamentos financeiros da fazenda.</p>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 w-full sm:w-auto">
         @can('viewAny', App\Models\ExpenseCategory::class)
-            <a href="{{ route('despesas.categorias.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:bg-leaf-50 rounded-lg transition">
+            <a href="{{ route('despesas.categorias.index') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:bg-leaf-50 rounded-lg transition flex-1 sm:flex-none">
                 Categorias
             </a>
         @endcan
         @can('create', App\Models\Expense::class)
-            <a href="{{ route('despesas.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm">
+            <a href="{{ route('despesas.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm flex-1 sm:flex-none">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                 Nova despesa
             </a>
@@ -42,24 +42,24 @@
 @endphp
 
 <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-4 mb-4">
-    <div class="flex items-center justify-between flex-wrap gap-3 mb-3">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
         <div class="flex items-center gap-2 text-sm">
-            <svg class="w-4 h-4 text-leaf-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <svg class="w-4 h-4 text-leaf-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             <span class="text-leaf-500">Mostrando:</span>
             <span class="font-bold text-leaf-900">{{ $periodoLabel }}</span>
         </div>
-        <div class="flex items-center gap-2 text-xs">
+        <div class="grid grid-cols-3 sm:flex sm:items-center gap-2 text-xs">
             <a href="{{ route('despesas.index') }}"
-               class="px-3 py-1.5 rounded-md font-semibold transition {{ $isMesAtual ? 'bg-leaf-700 text-white' : 'bg-leaf-50 text-leaf-700 hover:bg-leaf-100' }}">
+               class="text-center px-3 py-1.5 rounded-md font-semibold transition {{ $isMesAtual ? 'bg-leaf-700 text-white' : 'bg-leaf-50 text-leaf-700 hover:bg-leaf-100' }}">
                 Este mês
             </a>
             <a href="{{ route('despesas.index', ['from' => $mesPassado->copy()->startOfMonth()->toDateString(), 'to' => $mesPassado->copy()->endOfMonth()->toDateString()]) }}"
-               class="px-3 py-1.5 rounded-md font-semibold transition {{ $isMesPassado ? 'bg-leaf-700 text-white' : 'bg-leaf-50 text-leaf-700 hover:bg-leaf-100' }}">
+               class="text-center px-3 py-1.5 rounded-md font-semibold transition {{ $isMesPassado ? 'bg-leaf-700 text-white' : 'bg-leaf-50 text-leaf-700 hover:bg-leaf-100' }}">
                 Mês passado
             </a>
             <a href="{{ route('despesas.index', ['all' => 1]) }}"
-               class="px-3 py-1.5 rounded-md font-semibold transition {{ $verTudo ? 'bg-leaf-700 text-white' : 'bg-leaf-50 text-leaf-700 hover:bg-leaf-100' }}">
-                Todo o histórico
+               class="text-center px-3 py-1.5 rounded-md font-semibold transition {{ $verTudo ? 'bg-leaf-700 text-white' : 'bg-leaf-50 text-leaf-700 hover:bg-leaf-100' }}">
+                Histórico
             </a>
         </div>
     </div>
@@ -79,7 +79,7 @@
             <div>
                 <label class="block text-xs font-semibold text-leaf-700 mb-1.5">Categoria</label>
                 <select name="cat" class="w-full px-3 py-2 text-sm rounded-lg border border-leaf-200 focus:outline-none focus:ring-2 focus:ring-leaf-500">
-                    <option value="">Todas/option>
+                    <option value="">Todas</option>
                     @foreach($allCategories as $c)
                         <option value="{{ $c->id }}" @selected($catId == $c->id)>{{ $c->nome }}{{ $c->ativo ? '' : ' (inativa)' }}</option>
                     @endforeach
@@ -115,7 +115,30 @@
 </div>
 
 <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
+    {{-- Mobile: cards --}}
+    <ul class="md:hidden divide-y divide-leaf-100">
+        @forelse($expenses as $e)
+            <li class="px-4 py-4 flex items-start gap-3">
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-leaf-900 mb-0.5 break-words">{{ $e->descricao }}</p>
+                    <p class="text-xs text-leaf-500">
+                        {{ $e->data->format('d/m/Y') }} · {{ $e->categoriaNome() }}
+                    </p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                    <p class="font-bold text-leaf-800 text-sm whitespace-nowrap">R$ {{ number_format($e->valor_total, 2, ',', '.') }}</p>
+                    @can('update', $e)
+                        <a href="{{ route('despesas.edit', $e) }}" class="inline-flex items-center gap-1 text-xs font-semibold text-leaf-700 hover:underline mt-1">editar</a>
+                    @endcan
+                </div>
+            </li>
+        @empty
+            <li class="px-4 py-12 text-center text-leaf-500">Nenhuma despesa.</li>
+        @endforelse
+    </ul>
+
+    {{-- Desktop: tabela --}}
+    <table class="hidden md:table w-full text-sm">
         <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
             <tr>
                 <th class="text-left px-6 py-3 font-semibold">Data</th>

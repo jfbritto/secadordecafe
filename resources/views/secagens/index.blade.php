@@ -9,7 +9,7 @@
         <p class="text-sm text-leaf-500 mt-0.5">Operações de secagem com cálculo automático de rendimento e comissão.</p>
     </div>
     @can('create', App\Models\Secagem::class)
-        <a href="{{ route('secagens.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm">
+        <a href="{{ route('secagens.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm w-full sm:w-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             Nova secagem
         </a>
@@ -17,7 +17,34 @@
 </div>
 
 <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
+    {{-- Mobile: cards --}}
+    <ul class="md:hidden divide-y divide-leaf-100">
+        @forelse($secagens as $s)
+            <li>
+                <a href="{{ $s->isRascunho() && auth()->user()->can('update', $s) ? route('secagens.edit', $s) : route('secagens.show', $s) }}"
+                   class="flex items-center gap-3 px-4 py-4 hover:bg-leaf-50/30 transition">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <p class="font-bold text-leaf-900">#{{ $s->numero }}</p>
+                            @if($s->isConcluida())
+                                <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-100 text-emerald-700">CONCLUÍDA</span>
+                            @else
+                                <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-100 text-amber-700">RASCUNHO</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-leaf-700 truncate">{{ $s->data->format('d/m/Y') }} · {{ $s->secadorNome() }}</p>
+                        <p class="text-xs text-leaf-500 mt-0.5">{{ $s->items_count }} {{ $s->items_count === 1 ? 'item' : 'itens' }}</p>
+                    </div>
+                    <svg class="w-4 h-4 text-leaf-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </li>
+        @empty
+            <li class="px-4 py-12 text-center text-leaf-500">Nenhuma secagem registrada.</li>
+        @endforelse
+    </ul>
+
+    {{-- Desktop: tabela --}}
+    <table class="hidden md:table w-full text-sm">
         <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
             <tr>
                 <th class="text-left px-6 py-3 font-semibold">#</th>

@@ -24,7 +24,7 @@
             <label class="block text-[10px] uppercase tracking-wider text-leaf-500 font-semibold mb-1.5">Plano</label>
             <select name="status"
                     class="w-full px-3 py-2 text-sm rounded-lg border border-leaf-200 focus:outline-none focus:ring-2 focus:ring-leaf-500 focus:border-leaf-500 bg-white">
-                <option value="">Todos/option>
+                <option value="">Todos</option>
                 @foreach($statuses as $value => $label)
                     <option value="{{ $value }}" @selected($statusFilter === $value)>{{ $label }}</option>
                 @endforeach
@@ -36,8 +36,53 @@
     </div>
 </form>
 
+@php
+    $farmTone = function ($value) {
+        return match($value) {
+            'partner'   => 'bg-purple-100 text-purple-700',
+            'active'    => 'bg-emerald-100 text-emerald-700',
+            'trial'     => 'bg-amber-100 text-amber-700',
+            'past_due'  => 'bg-orange-100 text-orange-700',
+            'blocked'   => 'bg-rose-100 text-rose-700',
+            'canceled'  => 'bg-gray-100 text-gray-700',
+            default     => 'bg-gray-100 text-gray-700',
+        };
+    };
+@endphp
+
 <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
+    {{-- Mobile: cards --}}
+    <ul class="md:hidden divide-y divide-leaf-100">
+        @forelse($farms as $farm)
+            @php
+                $owner = $farm->users->first();
+                $statusValue = $farm->subscription?->status ?? $farm->status;
+                $tone = $farmTone($statusValue);
+            @endphp
+            <li>
+                <a href="{{ route('admin.fazendas.show', $farm) }}" class="flex items-start gap-3 px-4 py-4 hover:bg-leaf-50/30 transition">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <p class="font-semibold text-leaf-900 truncate">{{ $farm->nome }}</p>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $tone }}">{{ $statuses[$statusValue] ?? $statusValue }}</span>
+                        </div>
+                        @if($owner)
+                            <p class="text-xs text-leaf-500 truncate">{{ $owner->name }} · {{ $owner->email }}</p>
+                        @endif
+                        <p class="text-xs text-leaf-500 mt-1">
+                            {{ $farm->users_count }} usuário(s) · {{ $farm->customers_count }} cliente(s) · criada {{ $farm->created_at->format('d/m/Y') }}
+                        </p>
+                    </div>
+                    <svg class="w-4 h-4 text-leaf-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </li>
+        @empty
+            <li class="px-4 py-12 text-center text-leaf-500">Nenhuma fazenda encontrada.</li>
+        @endforelse
+    </ul>
+
+    {{-- Desktop: tabela --}}
+    <table class="hidden md:table w-full text-sm">
         <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
             <tr>
                 <th class="text-left px-6 py-3 font-semibold">Fazenda</th>
@@ -54,15 +99,7 @@
                 @php
                     $owner = $farm->users->first();
                     $statusValue = $farm->subscription?->status ?? $farm->status;
-                    $tone = match($statusValue) {
-                        'partner'   => 'bg-purple-100 text-purple-700',
-                        'active'    => 'bg-emerald-100 text-emerald-700',
-                        'trial'     => 'bg-amber-100 text-amber-700',
-                        'past_due'  => 'bg-orange-100 text-orange-700',
-                        'blocked'   => 'bg-rose-100 text-rose-700',
-                        'canceled'  => 'bg-gray-100 text-gray-700',
-                        default     => 'bg-gray-100 text-gray-700',
-                    };
+                    $tone = $farmTone($statusValue);
                 @endphp
                 <tr class="hover:bg-leaf-50/30 transition">
                     <td class="px-6 py-3">

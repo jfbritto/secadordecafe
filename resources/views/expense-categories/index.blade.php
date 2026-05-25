@@ -10,7 +10,7 @@
         <p class="text-sm text-leaf-500 mt-0.5">Organize seus lançamentos financeiros por categoria.</p>
     </div>
     @can('create', App\Models\ExpenseCategory::class)
-        <a href="{{ route('despesas.categorias.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm">
+        <a href="{{ route('despesas.categorias.create') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm w-full sm:w-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             Nova categoria
         </a>
@@ -18,7 +18,30 @@
 </div>
 
 <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-    <table class="w-full text-sm">
+    {{-- Mobile: cards --}}
+    <ul class="md:hidden divide-y divide-leaf-100">
+        @forelse($categories as $cat)
+            <li class="px-4 py-4 flex items-center gap-3">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <p class="font-semibold text-leaf-900 truncate">{{ $cat->nome }}</p>
+                        @unless($cat->ativo)
+                            <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-gray-100 text-gray-700 flex-shrink-0">INATIVA</span>
+                        @endunless
+                    </div>
+                    <p class="text-xs text-leaf-500">{{ $cat->expenses_count }} {{ $cat->expenses_count === 1 ? 'lançamento' : 'lançamentos' }}</p>
+                </div>
+                @can('update', $cat)
+                    <a href="{{ route('despesas.categorias.edit', $cat) }}" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-leaf-700 bg-leaf-50 hover:bg-leaf-100 rounded-lg transition flex-shrink-0">editar</a>
+                @endcan
+            </li>
+        @empty
+            <li class="px-4 py-12 text-center text-leaf-500">Nenhuma categoria cadastrada.</li>
+        @endforelse
+    </ul>
+
+    {{-- Desktop: tabela --}}
+    <table class="hidden md:table w-full text-sm">
         <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
             <tr>
                 <th class="text-left px-6 py-3 font-semibold">Nome</th>

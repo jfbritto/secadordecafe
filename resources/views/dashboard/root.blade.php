@@ -54,10 +54,38 @@
     </div>
 
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-leaf-100">
+        <div class="px-4 sm:px-6 py-4 border-b border-leaf-100">
             <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Fazendas recentes</h2>
         </div>
-        <table class="w-full text-sm">
+
+        @php
+            $statusTone = fn($s) => match($s){
+                'active'=>'bg-emerald-100 text-emerald-700',
+                'partner'=>'bg-purple-100 text-purple-700',
+                'blocked'=>'bg-rose-100 text-rose-700',
+                'past_due'=>'bg-orange-100 text-orange-700',
+                'canceled'=>'bg-gray-100 text-gray-700',
+                default=>'bg-amber-100 text-amber-700'
+            };
+        @endphp
+
+        {{-- Mobile: cards --}}
+        <ul class="md:hidden divide-y divide-leaf-100">
+            @foreach($recentFarms as $f)
+                <li>
+                    <a href="{{ route('admin.fazendas.show', $f) }}" class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-leaf-50/30 transition">
+                        <div class="min-w-0 flex-1">
+                            <p class="font-semibold text-leaf-900 truncate">{{ $f->nome }}</p>
+                            <p class="text-xs text-leaf-500 mt-0.5">Criada {{ $f->created_at->format('d/m/Y') }}</p>
+                        </div>
+                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 {{ $statusTone($f->status) }}">{{ \App\Support\StatusLabels::farm($f->status) }}</span>
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+
+        {{-- Desktop: tabela --}}
+        <table class="hidden md:table w-full text-sm">
             <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
                 <tr>
                     <th class="text-left px-6 py-2 font-semibold">Fazenda</th>
@@ -72,15 +100,7 @@
                             <a href="{{ route('admin.fazendas.show', $f) }}" class="text-leaf-900 font-semibold hover:underline">{{ $f->nome }}</a>
                         </td>
                         <td class="px-6 py-2.5">
-                            @php $cls = match($f->status){
-                                'active'=>'bg-emerald-100 text-emerald-700',
-                                'partner'=>'bg-purple-100 text-purple-700',
-                                'blocked'=>'bg-rose-100 text-rose-700',
-                                'past_due'=>'bg-orange-100 text-orange-700',
-                                'canceled'=>'bg-gray-100 text-gray-700',
-                                default=>'bg-amber-100 text-amber-700'
-                            }; @endphp
-                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $cls }}">{{ \App\Support\StatusLabels::farm($f->status) }}</span>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $statusTone($f->status) }}">{{ \App\Support\StatusLabels::farm($f->status) }}</span>
                         </td>
                         <td class="px-6 py-2.5 text-leaf-500">{{ $f->created_at->format('d/m/Y') }}</td>
                     </tr>
