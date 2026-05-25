@@ -37,7 +37,7 @@
                 </label>
                 <select id="dryer_id" name="dryer_id" required
                         class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                    <option value="">Selecione/option>
+                    <option value="">Selecione</option>
                     @foreach($dryers as $d)
                         <option value="{{ $d->id }}" @selected(old('dryer_id') == $d->id)>{{ $d->nome }}</option>
                     @endforeach
@@ -49,24 +49,9 @@
             </div>
         </div>
 
-        <div class="mb-6">
-            <label for="area_id" class="block text-sm font-bold text-leaf-900 mb-2">
-                Área <span class="text-leaf-400 font-normal">(opcional)</span>
-            </label>
-            <select id="area_id" name="area_id"
-                    class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                <option value="">Sem área (secagem pra cliente)/option>
-                @foreach($areas as $a)
-                    <option value="{{ $a->id }}" @selected(old('area_id') == $a->id)>{{ $a->nome }}</option>
-                @endforeach
-            </select>
-            <p class="mt-1.5 text-sm text-leaf-500">
-                Selecione quando o café for <strong>da sua roça</strong>. Deixe em branco quando estiver secando café <strong>de cliente</strong> (que veio de outra roça).
-                @if($areas->isEmpty())
-                    <a href="{{ route('areas.create') }}" class="text-leaf-700 font-semibold hover:underline">Cadastrar área</a>.
-                @endif
-            </p>
-            @error('area_id')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+        <div class="bg-leaf-50/50 border border-leaf-100 rounded-lg p-4 mb-6 text-sm text-leaf-700">
+            <strong>Misturando café?</strong> Depois de criar o rascunho, você adiciona cada lote escolhendo a origem:
+            🧑 <strong>cliente externo</strong> ou 🌱 <strong>área da sua roça</strong>. Pode misturar os dois no mesmo ciclo do secador.
         </div>
 
         <div class="mb-6">

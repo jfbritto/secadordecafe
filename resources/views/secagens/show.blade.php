@@ -9,9 +9,9 @@
         <h1 class="text-2xl font-bold text-leaf-900">Secagem #{{ $secagem->numero }}</h1>
         <p class="text-sm text-leaf-500 mt-0.5">
             {{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secadorNome() }}
-            @if($secagem->area)
-                · <a href="{{ route('areas.show', $secagem->area) }}" class="text-leaf-700 font-semibold hover:underline">{{ $secagem->area->nome }}</a>
-            @endif
+            @foreach($secagem->areasEnvolvidas() as $area)
+                · <a href="{{ route('areas.show', $area) }}" class="text-leaf-700 font-semibold hover:underline">🌱 {{ $area->nome }}</a>
+            @endforeach
             ·
             @if($secagem->isConcluida())
                 <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">CONCLUÍDA em {{ $secagem->concluida_at->format('d/m/Y H:i') }}</span>
