@@ -84,18 +84,16 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::resource('clientes', CustomerController::class)->parameters(['clientes' => 'cliente']);
 
         // Movimentações polimórficas: owner pode ser cliente, area ou fazenda.
-        // Pra fazenda o id não é necessário (sempre a fazenda do usuário logado).
-        Route::get('movimentacoes/fazenda', [MovementController::class, 'index'])
-            ->defaults('tipo', 'fazenda')->defaults('id', null)
+        // Fazenda usa rota separada (sempre é a fazenda do usuário logado, sem id).
+        Route::get('movimentacoes/fazenda', [MovementController::class, 'indexFazenda'])
             ->name('movimentacoes.fazenda.index');
-        Route::post('movimentacoes/fazenda', [MovementController::class, 'store'])
-            ->defaults('tipo', 'fazenda')->defaults('id', null)
+        Route::post('movimentacoes/fazenda', [MovementController::class, 'storeFazenda'])
             ->name('movimentacoes.fazenda.store');
         Route::get('movimentacoes/{tipo}/{id}', [MovementController::class, 'index'])
-            ->whereIn('tipo', ['cliente', 'area'])
+            ->whereIn('tipo', ['cliente', 'area'])->whereNumber('id')
             ->name('movimentacoes.index');
         Route::post('movimentacoes/{tipo}/{id}', [MovementController::class, 'store'])
-            ->whereIn('tipo', ['cliente', 'area'])
+            ->whereIn('tipo', ['cliente', 'area'])->whereNumber('id')
             ->name('movimentacoes.store');
 
         // Atalhos legados pra mobile + bookmarks: /clientes/{c}/movimentacoes

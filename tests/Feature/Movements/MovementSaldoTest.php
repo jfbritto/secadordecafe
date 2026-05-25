@@ -116,6 +116,15 @@ it('extrato calcula saldo após cada movimentação (running balance)', function
     expect((float) $c->fresh()->saldo_coco_kg)->toBe(130.0);
 });
 
+it('extrato da fazenda abre sem id e mostra saldo de comissão', function () {
+    $admin = makeFarmUser('admin');
+
+    $this->actingAs($admin)
+        ->get('/movimentacoes/fazenda')
+        ->assertOk()
+        ->assertSee('Comissão');
+});
+
 it('extrato mostra link clicável pra Secagem como origem', function () {
     $admin = makeFarmUser('admin');
     $dryer = \App\Models\Dryer::factory()->forFarm($admin->farm)->create();

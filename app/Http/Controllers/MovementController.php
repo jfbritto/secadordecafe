@@ -26,7 +26,27 @@ use Illuminate\View\View;
  */
 class MovementController extends Controller
 {
-    public function index(string $tipo, ?int $id, Request $request): View
+    public function indexFazenda(Request $request): View
+    {
+        return $this->renderIndex($request, 'fazenda', null);
+    }
+
+    public function storeFazenda(StoreMovementRequest $request, RegisterMovementAction $action): RedirectResponse
+    {
+        return $this->handleStore($request, $action, 'fazenda', null);
+    }
+
+    public function index(string $tipo, int $id, Request $request): View
+    {
+        return $this->renderIndex($request, $tipo, $id);
+    }
+
+    public function store(StoreMovementRequest $request, RegisterMovementAction $action, string $tipo, int $id): RedirectResponse
+    {
+        return $this->handleStore($request, $action, $tipo, $id);
+    }
+
+    private function renderIndex(Request $request, string $tipo, ?int $id): View
     {
         $owner = $this->resolveOwner($tipo, $id);
         $this->authorizeOwner($owner);
@@ -56,7 +76,7 @@ class MovementController extends Controller
         ]);
     }
 
-    public function store(StoreMovementRequest $request, string $tipo, ?int $id, RegisterMovementAction $action): RedirectResponse
+    private function handleStore(StoreMovementRequest $request, RegisterMovementAction $action, string $tipo, ?int $id): RedirectResponse
     {
         $owner = $this->resolveOwner($tipo, $id);
         $this->authorizeOwner($owner);
@@ -76,12 +96,12 @@ class MovementController extends Controller
 
         $owner->refresh();
 
-        $params = ['tipo' => $tipo];
-        if ($id !== null) {
-            $params['id'] = $id;
+        if ($tipo === 'fazenda') {
+            return redirect()->route('movimentacoes.fazenda.index')
+                ->with('flash', 'Movimentação registrada.');
         }
 
-        return redirect()->route('movimentacoes.index', $params)
+        return redirect()->route('movimentacoes.index', ['tipo' => $tipo, 'id' => $id])
             ->with('flash', 'Movimentação registrada.');
     }
 
