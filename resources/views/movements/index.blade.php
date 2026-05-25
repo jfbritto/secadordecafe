@@ -15,7 +15,7 @@
         </div>
         <div class="bg-leaf-700 text-white px-5 py-3 rounded-xl shadow-md text-right flex-shrink-0">
             <p class="text-[10px] uppercase tracking-wider text-leaf-200">Saldo atual</p>
-            <p class="text-2xl font-bold">{{ number_format($customer->saldo_cafe_kg, 3, ',', '.') }} <span class="text-sm font-normal text-leaf-200">kg</span></p>
+            <p class="text-2xl font-bold">{{ number_format($customer->saldo_cafe_kg, 2, ',', '.') }} <span class="text-sm font-normal text-leaf-200">kg</span></p>
         </div>
     </div>
 
@@ -82,8 +82,8 @@
                         Quantidade <span class="text-rose-500">*</span>
                     </label>
                     <div class="relative">
-                        <input id="quantidade" type="number" step="0.001" min="0.001" inputmode="decimal" name="quantidade" required
-                               placeholder="0,000"
+                        <input id="quantidade" type="number" step="0.01" min="0.01" inputmode="decimal" name="quantidade" required
+                               placeholder="0,00"
                                class="w-full pl-4 pr-12 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
                         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">kg</span>
                     </div>
@@ -134,7 +134,7 @@
                             <span class="text-xs text-leaf-500">{{ $m->occurred_at->format('d/m/Y H:i') }}</span>
                         </div>
                         <span class="font-bold whitespace-nowrap text-sm {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
-                            {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }} kg
+                            {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 2, ',', '.') }} kg
                         </span>
                     </div>
                     @if($sourceLink)
@@ -145,7 +145,7 @@
                     <div class="flex items-center justify-between text-xs text-leaf-500 mt-1.5">
                         <span>{{ $m->user?->name ? 'Por '.$m->user->name : '—' }}</span>
                         @isset($m->saldo_apos)
-                            <span>Saldo após: <strong class="text-leaf-900">{{ number_format($m->saldo_apos, 3, ',', '.') }} kg</strong></span>
+                            <span>Saldo após: <strong class="text-leaf-900">{{ number_format($m->saldo_apos, 2, ',', '.') }} kg</strong></span>
                         @endisset
                     </div>
                 </li>
@@ -185,11 +185,11 @@
                                 <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ \App\Support\StatusLabels::movementTipo($m->tipo) }}</span>
                             </td>
                             <td class="px-6 py-3 text-right font-bold whitespace-nowrap {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
-                                {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }}
+                                {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 2, ',', '.') }}
                             </td>
                             <td class="px-6 py-3 text-right font-semibold text-leaf-900 whitespace-nowrap">
                                 @isset($m->saldo_apos)
-                                    {{ number_format($m->saldo_apos, 3, ',', '.') }}
+                                    {{ number_format($m->saldo_apos, 2, ',', '.') }}
                                 @else
                                     —
                                 @endisset

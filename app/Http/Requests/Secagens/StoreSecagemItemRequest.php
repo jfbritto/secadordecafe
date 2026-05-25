@@ -59,7 +59,7 @@ class StoreSecagemItemRequest extends FormRequest
             if ($recebida > $saldo) {
                 $v->errors()->add(
                     'quantidade_recebida_kg',
-                    "Saldo insuficiente. {$customer->nome} tem apenas " . number_format($saldo, 3, ',', '.') . ' kg disponível.'
+                    "Saldo insuficiente. {$customer->nome} tem apenas " . number_format($saldo, 2, ',', '.') . ' kg disponível.'
                 );
             }
         });

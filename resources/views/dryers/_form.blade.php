@@ -33,7 +33,7 @@
         <div>
             <label for="capacidade_kg" class="block text-sm font-bold text-leaf-900 mb-2">Capacidade</label>
             <div class="relative">
-                <input id="capacidade_kg" type="number" step="0.001" min="0" inputmode="decimal" name="capacidade_kg"
+                <input id="capacidade_kg" type="number" step="0.01" min="0" inputmode="decimal" name="capacidade_kg"
                        value="{{ old('capacidade_kg', $D?->capacidade_kg) }}"
                        placeholder="ex: 2500"
                        class="w-full pl-4 pr-14 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">

@@ -95,7 +95,7 @@ it('formatValue formata booleanos, datas, valores monetários e kg', function ()
     expect(AuditFormatter::formatValue('', 'qualquer'))->toBe('—');
     expect(AuditFormatter::formatValue('2026-05-07', 'data'))->toBe('07/05/2026');
     expect(AuditFormatter::formatValue(123.45, 'valor_total'))->toBe('R$ 123,45');
-    expect(AuditFormatter::formatValue(1500, 'saldo_cafe_kg'))->toBe('1.500,000 kg');
+    expect(AuditFormatter::formatValue(1500, 'saldo_cafe_kg'))->toBe('1.500,00 kg');
 });
 
 it('fieldLabel traduz campos conhecidos e aplica fallback humano', function () {

@@ -57,9 +57,9 @@
 <div class="mb-6">
     <label for="saldo_cafe_kg" class="block text-sm font-bold text-leaf-900 mb-2">Saldo inicial (kg)</label>
     <div class="relative">
-        <input id="saldo_cafe_kg" type="number" step="0.001" min="0" inputmode="decimal" name="saldo_cafe_kg"
+        <input id="saldo_cafe_kg" type="number" step="0.01" min="0" inputmode="decimal" name="saldo_cafe_kg"
                value="{{ old('saldo_cafe_kg', 0) }}"
-               placeholder="0,000"
+               placeholder="0,00"
                class="w-full pl-4 pr-14 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">kg</span>
     </div>
@@ -72,7 +72,7 @@
     <h2 class="text-base font-bold text-leaf-900">Saldo de café</h2>
     <p class="text-sm text-leaf-500 mt-0.5">
         O saldo é controlado pelo extrato, entradas, secagens, ajustes e saídas. Saldo atual:
-        <strong class="text-leaf-700">{{ number_format($C->saldo_cafe_kg, 3, ',', '.') }} kg</strong>.
+        <strong class="text-leaf-700">{{ number_format($C->saldo_cafe_kg, 2, ',', '.') }} kg</strong>.
         <a href="{{ route('clientes.movimentacoes.index', $C) }}" class="text-leaf-700 font-semibold hover:underline">Abrir extrato</a>.
     </p>
 </div>

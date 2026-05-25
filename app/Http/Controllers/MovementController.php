@@ -67,7 +67,7 @@ class MovementController extends Controller
 
         $cliente->refresh();
         return redirect()->route('clientes.movimentacoes.index', $cliente)
-            ->with('flash', 'Movimentação registrada. Novo saldo: <strong>' . number_format((float) $cliente->saldo_cafe_kg, 3, ',', '.') . ' kg</strong>.');
+            ->with('flash', 'Movimentação registrada. Novo saldo: <strong>' . number_format((float) $cliente->saldo_cafe_kg, 2, ',', '.') . ' kg</strong>.');
     }
 
     private function ensureSameFarm(Customer $customer): void

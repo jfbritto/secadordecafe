@@ -242,7 +242,7 @@ class AuditFormatter
             return 'R$ ' . number_format((float) $value, 2, ',', '.');
         }
         if (in_array($field, ['saldo_cafe_kg', 'capacidade_kg', 'quantidade', 'quantidade_kg', 'quantidade_recebida_kg', 'quantidade_seca_kg', 'comissao_kg', 'saldo_liquido_kg'], true) && is_numeric($value)) {
-            return number_format((float) $value, 3, ',', '.') . ' kg';
+            return number_format((float) $value, 2, ',', '.') . ' kg';
         }
 
         return (string) $value;

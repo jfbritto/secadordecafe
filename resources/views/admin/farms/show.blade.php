@@ -40,7 +40,7 @@
     @foreach([
         ['Usuários', $counts['users']],
         ['Clientes', $counts['customers']],
-        ['Saldo (kg)', number_format($counts['saldo_total_kg'], 0, ',', '.')],
+        ['Saldo (kg)', number_format($counts['saldo_total_kg'], 2, ',', '.')],
         ['Secagens OK', $counts['secagens_concluidas']],
         ['Rascunhos', $counts['secagens_rascunho']],
         ['Movimentos', $counts['movimentos']],

@@ -47,9 +47,9 @@ class ConcludeSecagemAction
                 if ((float) $customer->saldo_cafe_kg < (float) $item->quantidade_recebida_kg) {
                     throw new DomainException(
                         "Saldo insuficiente para {$customer->nome} (precisa "
-                        . number_format((float) $item->quantidade_recebida_kg, 3, ',', '.')
+                        . number_format((float) $item->quantidade_recebida_kg, 2, ',', '.')
                         . ' kg, tem '
-                        . number_format((float) $customer->saldo_cafe_kg, 3, ',', '.')
+                        . number_format((float) $customer->saldo_cafe_kg, 2, ',', '.')
                         . ' kg).'
                     );
                 }

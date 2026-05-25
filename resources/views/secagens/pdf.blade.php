@@ -54,22 +54,22 @@
         @foreach($secagem->items as $item)
             <tr>
                 <td>{{ $item->customer->nome }}</td>
-                <td class="right">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }}</td>
-                <td class="right">{{ number_format($item->quantidade_seca_kg, 3, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }}</td>
                 <td class="right">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
                 <td class="right">{{ number_format($item->comissao_percentual, 2, ',', '.') }}%</td>
-                <td class="right">{{ number_format($item->comissao_kg, 3, ',', '.') }}</td>
-                <td class="right">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->comissao_kg, 2, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->saldo_liquido_kg, 2, ',', '.') }}</td>
             </tr>
         @endforeach
     </tbody>
     <tfoot>
         <tr>
             <td>Totais</td>
-            <td class="right">{{ number_format($secagem->totalRecebidoKg(), 3, ',', '.') }}</td>
-            <td class="right">{{ number_format($secagem->totalSecoKg(), 3, ',', '.') }}</td>
+            <td class="right">{{ number_format($secagem->totalRecebidoKg(), 2, ',', '.') }}</td>
+            <td class="right">{{ number_format($secagem->totalSecoKg(), 2, ',', '.') }}</td>
             <td></td><td></td>
-            <td class="right">{{ number_format($secagem->totalComissaoKg(), 3, ',', '.') }}</td>
+            <td class="right">{{ number_format($secagem->totalComissaoKg(), 2, ',', '.') }}</td>
             <td></td>
         </tr>
     </tfoot>

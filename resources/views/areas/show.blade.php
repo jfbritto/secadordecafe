@@ -67,17 +67,17 @@
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
         <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total recebido</p>
-        <p class="text-2xl font-bold text-leaf-700 mt-2">{{ number_format($stats['total_recebido'], 3, ',', '.') }}</p>
+        <p class="text-2xl font-bold text-leaf-700 mt-2">{{ number_format($stats['total_recebido'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg que entraram na secagem</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
         <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total seco</p>
-        <p class="text-2xl font-bold text-emerald-700 mt-2">{{ number_format($stats['total_seco'], 3, ',', '.') }}</p>
+        <p class="text-2xl font-bold text-emerald-700 mt-2">{{ number_format($stats['total_seco'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg de café seco produzidos</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
         <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Comissão paga</p>
-        <p class="text-2xl font-bold text-amber-700 mt-2">{{ number_format($stats['total_comissao'], 3, ',', '.') }}</p>
+        <p class="text-2xl font-bold text-amber-700 mt-2">{{ number_format($stats['total_comissao'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg em comissões nas secagens</p>
     </div>
 </div>
@@ -126,8 +126,8 @@
                             </p>
                         </div>
                         <div class="text-right whitespace-nowrap">
-                            <p class="text-sm font-bold text-leaf-700">{{ number_format($recebido, 3, ',', '.') }} kg</p>
-                            <p class="text-[10px] text-leaf-500">recebido · seco {{ number_format($seco, 3, ',', '.') }} kg</p>
+                            <p class="text-sm font-bold text-leaf-700">{{ number_format($recebido, 2, ',', '.') }} kg</p>
+                            <p class="text-[10px] text-leaf-500">recebido · seco {{ number_format($seco, 2, ',', '.') }} kg</p>
                         </div>
                     </div>
                 </li>

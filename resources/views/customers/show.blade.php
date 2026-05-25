@@ -42,7 +42,7 @@
 
     <div class="bg-gradient-to-br from-leaf-700 to-leaf-800 text-white rounded-xl shadow-lg shadow-leaf-700/10 p-6">
         <p class="text-xs uppercase tracking-wider text-leaf-200 font-semibold">Saldo de café</p>
-        <p class="text-4xl font-bold mt-2">{{ number_format($customer->saldo_cafe_kg, 3, ',', '.') }}</p>
+        <p class="text-4xl font-bold mt-2">{{ number_format($customer->saldo_cafe_kg, 2, ',', '.') }}</p>
         <p class="text-sm text-leaf-200 mt-1">kg em estoque</p>
     </div>
 </div>
@@ -51,17 +51,17 @@
 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
         <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total recebido</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-2">{{ number_format($stats['total_entradas'], 3, ',', '.') }}</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-2">{{ number_format($stats['total_entradas'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg de café que entraram</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
         <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total secado</p>
-        <p class="text-2xl font-bold text-leaf-700 mt-2">{{ number_format($stats['total_secado'], 3, ',', '.') }}</p>
+        <p class="text-2xl font-bold text-leaf-700 mt-2">{{ number_format($stats['total_secado'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg debitados em secagens</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
         <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total saídas</p>
-        <p class="text-2xl font-bold text-rose-600 mt-2">{{ number_format($stats['total_saidas'], 3, ',', '.') }}</p>
+        <p class="text-2xl font-bold text-rose-600 mt-2">{{ number_format($stats['total_saidas'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg retirados sem secagem</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
@@ -105,7 +105,7 @@
                         <p class="text-xs text-leaf-500">{{ $m->occurred_at->format('d/m/Y H:i') }}</p>
                     </div>
                     <span class="text-sm font-bold whitespace-nowrap {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
-                        {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 3, ',', '.') }} kg
+                        {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 2, ',', '.') }} kg
                     </span>
                 </li>
             @empty
@@ -135,8 +135,8 @@
                         </div>
                         @if($item)
                             <div class="text-right whitespace-nowrap">
-                                <p class="text-sm font-bold text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }} kg</p>
-                                <p class="text-[10px] text-leaf-500">recebido · seco {{ number_format($item->quantidade_seca_kg, 3, ',', '.') }} kg</p>
+                                <p class="text-sm font-bold text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg</p>
+                                <p class="text-[10px] text-leaf-500">recebido · seco {{ number_format($item->quantidade_seca_kg, 2, ',', '.') }} kg</p>
                             </div>
                         @endif
                     </div>

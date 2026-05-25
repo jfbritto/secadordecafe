@@ -38,7 +38,7 @@
                         </p>
                     </div>
                     <div class="text-right flex-shrink-0">
-                        <p class="font-bold text-leaf-700 text-sm whitespace-nowrap">{{ number_format($c->saldo_cafe_kg, 3, ',', '.') }} kg</p>
+                        <p class="font-bold text-leaf-700 text-sm whitespace-nowrap">{{ number_format($c->saldo_cafe_kg, 2, ',', '.') }} kg</p>
                         <p class="text-[10px] text-leaf-400 uppercase tracking-wider mt-0.5">saldo</p>
                     </div>
                     <svg class="w-4 h-4 text-leaf-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -68,7 +68,7 @@
                     </td>
                     <td class="px-6 py-3.5 text-leaf-600">{{ $c->telefone ?? '—' }}</td>
                     <td class="px-6 py-3.5 text-leaf-600">{{ $c->cpf_cnpj ?? '—' }}</td>
-                    <td class="px-6 py-3.5 text-right font-bold text-leaf-700">{{ number_format($c->saldo_cafe_kg, 3, ',', '.') }}</td>
+                    <td class="px-6 py-3.5 text-right font-bold text-leaf-700">{{ number_format($c->saldo_cafe_kg, 2, ',', '.') }}</td>
                     <td class="px-6 py-3.5 text-right text-sm">
                         <a href="{{ route('clientes.show', $c) }}"
                            class="inline-flex items-center gap-1 font-semibold text-leaf-700 hover:text-leaf-900 hover:underline">

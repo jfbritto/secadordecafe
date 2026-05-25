@@ -30,7 +30,7 @@
                     </div>
                     <p class="text-xs text-leaf-500">
                         {{ $d->modelo ?? 'sem modelo' }}
-                        @if($d->capacidade_kg) · {{ number_format($d->capacidade_kg, 0, ',', '.') }} kg @endif
+                        @if($d->capacidade_kg) · {{ number_format($d->capacidade_kg, 2, ',', '.') }} kg @endif
                         · {{ $d->secagens_count }} {{ $d->secagens_count === 1 ? 'secagem' : 'secagens' }}
                     </p>
                 </div>
@@ -66,7 +66,7 @@
                     <td class="px-6 py-3 font-semibold text-leaf-900">{{ $d->nome }}</td>
                     <td class="px-6 py-3 text-leaf-600">{{ $d->modelo ?? '—' }}</td>
                     <td class="px-6 py-3 text-right text-leaf-700">
-                        {{ $d->capacidade_kg ? number_format($d->capacidade_kg, 0, ',', '.') . ' kg' : '—' }}
+                        {{ $d->capacidade_kg ? number_format($d->capacidade_kg, 2, ',', '.') . ' kg' : '—' }}
                     </td>
                     <td class="px-6 py-3 text-right text-leaf-700">{{ $d->secagens_count }}</td>
                     <td class="px-6 py-3">

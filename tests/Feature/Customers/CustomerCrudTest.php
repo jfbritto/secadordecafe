@@ -104,7 +104,7 @@ it('tela do cliente lista últimas movimentações (até 5) e secagens recentes'
         ->get(route('clientes.show', $c))
         ->assertOk()
         ->assertSee("Secagem #{$s->numero}")
-        ->assertSee('200,000') // recebido na secagem listada
+        ->assertSee('200,00') // recebido na secagem listada
         ->assertSee('Cliente desde');
 });
 

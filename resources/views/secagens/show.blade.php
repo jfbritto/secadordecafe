@@ -56,11 +56,11 @@
                 <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
                     <div>
                         <p class="text-[10px] uppercase tracking-wider text-leaf-500">Recebido</p>
-                        <p class="text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }} kg</p>
+                        <p class="text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg</p>
                     </div>
                     <div>
                         <p class="text-[10px] uppercase tracking-wider text-leaf-500">Seco</p>
-                        <p class="text-leaf-700">{{ number_format($item->quantidade_seca_kg, 3, ',', '.') }} kg</p>
+                        <p class="text-leaf-700">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }} kg</p>
                     </div>
                     <div>
                         <p class="text-[10px] uppercase tracking-wider text-leaf-500">Rendimento</p>
@@ -68,11 +68,11 @@
                     </div>
                     <div>
                         <p class="text-[10px] uppercase tracking-wider text-leaf-500">Comissão</p>
-                        <p class="text-leaf-700">{{ number_format($item->comissao_percentual, 2, ',', '.') }}% ({{ number_format($item->comissao_kg, 3, ',', '.') }} kg)</p>
+                        <p class="text-leaf-700">{{ number_format($item->comissao_percentual, 2, ',', '.') }}% ({{ number_format($item->comissao_kg, 2, ',', '.') }} kg)</p>
                     </div>
                     <div class="col-span-2 pt-1 mt-1 border-t border-leaf-100">
                         <p class="text-[10px] uppercase tracking-wider text-leaf-500">Líquido</p>
-                        <p class="font-bold text-leaf-800">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }} kg</p>
+                        <p class="font-bold text-leaf-800">{{ number_format($item->saldo_liquido_kg, 2, ',', '.') }} kg</p>
                     </div>
                 </div>
             </li>
@@ -82,15 +82,15 @@
             <div class="grid grid-cols-3 gap-2 text-sm">
                 <div>
                     <p class="text-[10px] text-leaf-500">Recebido</p>
-                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalRecebidoKg(), 3, ',', '.') }}</p>
+                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalRecebidoKg(), 2, ',', '.') }}</p>
                 </div>
                 <div>
                     <p class="text-[10px] text-leaf-500">Seco</p>
-                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalSecoKg(), 3, ',', '.') }}</p>
+                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalSecoKg(), 2, ',', '.') }}</p>
                 </div>
                 <div>
                     <p class="text-[10px] text-leaf-500">Comissão</p>
-                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalComissaoKg(), 3, ',', '.') }}</p>
+                    <p class="font-bold text-leaf-900">{{ number_format($secagem->totalComissaoKg(), 2, ',', '.') }}</p>
                 </div>
             </div>
         </li>
@@ -113,22 +113,22 @@
             @foreach($secagem->items as $item)
                 <tr class="hover:bg-leaf-50/30 transition">
                     <td class="px-4 py-3 text-leaf-900 font-medium">{{ $item->customer->nome }}</td>
-                    <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 3, ',', '.') }}</td>
-                    <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_seca_kg, 3, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }}</td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->comissao_percentual, 2, ',', '.') }}%</td>
-                    <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->comissao_kg, 3, ',', '.') }}</td>
-                    <td class="px-4 py-3 text-right font-bold text-leaf-800">{{ number_format($item->saldo_liquido_kg, 3, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->comissao_kg, 2, ',', '.') }}</td>
+                    <td class="px-4 py-3 text-right font-bold text-leaf-800">{{ number_format($item->saldo_liquido_kg, 2, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot class="bg-leaf-50/50 font-semibold text-leaf-900">
             <tr>
                 <td class="px-4 py-3">Totais</td>
-                <td class="px-4 py-3 text-right">{{ number_format($secagem->totalRecebidoKg(), 3, ',', '.') }}</td>
-                <td class="px-4 py-3 text-right">{{ number_format($secagem->totalSecoKg(), 3, ',', '.') }}</td>
+                <td class="px-4 py-3 text-right">{{ number_format($secagem->totalRecebidoKg(), 2, ',', '.') }}</td>
+                <td class="px-4 py-3 text-right">{{ number_format($secagem->totalSecoKg(), 2, ',', '.') }}</td>
                 <td></td><td></td>
-                <td class="px-4 py-3 text-right">{{ number_format($secagem->totalComissaoKg(), 3, ',', '.') }}</td>
+                <td class="px-4 py-3 text-right">{{ number_format($secagem->totalComissaoKg(), 2, ',', '.') }}</td>
                 <td></td>
             </tr>
         </tfoot>
