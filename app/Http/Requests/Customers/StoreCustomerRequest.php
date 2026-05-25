@@ -33,7 +33,8 @@ class StoreCustomerRequest extends FormRequest
                     ->where(fn ($q) => $q->where('farm_id', $this->user()->farm_id)),
             ],
             'observacoes' => ['nullable', 'string', 'max:2000'],
-            'saldo_cafe_kg' => ['nullable', 'numeric', 'min:0'],
+            'saldo_coco_kg' => ['nullable', 'numeric', 'min:0'],
+            'saldo_seco_kg' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

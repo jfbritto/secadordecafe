@@ -82,14 +82,15 @@ it('operador cria e edita mas não exclui', function () {
     $this->actingAs($op)->delete("/areas/{$a->id}")->assertForbidden();
 });
 
-it('não permite excluir área com secagens vinculadas', function () {
+it('não permite excluir área com items de secagem vinculados', function () {
     $admin = makeFarmUser('admin');
-    $a = Area::factory()->forFarm($admin->farm)->create();
+    $a = Area::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
     $d = Dryer::factory()->forFarm($admin->farm)->create();
-    Secagem::create([
-        'farm_id' => $admin->farm_id, 'user_id' => $admin->id,
-        'dryer_id' => $d->id, 'area_id' => $a->id,
-        'numero' => 1, 'data' => '2026-05-21', 'status' => 'rascunho',
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-21', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'origin_type' => 'area', 'origin_id' => $a->id, 'quantidade_recebida_kg' => 100,
     ]);
 
     $this->actingAs($admin)
@@ -110,18 +111,20 @@ it('lista áreas por tenant', function () {
 
 it('show da área expõe stats agregadas no período padrão (este ano)', function () {
     $admin = makeFarmUser('admin');
-    $area = Area::factory()->forFarm($admin->farm)->create();
+    $area = Area::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
     $d = Dryer::factory()->forFarm($admin->farm)->create();
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
 
-    // Cria 1 secagem completa vinculada à área
+    // Cria 1 secagem com item de área (sem cliente)
     $this->actingAs($admin)->post('/secagens', [
-        'data' => now()->format('Y-m-d'), 'dryer_id' => $d->id, 'area_id' => $area->id,
+        'data' => now()->format('Y-m-d'), 'dryer_id' => $d->id,
     ]);
     $s = Secagem::first();
     $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c->id, 'quantidade_recebida_kg' => 500,
-        'quantidade_seca_kg' => 300, 'comissao_percentual' => 10,
+        'origin_type' => 'area', 'origin_id' => $area->id, 'quantidade_recebida_kg' => 500,
+    ]);
+    $item = \App\Models\SecagemItem::first();
+    $this->actingAs($admin)->patch("/secagens/{$s->id}/items/{$item->id}/saida", [
+        'quantidade_seca_kg' => 300, 'comissao_percentual' => 0,
     ]);
     $this->actingAs($admin)->post("/secagens/{$s->id}/concluir");
 
@@ -132,7 +135,6 @@ it('show da área expõe stats agregadas no período padrão (este ano)', functi
     expect($stats['qtd_secagens'])->toBe(1);
     expect($stats['total_recebido'])->toBe(500.0);
     expect($stats['total_seco'])->toBe(300.0);
-    expect($stats['total_comissao'])->toBe(30.0);
     expect($stats['periodo_label'])->toBe('Este ano');
 });
 

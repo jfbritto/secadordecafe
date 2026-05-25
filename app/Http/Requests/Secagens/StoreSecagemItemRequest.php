@@ -2,12 +2,22 @@
 
 namespace App\Http\Requests\Secagens;
 
+use App\Models\Area;
 use App\Models\Customer;
-use App\Models\SecagemItem;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Request pra adicionar item à secagem.
+ *
+ * Polimórfico: o lote pode ser de um Customer (cliente externo trouxe café côco)
+ * ou de uma Area (café próprio que veio da colheita). Validação garante que o
+ * owner tem saldo de côco suficiente.
+ *
+ * Saída (quantidade_seca_kg + comissão) NÃO entra aqui — vai num PATCH separado
+ * quando o café sai do secador.
+ */
 class StoreSecagemItemRequest extends FormRequest
 {
     public function authorize(): bool
@@ -21,47 +31,62 @@ class StoreSecagemItemRequest extends FormRequest
         $secagemId = $secagem?->id ?? 0;
 
         return [
-            'customer_id' => [
+            'origin_type' => ['required', 'in:cliente,area'],
+            'origin_id' => [
                 'required',
-                Rule::exists('customers', 'id')->where('farm_id', $this->user()->farm_id),
-                // Impede o mesmo cliente aparecer duas vezes na mesma secagem
-                Rule::unique('secagem_items', 'customer_id')
-                    ->where(fn ($q) => $q->where('secagem_id', $secagemId)),
+                'integer',
+                Rule::unique('secagem_items', 'origin_id')
+                    ->where(fn ($q) => $q->where('secagem_id', $secagemId)
+                        ->where('origin_type', $this->resolvedOriginClass())),
             ],
             'quantidade_recebida_kg' => ['required', 'numeric', 'gt:0'],
-            'quantidade_seca_kg' => ['required', 'numeric', 'gt:0'],
-            'comissao_percentual' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'customer_id.unique' => 'Este cliente já está nesta secagem. Remova o item existente e adicione de novo se precisar ajustar os valores.',
+            'origin_id.unique' => 'Essa origem já tem um item nesta secagem. Remova o item existente se precisar ajustar.',
         ];
     }
 
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $v) {
-            if ($v->errors()->hasAny(['customer_id', 'quantidade_recebida_kg'])) {
+            if ($v->errors()->hasAny(['origin_type', 'origin_id', 'quantidade_recebida_kg'])) {
                 return;
             }
 
-            $customer = Customer::find($this->input('customer_id'));
-            if (! $customer) {
+            $originClass = $this->resolvedOriginClass();
+            $origin = $originClass::query()
+                ->where('id', $this->input('origin_id'))
+                ->where('farm_id', $this->user()->farm_id)
+                ->first();
+
+            if (! $origin) {
+                $v->errors()->add('origin_id', 'Origem não encontrada ou fora da fazenda.');
                 return;
             }
 
             $recebida = (float) $this->input('quantidade_recebida_kg');
-            $saldo = (float) $customer->saldo_cafe_kg;
+            $saldo = (float) $origin->saldo_coco_kg;
 
             if ($recebida > $saldo) {
+                $label = $origin->nome;
                 $v->errors()->add(
                     'quantidade_recebida_kg',
-                    "Saldo insuficiente. {$customer->nome} tem apenas " . number_format($saldo, 2, ',', '.') . ' kg disponível.'
+                    "Saldo de côco insuficiente. {$label} tem apenas " . number_format($saldo, 2, ',', '.') . ' kg disponível.'
                 );
             }
         });
+    }
+
+    public function resolvedOriginClass(): string
+    {
+        return match ($this->input('origin_type')) {
+            'cliente' => Customer::class,
+            'area'    => Area::class,
+            default   => Customer::class,
+        };
     }
 }

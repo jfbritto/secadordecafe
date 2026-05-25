@@ -38,18 +38,32 @@ class CustomerController extends Controller
     public function store(StoreCustomerRequest $request, RegisterMovementAction $register): RedirectResponse
     {
         $data = $request->validated();
-        $saldoInicial = (float) ($data['saldo_cafe_kg'] ?? 0);
-        $data['saldo_cafe_kg'] = 0; // saldo é controlado por movements
+        $saldoInicialCoco = (float) ($data['saldo_coco_kg'] ?? 0);
+        $saldoInicialSeco = (float) ($data['saldo_seco_kg'] ?? 0);
+        $data['saldo_coco_kg'] = 0;
+        $data['saldo_seco_kg'] = 0;
 
         $customer = Customer::create($data);
 
-        if ($saldoInicial > 0) {
+        if ($saldoInicialCoco > 0) {
             $register->execute(
-                customer: $customer,
+                owner: $customer,
                 user: $request->user(),
                 tipo: Movement::TIPO_ENTRADA,
-                quantidade: $saldoInicial,
-                observacao: 'Saldo inicial',
+                produto: Movement::PRODUTO_COCO,
+                quantidade: $saldoInicialCoco,
+                observacao: 'Saldo inicial de côco',
+            );
+        }
+
+        if ($saldoInicialSeco > 0) {
+            $register->execute(
+                owner: $customer,
+                user: $request->user(),
+                tipo: Movement::TIPO_ENTRADA,
+                produto: Movement::PRODUTO_SECO,
+                quantidade: $saldoInicialSeco,
+                observacao: 'Saldo inicial de seco',
             );
         }
 
@@ -62,32 +76,38 @@ class CustomerController extends Controller
         $this->ensureSameFarm($cliente);
         $this->authorize('view', $cliente);
 
-        // Totais por tipo de movimentação (tudo em 1 query).
-        // reorder() limpa o orderBy padrão da relação (occurred_at desc) — incompatível
-        // com only_full_group_by no MySQL quando agrupamos por tipo.
-        $totaisPorTipo = $cliente->movements()
-            ->reorder()
-            ->selectRaw('tipo, SUM(quantidade_kg) as total, COUNT(*) as cnt, COUNT(DISTINCT source_id) as cnt_source')
-            ->groupBy('tipo')
-            ->get()
-            ->keyBy('tipo');
+        // Stats por tipo + produto (1 query)
+        $stats = $cliente->movements()
+            ->selectRaw('tipo, produto, SUM(quantidade_kg) as total, COUNT(*) as cnt, COUNT(DISTINCT source_id) as cnt_source')
+            ->groupBy('tipo', 'produto')
+            ->get();
+
+        $get = fn (string $tipo, string $produto) =>
+            (float) ($stats->firstWhere(fn ($r) => $r->tipo === $tipo && $r->produto === $produto)->total ?? 0);
+        $cnt = fn (string $tipo, string $produto, string $col = 'cnt') =>
+            (int) ($stats->firstWhere(fn ($r) => $r->tipo === $tipo && $r->produto === $produto)->{$col} ?? 0);
 
         $stats = [
-            'total_entradas' => (float) ($totaisPorTipo[Movement::TIPO_ENTRADA]->total ?? 0),
-            'total_secado' => abs((float) ($totaisPorTipo[Movement::TIPO_SECAGEM]->total ?? 0)),
-            'total_saidas' => abs((float) ($totaisPorTipo[Movement::TIPO_SAIDA]->total ?? 0)),
-            'qtd_secagens' => (int) ($totaisPorTipo[Movement::TIPO_SECAGEM]->cnt_source ?? 0),
-            'qtd_movimentacoes' => (int) $totaisPorTipo->sum('cnt'),
+            'total_entradas_coco' => $get(Movement::TIPO_ENTRADA, 'coco'),
+            'total_secado_coco' => abs($get(Movement::TIPO_SECAGEM, 'coco')),
+            'total_producao_seco' => $get(Movement::TIPO_PRODUCAO, 'seco'),
+            'total_saidas_seco' => abs($get(Movement::TIPO_SAIDA, 'seco')),
+            'total_saidas_coco' => abs($get(Movement::TIPO_SAIDA, 'coco')),
+            'qtd_secagens' => $cnt(Movement::TIPO_SECAGEM, 'coco', 'cnt_source'),
+            'qtd_movimentacoes' => $stats->sum('cnt'),
         ];
 
         $ultimasMovimentacoes = $cliente->movements()
             ->with(['user', 'source'])
+            ->latest('occurred_at')
             ->limit(5)
             ->get();
 
         $ultimasSecagens = Secagem::query()
-            ->whereHas('items', fn ($q) => $q->where('customer_id', $cliente->id))
-            ->with(['dryer', 'items' => fn ($q) => $q->where('customer_id', $cliente->id)])
+            ->whereHas('items', fn ($q) =>
+                $q->where('origin_type', Customer::class)->where('origin_id', $cliente->id))
+            ->with(['dryer', 'items' => fn ($q) =>
+                $q->where('origin_type', Customer::class)->where('origin_id', $cliente->id)])
             ->orderByDesc('data')
             ->orderByDesc('id')
             ->limit(5)

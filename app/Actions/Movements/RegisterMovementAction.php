@@ -3,7 +3,8 @@
 namespace App\Actions\Movements;
 
 use App\Exceptions\DomainException;
-use App\Models\Customer;
+use App\Models\Concerns\HasStockMovements;
+use App\Models\Farm;
 use App\Models\Movement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -12,17 +13,28 @@ use Illuminate\Support\Facades\DB;
 class RegisterMovementAction
 {
     /**
-     * Cria movimentação e atualiza saldo do cliente sob lock.
+     * Cria movimentação polimórfica e atualiza o saldo do owner sob lock.
      *
-     * @param string $tipo  one of entrada|saida|ajuste|secagem
-     * @param string $direcao  '+' ou '-' (apenas para ajuste; ignorado para os demais)
+     * Owner pode ser Customer, Area ou Farm (qualquer model que use HasStockMovements).
+     * Produto é 'coco' ou 'seco' — define qual coluna de saldo do owner é mutada.
+     *
+     * Regras de sinal por tipo:
+     *   - entrada, colheita, producao, comissao → soma
+     *   - saida, secagem                         → subtrai
+     *   - ajuste                                  → soma ou subtrai conforme `direcao`
+     *
+     * @param Model&HasStockMovements $owner
+     * @param string $produto  'coco' | 'seco'
+     * @param string $tipo     entrada | saida | ajuste | secagem | colheita | producao | comissao
      * @param float  $quantidade  sempre positivo (módulo)
-     * @param Model  $source  origem polimórfica da movimentação (ex.: Secagem)
+     * @param string $direcao  '+' ou '-' (apenas para ajuste)
+     * @param Model  $source  origem polimórfica (ex.: Secagem)
      */
     public function execute(
-        Customer $customer,
+        Model $owner,
         User $user,
         string $tipo,
+        string $produto,
         float $quantidade,
         ?string $observacao = null,
         ?string $direcao = null,
@@ -33,42 +45,57 @@ class RegisterMovementAction
             throw new DomainException('Quantidade deve ser maior que zero.');
         }
 
+        if (! in_array($produto, [Movement::PRODUTO_COCO, Movement::PRODUTO_SECO], true)) {
+            throw new DomainException("Produto inválido: {$produto}");
+        }
+
         $signed = match ($tipo) {
-            Movement::TIPO_ENTRADA => +$quantidade,
-            Movement::TIPO_SAIDA => -$quantidade,
+            Movement::TIPO_ENTRADA,
+            Movement::TIPO_COLHEITA,
+            Movement::TIPO_PRODUCAO,
+            Movement::TIPO_COMISSAO => +$quantidade,
+
+            Movement::TIPO_SAIDA,
             Movement::TIPO_SECAGEM => -$quantidade,
+
             Movement::TIPO_AJUSTE => $direcao === '-' ? -$quantidade : +$quantidade,
+
             default => throw new DomainException("Tipo inválido: {$tipo}"),
         };
 
-        return DB::transaction(function () use ($customer, $user, $tipo, $signed, $observacao, $occurredAt, $source) {
-            $locked = Customer::query()->withoutGlobalScopes()->whereKey($customer->id)->lockForUpdate()->first();
+        return DB::transaction(function () use ($owner, $user, $tipo, $produto, $signed, $observacao, $occurredAt, $source) {
+            // Lock pessimista do owner. Farm não tem global scope; demais tipos usam scope farm,
+            // por isso withoutGlobalScopes() pra evitar query duplicada.
+            $ownerClass = get_class($owner);
+            $locked = $ownerClass::query()->withoutGlobalScopes()->whereKey($owner->getKey())->lockForUpdate()->first();
             if (! $locked) {
-                throw new DomainException('Cliente não encontrado.');
+                throw new DomainException(class_basename($ownerClass) . ' não encontrado.');
             }
 
-            // Defesa em profundidade: cliente DEVE ser da mesma fazenda do usuário.
-            // Os controllers já filtram via route binding + global scope, mas se uma action
-            // interna passar um Customer de outra farm por engano, falha aqui em vez de mexer no saldo.
-            if (! $user->isRoot() && $locked->farm_id !== $user->farm_id) {
-                throw new DomainException('Cliente fora da fazenda atual.');
+            // Defesa em profundidade: owner tem que estar na fazenda do usuário (exceto Farm,
+            // que é o próprio escopo).
+            $ownerFarmId = $locked instanceof Farm ? $locked->id : ($locked->farm_id ?? null);
+            if (! $user->isRoot() && $ownerFarmId !== $user->farm_id) {
+                throw new DomainException('Owner fora da fazenda atual.');
             }
 
-            // Source (Secagem etc.) também precisa pertencer à mesma farm.
-            if ($source && isset($source->farm_id) && $source->farm_id !== $locked->farm_id) {
-                throw new DomainException('Origem da movimentação fora da fazenda do cliente.');
+            // Source também precisa pertencer à mesma farm
+            if ($source && isset($source->farm_id) && $source->farm_id !== $ownerFarmId) {
+                throw new DomainException('Origem da movimentação fora da fazenda do owner.');
             }
 
-            $newSaldo = (float) $locked->saldo_cafe_kg + $signed;
-            if ($newSaldo < 0) {
-                throw new DomainException('Saldo insuficiente para esta operação.');
+            $novoSaldo = $locked->incrementSaldo($produto, $signed);
+            if ($novoSaldo < 0) {
+                throw new DomainException("Saldo de {$produto} insuficiente para esta operação.");
             }
 
             $movement = Movement::create([
-                'farm_id' => $locked->farm_id,
-                'customer_id' => $locked->id,
+                'farm_id' => $ownerFarmId,
+                'owner_type' => $locked->getMorphClass(),
+                'owner_id' => $locked->getKey(),
                 'user_id' => $user->id,
                 'tipo' => $tipo,
+                'produto' => $produto,
                 'quantidade_kg' => $signed,
                 'observacao' => $observacao,
                 'source_type' => $source?->getMorphClass(),
@@ -76,7 +103,6 @@ class RegisterMovementAction
                 'occurred_at' => $occurredAt ?? now(),
             ]);
 
-            $locked->saldo_cafe_kg = $newSaldo;
             $locked->save();
 
             return $movement;

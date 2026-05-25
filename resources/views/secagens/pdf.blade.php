@@ -41,7 +41,7 @@
 <table>
     <thead>
         <tr>
-            <th>Cliente</th>
+            <th>Origem</th>
             <th class="right">Recebido (kg)</th>
             <th class="right">Seco (kg)</th>
             <th class="right">Rendimento</th>
@@ -53,7 +53,7 @@
     <tbody>
         @foreach($secagem->items as $item)
             <tr>
-                <td>{{ $item->customer->nome }}</td>
+                <td>{{ ($item->isArea() ? '[Area] ' : '') . $item->originLabel() }}</td>
                 <td class="right">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }}</td>
                 <td class="right">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }}</td>
                 <td class="right">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>

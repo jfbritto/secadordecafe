@@ -50,30 +50,42 @@
 {{-- Saldo inicial: só na criação. Depois o saldo vive no extrato. --}}
 @if(! $C)
 <div class="border-b border-leaf-100 pb-5 mb-6">
-    <h2 class="text-base font-bold text-leaf-900">Saldo de café</h2>
-    <p class="text-sm text-leaf-500 mt-0.5">Já tem café deste cliente em estoque? Informe o valor inicial, vamos registrar como uma entrada no extrato.</p>
+    <h2 class="text-base font-bold text-leaf-900">Saldo de café inicial</h2>
+    <p class="text-sm text-leaf-500 mt-0.5">Já tem café deste cliente em estoque? Informe os valores iniciais — vão entrar no extrato como entrada.</p>
 </div>
 
-<div class="mb-6">
-    <label for="saldo_cafe_kg" class="block text-sm font-bold text-leaf-900 mb-2">Saldo inicial (kg)</label>
-    <div class="relative">
-        <input id="saldo_cafe_kg" type="number" step="0.01" min="0" inputmode="decimal" name="saldo_cafe_kg"
-               value="{{ old('saldo_cafe_kg', 0) }}"
-               placeholder="0,00"
-               class="w-full pl-4 pr-14 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
-        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">kg</span>
+<div class="grid sm:grid-cols-2 gap-5 mb-6">
+    <div>
+        <label for="saldo_coco_kg" class="block text-sm font-bold text-leaf-900 mb-2">Café côco (kg)</label>
+        <div class="relative">
+            <input id="saldo_coco_kg" type="number" step="0.01" min="0" inputmode="decimal" name="saldo_coco_kg"
+                   value="{{ old('saldo_coco_kg', 0) }}"
+                   placeholder="0,00"
+                   class="w-full pl-4 pr-14 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">kg</span>
+        </div>
+        <p class="mt-1.5 text-xs text-leaf-500">Café maduro ainda por secar.</p>
     </div>
-    <p class="mt-1.5 text-sm text-leaf-500">
-        Use <strong>0</strong> se ainda não há café em estoque. Daqui pra frente, o saldo só muda pelas movimentações (entradas, secagens, ajustes, saídas), registradas no extrato.
-    </p>
+    <div>
+        <label for="saldo_seco_kg" class="block text-sm font-bold text-leaf-900 mb-2">Café seco (kg)</label>
+        <div class="relative">
+            <input id="saldo_seco_kg" type="number" step="0.01" min="0" inputmode="decimal" name="saldo_seco_kg"
+                   value="{{ old('saldo_seco_kg', 0) }}"
+                   placeholder="0,00"
+                   class="w-full pl-4 pr-14 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">kg</span>
+        </div>
+        <p class="mt-1.5 text-xs text-leaf-500">Já secado, esperando venda ou retirada.</p>
+    </div>
 </div>
 @else
 <div class="border-b border-leaf-100 pb-5 mb-6">
     <h2 class="text-base font-bold text-leaf-900">Saldo de café</h2>
     <p class="text-sm text-leaf-500 mt-0.5">
-        O saldo é controlado pelo extrato, entradas, secagens, ajustes e saídas. Saldo atual:
-        <strong class="text-leaf-700">{{ number_format($C->saldo_cafe_kg, 2, ',', '.') }} kg</strong>.
-        <a href="{{ route('clientes.movimentacoes.index', $C) }}" class="text-leaf-700 font-semibold hover:underline">Abrir extrato</a>.
+        Saldo atual:
+        <strong class="text-amber-700">{{ number_format($C->saldo_coco_kg, 2, ',', '.') }} kg côco</strong> ·
+        <strong class="text-emerald-700">{{ number_format($C->saldo_seco_kg, 2, ',', '.') }} kg seco</strong>.
+        <a href="{{ route('movimentacoes.index', ['tipo' => 'cliente', 'id' => $C->id]) }}" class="text-leaf-700 font-semibold hover:underline ml-1">Abrir extrato</a>.
     </p>
 </div>
 @endif

@@ -22,13 +22,6 @@ class StoreSecagemRequest extends FormRequest
                 Rule::exists('dryers', 'id')
                     ->where(fn ($q) => $q->where('farm_id', $this->user()->farm_id)->where('ativo', true)),
             ],
-            // Área é opcional — secagens "pra ele mesmo" não vinculam.
-            // Quando informada, precisa ser da mesma farm e estar ativa.
-            'area_id' => [
-                'nullable',
-                Rule::exists('areas', 'id')
-                    ->where(fn ($q) => $q->where('farm_id', $this->user()->farm_id)->where('ativo', true)),
-            ],
             'observacoes' => ['nullable', 'string', 'max:1000'],
         ];
     }
@@ -38,15 +31,6 @@ class StoreSecagemRequest extends FormRequest
         return [
             'dryer_id.required' => 'Selecione um secador.',
             'dryer_id.exists' => 'Secador inválido.',
-            'area_id.exists' => 'Área inválida.',
         ];
-    }
-
-    public function prepareForValidation(): void
-    {
-        // String vazia do select vira null (sem vincular área)
-        if ($this->input('area_id') === '') {
-            $this->merge(['area_id' => null]);
-        }
     }
 }

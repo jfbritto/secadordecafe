@@ -22,9 +22,24 @@
                 Ver no mapa
             </a>
         @endif
+        <a href="{{ route('movimentacoes.index', ['tipo' => 'area', 'id' => $area->id]) }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:bg-leaf-50 rounded-lg transition">Extrato</a>
         @can('update', $area)
             <a href="{{ route('areas.edit', $area) }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm">Editar</a>
         @endcan
+    </div>
+</div>
+
+{{-- Saldos por produto --}}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <div class="bg-gradient-to-br from-amber-600 to-amber-700 text-white rounded-xl shadow-lg p-5">
+        <p class="text-xs uppercase tracking-wider text-amber-100 font-semibold">Saldo de côco</p>
+        <p class="text-3xl font-bold mt-1">{{ number_format($area->saldo_coco_kg, 2, ',', '.') }} <span class="text-base font-normal text-amber-100">kg</span></p>
+        <p class="text-xs text-amber-100 mt-0.5">{{ \App\Support\Sacos::formatSacos($area->saldo_coco_kg) }}</p>
+    </div>
+    <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-xl shadow-lg p-5">
+        <p class="text-xs uppercase tracking-wider text-emerald-100 font-semibold">Saldo de seco</p>
+        <p class="text-3xl font-bold mt-1">{{ number_format($area->saldo_seco_kg, 2, ',', '.') }} <span class="text-base font-normal text-emerald-100">kg</span></p>
+        <p class="text-xs text-emerald-100 mt-0.5">{{ \App\Support\Sacos::formatSacos($area->saldo_seco_kg) }}</p>
     </div>
 </div>
 

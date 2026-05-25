@@ -10,12 +10,14 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Reabre uma secagem concluída pra correção:
- * - Estorna o débito de cada item (cria Movement de ajuste positivo com source=Secagem)
- * - Volta status pra "rascunho" e zera concluida_at
+ * Reabre uma secagem concluída pra correção.
  *
- * Auditoria fica completa: o extrato do cliente mostra Secagem(-) → Estorno(+) → Secagem(-) novo.
- * Tudo em transação — falha em qualquer estorno cancela a operação inteira.
+ * Varre TODOS os movements gerados por essa secagem (source=Secagem) e gera um
+ * ajuste com sinal contrário pra cada um — funciona qualquer owner (Customer,
+ * Area, Farm) e qualquer produto (côco, seco).
+ *
+ * Auditoria preservada: extrato mostra movement original → ajuste de estorno
+ * → quando reconcluir, novos movements. Tudo encadeado por source=Secagem.
  */
 class ReopenSecagemAction
 {
@@ -29,30 +31,53 @@ class ReopenSecagemAction
             throw new DomainException('Só dá pra reabrir uma secagem concluída.');
         }
 
-        $secagem->loadMissing('items.customer');
-
         return DB::transaction(function () use ($secagem, $user) {
             $occurredAt = now();
 
-            foreach ($secagem->items as $item) {
-                // Estorno: ajuste positivo no saldo do cliente, com a Secagem como source
+            $movements = Movement::query()
+                ->where('source_type', $secagem->getMorphClass())
+                ->where('source_id', $secagem->id)
+                ->whereNot('tipo', Movement::TIPO_AJUSTE) // não estornar estornos anteriores
+                ->with('owner')
+                ->get();
+
+            foreach ($movements as $m) {
+                $owner = $m->owner;
+                if (! $owner) {
+                    throw new DomainException("Owner do movement #{$m->id} desapareceu — estorno impossível.");
+                }
+
+                // Movement original tem sinal embutido em quantidade_kg (positivo ou negativo).
+                // Pra estornar, geramos um ajuste com sinal contrário.
+                $qty = (float) $m->quantidade_kg;
+                $direcao = $qty > 0 ? '-' : '+';
+                $modulo = abs($qty);
+
                 $this->registerMovement->execute(
-                    customer: $item->customer,
+                    owner: $owner,
                     user: $user,
                     tipo: Movement::TIPO_AJUSTE,
-                    quantidade: (float) $item->quantidade_recebida_kg,
+                    produto: $m->produto,
+                    quantidade: $modulo,
                     observacao: "Estorno secagem #{$secagem->numero}",
-                    direcao: '+',
+                    direcao: $direcao,
                     occurredAt: $occurredAt,
                     source: $secagem,
                 );
+            }
+
+            // Zera campos calculados nos items (eles ficam pendentes de nova saída)
+            foreach ($secagem->items as $item) {
+                $item->comissao_kg = null;
+                $item->saldo_liquido_kg = null;
+                $item->save();
             }
 
             $secagem->status = Secagem::STATUS_RASCUNHO;
             $secagem->concluida_at = null;
             $secagem->save();
 
-            return $secagem->fresh('items.customer');
+            return $secagem->fresh('items.origin');
         });
     }
 }

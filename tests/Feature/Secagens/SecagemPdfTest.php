@@ -7,7 +7,7 @@ use App\Models\Secagem;
 it('generates PDF for a secagem', function () {
     $admin = makeFarmUser('admin');
     $d = Dryer::factory()->forFarm($admin->farm)->create();
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 1000]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s = Secagem::first();

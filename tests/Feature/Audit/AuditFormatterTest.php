@@ -43,7 +43,7 @@ it('diff retorna campos alterados em PT-BR', function () {
     $this->actingAs($admin)->put("/clientes/{$c->id}", [
         'nome' => 'Novo Nome',
         'telefone' => '22222',
-        'saldo_cafe_kg' => 0,
+        'saldo_coco_kg' => 0,
     ]);
 
     $activity = Activity::query()
@@ -95,12 +95,12 @@ it('formatValue formata booleanos, datas, valores monetários e kg', function ()
     expect(AuditFormatter::formatValue('', 'qualquer'))->toBe('—');
     expect(AuditFormatter::formatValue('2026-05-07', 'data'))->toBe('07/05/2026');
     expect(AuditFormatter::formatValue(123.45, 'valor_total'))->toBe('R$ 123,45');
-    expect(AuditFormatter::formatValue(1500, 'saldo_cafe_kg'))->toBe('1.500,00 kg');
+    expect(AuditFormatter::formatValue(1500, 'saldo_coco_kg'))->toBe('1.500,00 kg');
 });
 
 it('fieldLabel traduz campos conhecidos e aplica fallback humano', function () {
     expect(AuditFormatter::fieldLabel('cpf_cnpj'))->toBe('CPF/CNPJ');
-    expect(AuditFormatter::fieldLabel('saldo_cafe_kg'))->toBe('Saldo de café (kg)');
+    expect(AuditFormatter::fieldLabel('saldo_coco_kg'))->toBe('Saldo de côco (kg)');
     expect(AuditFormatter::fieldLabel('dryer_id'))->toBe('Secador');
     // Fallback: ucfirst + replace underscore
     expect(AuditFormatter::fieldLabel('campo_desconhecido'))->toBe('Campo desconhecido');
@@ -109,7 +109,7 @@ it('fieldLabel traduz campos conhecidos e aplica fallback humano', function () {
 it('admin vê auditoria com label PT-BR e botão Ver alterações para edições', function () {
     $admin = makeFarmUser('admin');
     $c = Customer::factory()->forFarm($admin->farm)->create(['nome' => 'AntesEdit']);
-    $this->actingAs($admin)->put("/clientes/{$c->id}", ['nome' => 'DepoisEdit', 'saldo_cafe_kg' => 0]);
+    $this->actingAs($admin)->put("/clientes/{$c->id}", ['nome' => 'DepoisEdit', 'saldo_coco_kg' => 0]);
 
     $resp = $this->actingAs($admin)->get('/auditoria')->assertOk();
     $html = $resp->getContent();

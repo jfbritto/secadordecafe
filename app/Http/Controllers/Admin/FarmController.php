@@ -77,7 +77,7 @@ class FarmController extends Controller
             'despesas' => Expense::withoutGlobalScopes()->where('farm_id', $farm->id)->count(),
             'saldo_total_kg' => (float) Customer::withoutGlobalScopes()
                 ->where('farm_id', $farm->id)
-                ->sum('saldo_cafe_kg'),
+                ->sum('saldo_coco_kg'),
         ];
 
         return view('admin.farms.show', [

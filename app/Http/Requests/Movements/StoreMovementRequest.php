@@ -17,6 +17,7 @@ class StoreMovementRequest extends FormRequest
     {
         return [
             'tipo' => ['required', 'in:entrada,saida,ajuste'],
+            'produto' => ['required', 'in:coco,seco'],
             'direcao' => ['nullable', 'in:+,-'],
             'quantidade' => ['required', 'numeric', 'gt:0'],
             'observacao' => ['nullable', 'string', 'max:500'],

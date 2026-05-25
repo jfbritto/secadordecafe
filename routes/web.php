@@ -9,6 +9,7 @@ use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\ColheitaController;
 use App\Http\Controllers\DryerController;
 use App\Http\Controllers\FarmBlockedController;
 use App\Http\Controllers\FarmController;
@@ -82,10 +83,29 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
         Route::resource('clientes', CustomerController::class)->parameters(['clientes' => 'cliente']);
 
-        Route::get('clientes/{cliente}/movimentacoes', [MovementController::class, 'index'])
-            ->name('clientes.movimentacoes.index');
-        Route::post('clientes/{cliente}/movimentacoes', [MovementController::class, 'store'])
-            ->name('clientes.movimentacoes.store');
+        // Movimentações polimórficas: owner pode ser cliente, area ou fazenda.
+        // Pra fazenda o id não é necessário (sempre a fazenda do usuário logado).
+        Route::get('movimentacoes/fazenda', [MovementController::class, 'index'])
+            ->defaults('tipo', 'fazenda')->defaults('id', null)
+            ->name('movimentacoes.fazenda.index');
+        Route::post('movimentacoes/fazenda', [MovementController::class, 'store'])
+            ->defaults('tipo', 'fazenda')->defaults('id', null)
+            ->name('movimentacoes.fazenda.store');
+        Route::get('movimentacoes/{tipo}/{id}', [MovementController::class, 'index'])
+            ->whereIn('tipo', ['cliente', 'area'])
+            ->name('movimentacoes.index');
+        Route::post('movimentacoes/{tipo}/{id}', [MovementController::class, 'store'])
+            ->whereIn('tipo', ['cliente', 'area'])
+            ->name('movimentacoes.store');
+
+        // Atalhos legados pra mobile + bookmarks: /clientes/{c}/movimentacoes
+        Route::get('clientes/{cliente}/movimentacoes', fn (\App\Models\Customer $cliente) =>
+            redirect()->route('movimentacoes.index', ['tipo' => 'cliente', 'id' => $cliente->id])
+        )->name('clientes.movimentacoes.index');
+
+        // Colheita: registra entrada de côco numa Área
+        Route::get('colheitas/criar', [ColheitaController::class, 'create'])->name('colheitas.create');
+        Route::post('colheitas', [ColheitaController::class, 'store'])->name('colheitas.store');
 
         Route::get('secadores', [DryerController::class, 'index'])->name('secadores.index');
         Route::get('secadores/criar', [DryerController::class, 'create'])->name('secadores.create');
@@ -110,6 +130,7 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::put('secagens/{secagem}', [SecagemController::class, 'update'])->name('secagens.update');
         Route::delete('secagens/{secagem}', [SecagemController::class, 'destroy'])->name('secagens.destroy');
         Route::post('secagens/{secagem}/items', [SecagemController::class, 'storeItem'])->name('secagens.items.store');
+        Route::patch('secagens/{secagem}/items/{item}/saida', [SecagemController::class, 'registerSaida'])->name('secagens.items.saida');
         Route::delete('secagens/{secagem}/items/{item}', [SecagemController::class, 'destroyItem'])->name('secagens.items.destroy');
         Route::post('secagens/{secagem}/concluir', [SecagemController::class, 'conclude'])->name('secagens.conclude');
         Route::post('secagens/{secagem}/reabrir', [SecagemController::class, 'reopen'])->name('secagens.reopen');

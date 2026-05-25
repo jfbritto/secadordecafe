@@ -1,144 +1,160 @@
 @extends('layouts.app')
 
-@section('title', 'Extrato, '.$customer->nome)
+@section('title', 'Extrato, '.$ownerLabel)
 
 @section('content')
+@php
+    $ownerIsCustomer = $owner instanceof \App\Models\Customer;
+    $ownerIsArea = $owner instanceof \App\Models\Area;
+    $ownerIsFarm = $owner instanceof \App\Models\Farm;
+
+    // Saldos exibidos no card de cabeçalho
+    $saldoCoco = $ownerIsFarm ? null : (float) $owner->saldo_coco_kg;
+    $saldoSeco = $ownerIsFarm ? (float) $owner->saldo_seco_comissao_kg : (float) $owner->saldo_seco_kg;
+    $secaoSecoLabel = $ownerIsFarm ? 'Comissão (seco)' : 'Saldo seco';
+
+    $storeUrl = $ownerIsFarm
+        ? route('movimentacoes.fazenda.store')
+        : route('movimentacoes.store', ['tipo' => $ownerKind, 'id' => $owner->id]);
+    $baseIndexParams = $ownerIsFarm
+        ? []
+        : ['tipo' => $ownerKind, 'id' => $owner->id];
+    $baseIndexRoute = $ownerIsFarm ? 'movimentacoes.fazenda.index' : 'movimentacoes.index';
+@endphp
+
 <div class="max-w-6xl mx-auto">
     <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
         <div class="min-w-0">
             <p class="text-xs text-leaf-500 mb-1">
-                <a href="{{ route('clientes.index') }}" class="hover:underline">Clientes</a> ·
-                <a href="{{ route('clientes.show', $customer) }}" class="hover:underline">{{ $customer->nome }}</a> ·
+                @if($ownerIsCustomer)
+                    <a href="{{ route('clientes.index') }}" class="hover:underline">Clientes</a> ·
+                    <a href="{{ route('clientes.show', $owner) }}" class="hover:underline">{{ $owner->nome }}</a> ·
+                @elseif($ownerIsArea)
+                    <a href="{{ route('areas.index') }}" class="hover:underline">Áreas</a> ·
+                    <a href="{{ route('areas.show', $owner) }}" class="hover:underline">{{ $owner->nome }}</a> ·
+                @endif
                 <span class="text-leaf-700">Extrato</span>
             </p>
-            <h1 class="text-2xl font-bold text-leaf-900 break-words">Extrato, {{ $customer->nome }}</h1>
+            <h1 class="text-2xl font-bold text-leaf-900 break-words">Extrato, {{ $ownerLabel }}</h1>
         </div>
-        <div class="bg-leaf-700 text-white px-5 py-3 rounded-xl shadow-md text-right flex-shrink-0">
-            <p class="text-[10px] uppercase tracking-wider text-leaf-200">Saldo atual</p>
-            <p class="text-2xl font-bold">{{ number_format($customer->saldo_cafe_kg, 2, ',', '.') }} <span class="text-sm font-normal text-leaf-200">kg</span></p>
+        <div class="flex gap-2 flex-shrink-0">
+            @if($saldoCoco !== null)
+                <div class="bg-amber-600 text-white px-4 py-3 rounded-xl shadow text-right">
+                    <p class="text-[10px] uppercase tracking-wider text-amber-100">Côco</p>
+                    <p class="text-xl font-bold">{{ number_format($saldoCoco, 2, ',', '.') }} <span class="text-xs font-normal text-amber-100">kg</span></p>
+                </div>
+            @endif
+            <div class="bg-emerald-600 text-white px-4 py-3 rounded-xl shadow text-right">
+                <p class="text-[10px] uppercase tracking-wider text-emerald-100">{{ $secaoSecoLabel }}</p>
+                <p class="text-xl font-bold">{{ number_format($saldoSeco, 2, ',', '.') }} <span class="text-xs font-normal text-emerald-100">kg</span></p>
+            </div>
         </div>
     </div>
 
+    {{-- Filtro por produto --}}
+    <div class="flex gap-2 mb-4 flex-wrap">
+        <a href="{{ route($baseIndexRoute, $baseIndexParams) }}"
+           class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ ! $produto ? 'bg-leaf-700 text-white' : 'bg-white border border-leaf-200 text-leaf-700 hover:bg-leaf-50' }}">
+            Todos os produtos
+        </a>
+        <a href="{{ route($baseIndexRoute, $baseIndexParams + ['produto' => 'coco']) }}"
+           class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ $produto === 'coco' ? 'bg-amber-600 text-white' : 'bg-white border border-leaf-200 text-leaf-700 hover:bg-leaf-50' }}">
+            Só café côco
+        </a>
+        <a href="{{ route($baseIndexRoute, $baseIndexParams + ['produto' => 'seco']) }}"
+           class="px-3 py-1.5 text-xs font-semibold rounded-md transition {{ $produto === 'seco' ? 'bg-emerald-600 text-white' : 'bg-white border border-leaf-200 text-leaf-700 hover:bg-leaf-50' }}">
+            Só café seco
+        </a>
+    </div>
+
+    {{-- Form de nova movimentação manual --}}
+    @can('create', [\App\Models\Movement::class, 'entrada'])
     <div class="bg-white rounded-2xl border border-leaf-100 shadow-sm p-6 mb-6" x-data="{ tipo: 'entrada' }">
         <div class="border-b border-leaf-100 pb-4 mb-5">
             <h2 class="text-base font-bold text-leaf-900">Nova movimentação</h2>
-            <p class="text-sm text-leaf-500 mt-0.5">Use para registrar entradas (cliente trouxe café), ajustes ou saídas avulsas.</p>
+            <p class="text-sm text-leaf-500 mt-0.5">Entrada, saída avulsa ou ajuste de saldo.</p>
         </div>
 
-        <form method="POST" action="{{ route('clientes.movimentacoes.store', $customer) }}">
+        <form method="POST" action="{{ $storeUrl }}">
             @csrf
-
-            <div class="mb-5">
-                <label class="block text-sm font-bold text-leaf-900 mb-3">
-                    Tipo <span class="text-rose-500">*</span>
-                </label>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label class="flex items-start gap-3 p-4 rounded-lg border-2 border-leaf-200 cursor-pointer hover:bg-leaf-50/50 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
-                        <input type="radio" name="tipo" value="entrada" x-model="tipo" checked
-                               class="mt-0.5 w-5 h-5 border-leaf-300 text-emerald-600 focus:ring-emerald-500">
-                        <div>
-                            <span class="block text-sm font-bold text-leaf-900">+ Entrada</span>
-                            <span class="block text-xs text-leaf-500 mt-0.5">Cliente trouxe café para a fazenda. Soma ao saldo.</span>
-                        </div>
-                    </label>
-
-                    @if(auth()->user()->hasAnyRole(['admin','operador']))
-                    <label class="flex items-start gap-3 p-4 rounded-lg border-2 border-leaf-200 cursor-pointer hover:bg-leaf-50/50 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50">
-                        <input type="radio" name="tipo" value="ajuste" x-model="tipo"
-                               class="mt-0.5 w-5 h-5 border-leaf-300 text-amber-600 focus:ring-amber-500">
-                        <div>
-                            <span class="block text-sm font-bold text-leaf-900">± Ajuste</span>
-                            <span class="block text-xs text-leaf-500 mt-0.5">Correção de saldo. Pode ser para mais (+) ou para menos (−).</span>
-                        </div>
-                    </label>
-                    @endif
-
-                    @if(auth()->user()->hasRole('admin'))
-                    <label class="flex items-start gap-3 p-4 rounded-lg border-2 border-leaf-200 cursor-pointer hover:bg-leaf-50/50 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50">
-                        <input type="radio" name="tipo" value="saida" x-model="tipo"
-                               class="mt-0.5 w-5 h-5 border-leaf-300 text-rose-600 focus:ring-rose-500">
-                        <div>
-                            <span class="block text-sm font-bold text-leaf-900">− Saída</span>
-                            <span class="block text-xs text-leaf-500 mt-0.5">Café retirado pelo cliente sem secagem. Subtrai do saldo.</span>
-                        </div>
-                    </label>
-                    @endif
-                </div>
-                @error('tipo')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
-            </div>
-
-            <div class="grid sm:grid-cols-12 gap-4">
-                <div class="sm:col-span-3" x-show="tipo === 'ajuste'" x-cloak>
-                    <label for="direcao" class="block text-sm font-bold text-leaf-900 mb-2">Direção</label>
-                    <select id="direcao" name="direcao"
-                            class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
-                        <option value="+">+ Crédito (somar)</option>
-                        <option value="-">− Débito (subtrair)</option>
+            <div class="grid sm:grid-cols-12 gap-4 items-end">
+                <div class="sm:col-span-3">
+                    <label class="block text-sm font-bold text-leaf-900 mb-2">Tipo <span class="text-rose-500">*</span></label>
+                    <select name="tipo" x-model="tipo"
+                            class="w-full px-3 py-2.5 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none bg-white">
+                        <option value="entrada">+ Entrada</option>
+                        @if(auth()->user()->hasAnyRole(['admin','operador']))
+                            <option value="ajuste">± Ajuste</option>
+                        @endif
+                        @if(auth()->user()->hasRole('admin'))
+                            <option value="saida">− Saída</option>
+                        @endif
                     </select>
                 </div>
-
-                <div :class="tipo === 'ajuste' ? 'sm:col-span-3' : 'sm:col-span-4'">
-                    <label for="quantidade" class="block text-sm font-bold text-leaf-900 mb-2">
-                        Quantidade <span class="text-rose-500">*</span>
-                    </label>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-bold text-leaf-900 mb-2">Produto <span class="text-rose-500">*</span></label>
+                    <select name="produto" class="w-full px-3 py-2.5 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none bg-white">
+                        @unless($ownerIsFarm)
+                            <option value="coco">Côco</option>
+                        @endunless
+                        <option value="seco">Seco</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2" x-show="tipo === 'ajuste'" x-cloak>
+                    <label class="block text-sm font-bold text-leaf-900 mb-2">Direção</label>
+                    <select name="direcao" class="w-full px-3 py-2.5 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none bg-white">
+                        <option value="+">+ Soma</option>
+                        <option value="-">− Subtrai</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-bold text-leaf-900 mb-2">Quantidade <span class="text-rose-500">*</span></label>
                     <div class="relative">
-                        <input id="quantidade" type="number" step="0.01" min="0.01" inputmode="decimal" name="quantidade" required
-                               placeholder="0,00"
-                               class="w-full pl-4 pr-12 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">kg</span>
+                        <input type="number" step="0.01" min="0.01" inputmode="decimal" name="quantidade" required placeholder="0,00"
+                               class="w-full pl-3 pr-10 py-2.5 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500">kg</span>
                     </div>
-                    @error('quantidade')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
                 </div>
-
-                <div :class="tipo === 'ajuste' ? 'sm:col-span-4' : 'sm:col-span-6'">
-                    <label for="observacao" class="block text-sm font-bold text-leaf-900 mb-2">Observação</label>
-                    <input id="observacao" type="text" name="observacao" maxlength="500"
-                           placeholder="Ex: Lote do dia 5, ajuste de balança…"
-                           class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                <div class="sm:col-span-3">
+                    <label class="block text-sm font-bold text-leaf-900 mb-2">Observação</label>
+                    <input type="text" name="observacao" maxlength="500" placeholder="Opcional"
+                           class="w-full px-3 py-2.5 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
                 </div>
-
-                <div class="sm:col-span-2 flex items-end col-span-full sm:col-auto">
-                    <button type="submit" class="w-full px-4 py-3 text-base font-bold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition shadow-sm">Registrar</button>
+                <div class="sm:col-span-12">
+                    <button class="px-5 py-2.5 text-sm font-bold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition">Registrar</button>
                 </div>
             </div>
+            @error('quantidade')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
         </form>
     </div>
+    @endcan
 
+    {{-- Extrato --}}
     <div class="bg-white rounded-2xl border border-leaf-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-leaf-100">
-            <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Histórico</h2>
-        </div>
-
-        {{-- Mobile: cards (extrato bancário em formato vertical) --}}
-        <ul class="md:hidden divide-y divide-leaf-100">
+        <ul class="divide-y divide-leaf-100">
             @forelse($movements as $m)
                 @php
-                    $cls = match($m->tipo) {
-                        'entrada' => 'bg-emerald-100 text-emerald-700',
-                        'secagem' => 'bg-leaf-100 text-leaf-700',
-                        'ajuste'  => 'bg-amber-100 text-amber-700',
-                        'saida'   => 'bg-rose-100 text-rose-700',
-                        default   => 'bg-gray-100 text-gray-700',
+                    $tipoCls = match($m->tipo) {
+                        'entrada','colheita','producao','comissao' => 'bg-emerald-100 text-emerald-700',
+                        'saida','secagem' => 'bg-rose-100 text-rose-700',
+                        'ajuste' => 'bg-amber-100 text-amber-700',
+                        default => 'bg-gray-100 text-gray-700',
                     };
-                    $sourceLink = null;
-                    if ($m->source instanceof \App\Models\Secagem) {
-                        $sourceLink = ['route' => route('secagens.show', $m->source), 'label' => 'Secagem #'.$m->source->numero];
-                    } elseif ($m->source instanceof \App\Models\SecagemItem && $m->source->secagem) {
-                        $sourceLink = ['route' => route('secagens.show', $m->source->secagem), 'label' => 'Secagem #'.$m->source->secagem->numero];
-                    }
+                    $produtoCls = $m->produto === 'coco' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700';
                 @endphp
-                <li class="px-4 py-4">
+                <li class="px-4 sm:px-6 py-4">
                     <div class="flex items-start justify-between gap-3 mb-1.5">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ \App\Support\StatusLabels::movementTipo($m->tipo) }}</span>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $tipoCls }}">{{ \App\Support\StatusLabels::movementTipo($m->tipo) }}</span>
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $produtoCls }}">{{ \App\Support\StatusLabels::produto($m->produto) }}</span>
                             <span class="text-xs text-leaf-500">{{ $m->occurred_at->format('d/m/Y H:i') }}</span>
                         </div>
                         <span class="font-bold whitespace-nowrap text-sm {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
                             {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 2, ',', '.') }} kg
                         </span>
                     </div>
-                    @if($sourceLink)
-                        <a href="{{ $sourceLink['route'] }}" class="text-sm font-semibold text-leaf-700 hover:underline">{{ $sourceLink['label'] }} →</a>
+                    @if($m->source instanceof \App\Models\Secagem)
+                        <a href="{{ route('secagens.show', $m->source) }}" class="text-sm font-semibold text-leaf-700 hover:underline">Secagem #{{ $m->source->numero }} →</a>
                     @elseif($m->observacao)
                         <p class="text-sm text-leaf-700">{{ $m->observacao }}</p>
                     @endif
@@ -153,74 +169,6 @@
                 <li class="px-4 py-12 text-center text-leaf-500">Sem movimentações.</li>
             @endforelse
         </ul>
-
-        {{-- Desktop: tabela --}}
-        <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
-                    <tr>
-                        <th class="text-left px-6 py-3 font-semibold">Quando</th>
-                        <th class="text-left px-6 py-3 font-semibold">Tipo</th>
-                        <th class="text-right px-6 py-3 font-semibold">Qtd. (kg)</th>
-                        <th class="text-right px-6 py-3 font-semibold">Saldo após</th>
-                        <th class="text-left px-6 py-3 font-semibold">Origem</th>
-                        <th class="text-left px-6 py-3 font-semibold">Observação</th>
-                        <th class="text-left px-6 py-3 font-semibold">Por</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-leaf-100">
-                    @forelse($movements as $m)
-                        <tr class="hover:bg-leaf-50/30 transition">
-                            <td class="px-6 py-3 text-leaf-700 whitespace-nowrap">{{ $m->occurred_at->format('d/m/Y H:i') }}</td>
-                            <td class="px-6 py-3">
-                                @php
-                                    $cls = match($m->tipo) {
-                                        'entrada' => 'bg-emerald-100 text-emerald-700',
-                                        'secagem' => 'bg-leaf-100 text-leaf-700',
-                                        'ajuste'  => 'bg-amber-100 text-amber-700',
-                                        'saida'   => 'bg-rose-100 text-rose-700',
-                                        default   => 'bg-gray-100 text-gray-700',
-                                    };
-                                @endphp
-                                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider {{ $cls }}">{{ \App\Support\StatusLabels::movementTipo($m->tipo) }}</span>
-                            </td>
-                            <td class="px-6 py-3 text-right font-bold whitespace-nowrap {{ $m->quantidade_kg < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
-                                {{ ($m->quantidade_kg > 0 ? '+' : '') }}{{ number_format($m->quantidade_kg, 2, ',', '.') }}
-                            </td>
-                            <td class="px-6 py-3 text-right font-semibold text-leaf-900 whitespace-nowrap">
-                                @isset($m->saldo_apos)
-                                    {{ number_format($m->saldo_apos, 2, ',', '.') }}
-                                @else
-                                    —
-                                @endisset
-                            </td>
-                            <td class="px-6 py-3 text-leaf-700">
-                                @php $src = $m->source; @endphp
-                                @if($src instanceof \App\Models\Secagem)
-                                    <a href="{{ route('secagens.show', $src) }}"
-                                       class="inline-flex items-center gap-1 text-leaf-700 font-semibold hover:underline">
-                                        Secagem #{{ $src->numero }}
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                    </a>
-                                @elseif($src instanceof \App\Models\SecagemItem && $src->secagem)
-                                    <a href="{{ route('secagens.show', $src->secagem) }}"
-                                       class="inline-flex items-center gap-1 text-leaf-700 font-semibold hover:underline">
-                                        Secagem #{{ $src->secagem->numero }}
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                    </a>
-                                @else
-                                    <span class="text-leaf-400">—</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-3 text-leaf-700">{{ $m->observacao ?? '—' }}</td>
-                            <td class="px-6 py-3 text-leaf-500 whitespace-nowrap">{{ $m->user?->name ?? '—' }}</td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="7" class="px-6 py-12 text-center text-leaf-500">Sem movimentações.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
     </div>
 
     <div class="mt-4">{{ $movements->links() }}</div>

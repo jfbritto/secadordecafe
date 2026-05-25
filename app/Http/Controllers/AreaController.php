@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Areas\StoreAreaRequest;
 use App\Models\Area;
+use App\Models\Movement;
 use App\Models\Secagem;
 use App\Models\SecagemItem;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -18,7 +19,7 @@ class AreaController extends Controller
         $this->authorize('viewAny', Area::class);
 
         $areas = Area::query()
-            ->withCount('secagens')
+            ->withCount(['secagemItems as itens_count'])
             ->orderByDesc('ativo')
             ->orderBy('nome')
             ->paginate(20);
@@ -44,36 +45,31 @@ class AreaController extends Controller
         $this->ensureSameFarm($area);
         $this->authorize('view', $area);
 
-        // Filtro de período: default = "este ano" (?periodo=ano). Outras opções:
-        // - mes (este mês)
-        // - tudo (todo o histórico)
-        // - custom (?de=YYYY-MM-DD&ate=YYYY-MM-DD)
+        // Filtro de período: default = "este ano"
         $periodo = $request->string('periodo', 'ano')->toString();
         [$de, $ate, $periodoLabel] = $this->resolvePeriod($periodo, $request);
 
-        // Secagens concluídas dentro do período + filtro pela área
-        $secagensQuery = Secagem::query()
-            ->where('area_id', $area->id)
-            ->where('status', Secagem::STATUS_CONCLUIDA);
-        if ($de) $secagensQuery->whereDate('data', '>=', $de);
-        if ($ate) $secagensQuery->whereDate('data', '<=', $ate);
+        // Items desta área dentro do período (via secagens concluídas)
+        $itemsQuery = SecagemItem::query()
+            ->where('origin_type', Area::class)
+            ->where('origin_id', $area->id)
+            ->whereHas('secagem', function ($q) use ($de, $ate) {
+                $q->where('status', Secagem::STATUS_CONCLUIDA);
+                if ($de) $q->whereDate('data', '>=', $de);
+                if ($ate) $q->whereDate('data', '<=', $ate);
+            });
 
-        $secagemIds = $secagensQuery->pluck('id');
-
-        // Stats agregadas em 1 query
-        $itemStats = SecagemItem::query()
-            ->whereIn('secagem_id', $secagemIds)
-            ->selectRaw('
-                COALESCE(SUM(quantidade_recebida_kg), 0) as total_recebido,
-                COALESCE(SUM(quantidade_seca_kg), 0) as total_seco,
-                COALESCE(SUM(comissao_kg), 0) as total_comissao,
-                COALESCE(SUM(saldo_liquido_kg), 0) as total_liquido,
-                COUNT(*) as total_itens
-            ')
-            ->first();
+        $itemStats = (clone $itemsQuery)->selectRaw('
+            COALESCE(SUM(quantidade_recebida_kg), 0) as total_recebido,
+            COALESCE(SUM(quantidade_seca_kg), 0) as total_seco,
+            COALESCE(SUM(comissao_kg), 0) as total_comissao,
+            COALESCE(SUM(saldo_liquido_kg), 0) as total_liquido,
+            COUNT(*) as total_itens,
+            COUNT(DISTINCT secagem_id) as total_secagens
+        ')->first();
 
         $stats = [
-            'qtd_secagens' => $secagemIds->count(),
+            'qtd_secagens' => (int) ($itemStats->total_secagens ?? 0),
             'total_recebido' => (float) ($itemStats->total_recebido ?? 0),
             'total_seco' => (float) ($itemStats->total_seco ?? 0),
             'total_comissao' => (float) ($itemStats->total_comissao ?? 0),
@@ -83,9 +79,8 @@ class AreaController extends Controller
         ];
 
         $ultimasSecagens = Secagem::query()
-            ->where('area_id', $area->id)
-            ->where('status', Secagem::STATUS_CONCLUIDA)
-            ->with(['dryer', 'items'])
+            ->whereIn('id', (clone $itemsQuery)->select('secagem_id'))
+            ->with(['dryer', 'items' => fn ($q) => $q->where('origin_type', Area::class)->where('origin_id', $area->id)])
             ->orderByDesc('data')
             ->orderByDesc('id')
             ->limit(5)
@@ -121,9 +116,9 @@ class AreaController extends Controller
         $this->ensureSameFarm($area);
         $this->authorize('delete', $area);
 
-        if ($area->secagens()->exists()) {
+        if ($area->secagemItems()->exists() || $area->movements()->exists()) {
             return redirect()->route('areas.index')
-                ->with('error', 'Não é possível excluir <strong>' . e($area->nome) . '</strong>: há secagens vinculadas. Inative-a em vez de excluir.');
+                ->with('error', 'Não é possível excluir <strong>' . e($area->nome) . '</strong>: há movimentações ou itens de secagem vinculados. Inative-a em vez de excluir.');
         }
 
         $nome = $area->nome;
@@ -141,7 +136,7 @@ class AreaController extends Controller
         }
     }
 
-    /** @return array{0:?string,1:?string,2:string} [de, ate, label] */
+    /** @return array{0:?string,1:?string,2:string} */
     private function resolvePeriod(string $periodo, Request $request): array
     {
         return match ($periodo) {

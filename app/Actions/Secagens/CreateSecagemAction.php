@@ -20,7 +20,6 @@ class CreateSecagemAction
                 'farm_id' => $user->farm_id,
                 'user_id' => $user->id,
                 'dryer_id' => $data['dryer_id'],
-                'area_id' => $data['area_id'] ?? null,
                 'numero' => $next,
                 'data' => $data['data'],
                 'observacoes' => $data['observacoes'] ?? null,

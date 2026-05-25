@@ -18,7 +18,8 @@ class CustomerFactory extends Factory
             'telefone' => fake()->phoneNumber(),
             'cpf_cnpj' => fake()->numerify('###.###.###-##'),
             'observacoes' => null,
-            'saldo_cafe_kg' => 0,
+            'saldo_coco_kg' => 0,
+            'saldo_seco_kg' => 0,
         ];
     }
 

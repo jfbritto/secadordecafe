@@ -47,9 +47,9 @@ it('Movimentações: admin da farm A NAO acessa extrato de cliente da farm B', f
     $b = makeFarmUser('admin');
     $cb = Customer::factory()->forFarm($b->farm)->create();
 
-    $this->actingAs($a)->get("/clientes/{$cb->id}/movimentacoes")->assertNotFound();
+    $this->actingAs($a)->get("/movimentacoes/cliente/{$cb->id}")->assertNotFound();
     $this->actingAs($a)
-        ->post("/clientes/{$cb->id}/movimentacoes", ['tipo' => 'entrada', 'quantidade' => 10])
+        ->post("/movimentacoes/cliente/{$cb->id}", ['tipo' => 'entrada', 'produto' => 'coco', 'quantidade' => 10])
         ->assertNotFound();
 });
 
@@ -79,19 +79,17 @@ it('SecagemItem: admin da farm A NAO adiciona item com cliente da farm B', funct
     $a = makeFarmUser('admin');
     $b = makeFarmUser('admin');
     $da = Dryer::factory()->forFarm($a->farm)->create();
-    $cb = Customer::factory()->forFarm($b->farm)->create(['saldo_cafe_kg' => 1000]);
+    $cb = Customer::factory()->forFarm($b->farm)->create(['saldo_coco_kg' => 1000]);
 
     $this->actingAs($a)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $da->id]);
     $sa = Secagem::first();
 
     $this->actingAs($a)
         ->post("/secagens/{$sa->id}/items", [
-            'customer_id' => $cb->id,
+            'origin_type' => 'cliente', 'origin_id' => $cb->id,
             'quantidade_recebida_kg' => 100,
-            'quantidade_seca_kg' => 60,
-            'comissao_percentual' => 0,
         ])
-        ->assertSessionHasErrors('customer_id');
+        ->assertSessionHasErrors('origin_id');
 
     expect(SecagemItem::count())->toBe(0);
 });
@@ -172,17 +170,18 @@ it('Invitation: admin da farm A NAO exclui convite da farm B', function () {
 it('RegisterMovementAction: defesa em profundidade rejeita cliente de outra farm', function () {
     $a = makeFarmUser('admin');
     $b = makeFarmUser('admin');
-    $cb = Customer::factory()->forFarm($b->farm)->create(['saldo_cafe_kg' => 100]);
+    $cb = Customer::factory()->forFarm($b->farm)->create(['saldo_coco_kg' => 100]);
 
     expect(fn () => app(\App\Actions\Movements\RegisterMovementAction::class)->execute(
-        customer: $cb,
+        owner: $cb,
         user: $a,
         tipo: Movement::TIPO_ENTRADA,
+        produto: 'coco',
         quantidade: 10,
     ))->toThrow(\App\Exceptions\DomainException::class, 'fora da fazenda');
 
     expect(Movement::count())->toBe(0);
-    expect((float) $cb->fresh()->saldo_cafe_kg)->toBe(100.0);
+    expect((float) $cb->fresh()->saldo_coco_kg)->toBe(100.0);
 });
 
 it('Listagens: cada admin só vê dados da própria farm', function () {

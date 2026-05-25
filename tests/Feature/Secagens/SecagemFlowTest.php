@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Area;
 use App\Models\Customer;
 use App\Models\Dryer;
+use App\Models\Farm;
 use App\Models\Movement;
 use App\Models\Secagem;
 use App\Models\SecagemItem;
@@ -9,6 +11,28 @@ use App\Models\SecagemItem;
 function dryerFor($admin)
 {
     return Dryer::factory()->forFarm($admin->farm)->create();
+}
+
+/**
+ * Helper pra adicionar item completo (entrada + saída) numa secagem.
+ * Encapsula o fluxo de 2 tempos pros testes que querem cenário pronto.
+ */
+function addItemComOutput($test, $admin, Secagem $s, Customer|Area $origin, float $recebida, float $seca, float $comissao = 0)
+{
+    $tipo = $origin instanceof Customer ? 'cliente' : 'area';
+    $test->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'origin_type' => $tipo,
+        'origin_id' => $origin->id,
+        'quantidade_recebida_kg' => $recebida,
+    ])->assertRedirect();
+
+    $item = SecagemItem::orderByDesc('id')->first();
+    $test->actingAs($admin)->patch("/secagens/{$s->id}/items/{$item->id}/saida", [
+        'quantidade_seca_kg' => $seca,
+        'comissao_percentual' => $comissao,
+    ])->assertRedirect();
+
+    return $item->fresh();
 }
 
 it('admin can create secagem (rascunho) with sequential numero', function () {
@@ -42,92 +66,74 @@ it('numero is per-farm', function () {
     expect(Secagem::withoutGlobalScopes()->where('farm_id', $b->farm_id)->first()->numero)->toBe(1);
 });
 
-it('add item calculates comissao and saldo liquido', function () {
+it('add item + registrar saída calcula comissao e saldo liquido', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 1000]);
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s = Secagem::first();
 
-    $this->actingAs($admin)
-        ->post("/secagens/{$s->id}/items", [
-            'customer_id' => $c->id,
-            'quantidade_recebida_kg' => 500,
-            'quantidade_seca_kg' => 300,
-            'comissao_percentual' => 10,
-        ])
-        ->assertRedirect();
+    $item = addItemComOutput($this, $admin, $s, $c, 500, 300, 10);
 
-    $item = SecagemItem::first();
     expect((float) $item->comissao_kg)->toBe(30.0);
     expect((float) $item->saldo_liquido_kg)->toBe(270.0);
     expect($item->rendimentoPercentual())->toBe(60.0);
 });
 
-it('conclude secagem debits customer saldos and creates movements', function () {
+it('conclude secagem debita côco e credita seco (cliente + comissão na fazenda)', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c1 = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
-    $c2 = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 500]);
+    $c1 = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 1000]);
+    $c2 = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s = Secagem::first();
-    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c1->id, 'quantidade_recebida_kg' => 600, 'quantidade_seca_kg' => 360, 'comissao_percentual' => 5,
-    ]);
-    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c2->id, 'quantidade_recebida_kg' => 200, 'quantidade_seca_kg' => 110, 'comissao_percentual' => 5,
-    ]);
+    addItemComOutput($this, $admin, $s, $c1, 600, 360, 5); // comissao = 18, líquido = 342
+    addItemComOutput($this, $admin, $s, $c2, 200, 110, 5); // comissao = 5.5, líquido = 104.5
 
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/concluir")
         ->assertRedirect("/secagens/{$s->id}");
 
-    expect((float) $c1->fresh()->saldo_cafe_kg)->toBe(400.0);
-    expect((float) $c2->fresh()->saldo_cafe_kg)->toBe(300.0);
+    // Côco debitado
+    expect((float) $c1->fresh()->saldo_coco_kg)->toBe(400.0);
+    expect((float) $c2->fresh()->saldo_coco_kg)->toBe(300.0);
+    // Seco creditado (líquido)
+    expect((float) $c1->fresh()->saldo_seco_kg)->toBe(342.0);
+    expect((float) $c2->fresh()->saldo_seco_kg)->toBe(104.5);
+    // Comissão acumulada na Farm
+    $farm = Farm::find($admin->farm_id);
+    expect((float) $farm->saldo_seco_comissao_kg)->toBe(23.5);
 
     expect(Movement::where('tipo', 'secagem')->count())->toBe(2);
-    expect((float) Movement::where('customer_id', $c1->id)->first()->quantidade_kg)->toBe(-600.0);
-    expect((float) Movement::where('customer_id', $c2->id)->first()->quantidade_kg)->toBe(-200.0);
-
-    // Cada movement aponta source pra Secagem (não SecagemItem) — habilita link clicável no extrato
-    Movement::where('tipo', 'secagem')->get()->each(function ($m) use ($s) {
-        expect($m->source_type)->toBe(\App\Models\Secagem::class);
-        expect($m->source_id)->toBe($s->id);
-    });
+    expect(Movement::where('tipo', 'producao')->count())->toBe(2);
+    expect(Movement::where('tipo', 'comissao')->count())->toBe(2);
 
     $s->refresh();
     expect($s->status)->toBe('concluida');
     expect($s->concluida_at)->not->toBeNull();
 });
 
-it('conclude blocks if any customer has insufficient saldo', function () {
-    // Simula cenário em que o saldo do cliente foi reduzido APÓS o item ser adicionado
-    // (ex.: outra secagem concluída no meio). A validação no conclude funciona como
-    // defesa em profundidade — a validação primária acontece no item-add.
+it('conclude blocks if any owner has insufficient saldo de côco', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c1 = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
-    $c2 = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
+    $c1 = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 100]);
+    $c2 = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 100]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s = Secagem::first();
-    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c1->id, 'quantidade_recebida_kg' => 50, 'quantidade_seca_kg' => 30, 'comissao_percentual' => 0,
-    ]);
-    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c2->id, 'quantidade_recebida_kg' => 100, 'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
-    ]);
+    addItemComOutput($this, $admin, $s, $c1, 50, 30, 0);
+    addItemComOutput($this, $admin, $s, $c2, 100, 60, 0);
 
-    // Reduz saldo do c2 fora do fluxo de adição
-    $c2->update(['saldo_cafe_kg' => 50]);
+    // Reduz saldo do c2 fora do fluxo
+    $c2->update(['saldo_coco_kg' => 50]);
 
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/concluir")
         ->assertStatus(422);
 
-    expect((float) $c1->fresh()->saldo_cafe_kg)->toBe(100.0);
-    expect((float) $c2->fresh()->saldo_cafe_kg)->toBe(50.0);
+    expect((float) $c1->fresh()->saldo_coco_kg)->toBe(100.0);
+    expect((float) $c2->fresh()->saldo_coco_kg)->toBe(50.0);
     expect(Movement::count())->toBe(0);
     expect($s->fresh()->status)->toBe('rascunho');
 });
@@ -135,12 +141,10 @@ it('conclude blocks if any customer has insufficient saldo', function () {
 it('cannot edit concluded secagem', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 1000]);
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s = Secagem::first();
-    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c->id, 'quantidade_recebida_kg' => 100, 'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
-    ]);
+    addItemComOutput($this, $admin, $s, $c, 100, 60, 0);
     $this->actingAs($admin)->post("/secagens/{$s->id}/concluir");
 
     $this->actingAs($admin)
@@ -153,6 +157,24 @@ it('cannot conclude empty secagem', function () {
     $d = dryerFor($admin);
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s = Secagem::first();
+
+    $this->actingAs($admin)
+        ->post("/secagens/{$s->id}/concluir")
+        ->assertStatus(422);
+});
+
+it('cannot conclude secagem com item sem saída registrada', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+    // Só lança entrada, sem registrar saída
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'origin_type' => 'cliente', 'origin_id' => $c->id,
+        'quantidade_recebida_kg' => 100,
+    ])->assertRedirect();
 
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/concluir")
@@ -197,42 +219,35 @@ it('shows no-dryer page when no active dryer exists', function () {
         ->assertSee('Nenhum secador cadastrado');
 });
 
-it('also rejects PDF tests update on secagem without dryer text', function () {
-    expect(true)->toBeTrue(); // placeholder, dryer model exists, see SecagemPdfTest
-});
-
 it('rejeita adicionar o mesmo cliente duas vezes na mesma secagem', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 1000]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
     $s = Secagem::first();
 
-    // Primeiro item: OK
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/items", [
-            'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
-            'quantidade_seca_kg' => 60, 'comissao_percentual' => 5,
+            'origin_type' => 'cliente', 'origin_id' => $c->id,
+            'quantidade_recebida_kg' => 100,
         ])
         ->assertRedirect();
 
-    // Segundo item com MESMO cliente: deve falhar com erro de validação
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/items", [
-            'customer_id' => $c->id, 'quantidade_recebida_kg' => 50,
-            'quantidade_seca_kg' => 30, 'comissao_percentual' => 5,
+            'origin_type' => 'cliente', 'origin_id' => $c->id,
+            'quantidade_recebida_kg' => 50,
         ])
-        ->assertSessionHasErrors('customer_id');
+        ->assertSessionHasErrors('origin_id');
 
-    // Tabela permanece com 1 item só
     expect(SecagemItem::where('secagem_id', $s->id)->count())->toBe(1);
 });
 
 it('mesmo cliente PODE estar em secagens diferentes', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 2000]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 2000]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s1 = Secagem::orderBy('id')->first();
@@ -241,33 +256,33 @@ it('mesmo cliente PODE estar em secagens diferentes', function () {
 
     $this->actingAs($admin)
         ->post("/secagens/{$s1->id}/items", [
-            'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
-            'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
+            'origin_type' => 'cliente', 'origin_id' => $c->id,
+            'quantidade_recebida_kg' => 100,
         ])
         ->assertRedirect();
 
     $this->actingAs($admin)
         ->post("/secagens/{$s2->id}/items", [
-            'customer_id' => $c->id, 'quantidade_recebida_kg' => 200,
-            'quantidade_seca_kg' => 120, 'comissao_percentual' => 0,
+            'origin_type' => 'cliente', 'origin_id' => $c->id,
+            'quantidade_recebida_kg' => 200,
         ])
         ->assertRedirect();
 
     expect(SecagemItem::count())->toBe(2);
 });
 
-it('rejeita item com quantidade_recebida_kg maior que o saldo do cliente', function () {
+it('rejeita item com quantidade_recebida_kg maior que o saldo de côco', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 100]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
     $s = Secagem::first();
 
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/items", [
-            'customer_id' => $c->id, 'quantidade_recebida_kg' => 150,
-            'quantidade_seca_kg' => 90, 'comissao_percentual' => 0,
+            'origin_type' => 'cliente', 'origin_id' => $c->id,
+            'quantidade_recebida_kg' => 150,
         ])
         ->assertSessionHasErrors('quantidade_recebida_kg');
 
@@ -277,15 +292,15 @@ it('rejeita item com quantidade_recebida_kg maior que o saldo do cliente', funct
 it('aceita item com quantidade_recebida_kg igual ao saldo do cliente', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 100]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
     $s = Secagem::first();
 
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/items", [
-            'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
-            'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
+            'origin_type' => 'cliente', 'origin_id' => $c->id,
+            'quantidade_recebida_kg' => 100,
         ])
         ->assertRedirect();
 
@@ -295,24 +310,47 @@ it('aceita item com quantidade_recebida_kg igual ao saldo do cliente', function 
 it('apos remover, da pra readicionar o mesmo cliente', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 1000]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
     $s = Secagem::first();
 
     $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
-        'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
+        'origin_type' => 'cliente', 'origin_id' => $c->id,
+        'quantidade_recebida_kg' => 100,
     ])->assertRedirect();
 
     $item = SecagemItem::first();
     $this->actingAs($admin)->delete("/secagens/{$s->id}/items/{$item->id}")->assertRedirect();
 
-    // Re-adiciona com valores diferentes
     $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c->id, 'quantidade_recebida_kg' => 200,
-        'quantidade_seca_kg' => 120, 'comissao_percentual' => 5,
+        'origin_type' => 'cliente', 'origin_id' => $c->id,
+        'quantidade_recebida_kg' => 200,
     ])->assertRedirect();
 
     expect(SecagemItem::where('secagem_id', $s->id)->count())->toBe(1);
+});
+
+it('secagem mista: cliente + área no mesmo ciclo', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $cliente = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
+    $area = Area::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 300]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+
+    addItemComOutput($this, $admin, $s, $cliente, 500, 120, 10);
+    addItemComOutput($this, $admin, $s, $area, 300, 72, 0); // áreas não têm comissão
+
+    $this->actingAs($admin)
+        ->post("/secagens/{$s->id}/concluir")
+        ->assertRedirect();
+
+    expect((float) $cliente->fresh()->saldo_coco_kg)->toBe(0.0);
+    expect((float) $cliente->fresh()->saldo_seco_kg)->toBe(108.0); // 120 - 12 comissão
+    expect((float) $area->fresh()->saldo_coco_kg)->toBe(0.0);
+    expect((float) $area->fresh()->saldo_seco_kg)->toBe(72.0); // integral
+    $farm = Farm::find($admin->farm_id);
+    expect((float) $farm->saldo_seco_comissao_kg)->toBe(12.0); // só do cliente
 });

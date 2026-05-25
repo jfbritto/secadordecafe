@@ -36,10 +36,19 @@ class StatusLabels
 
     /** Tipos de movimentação no extrato. */
     public const MOVEMENT_TIPO = [
-        'entrada' => 'Entrada',
-        'secagem' => 'Secagem',
-        'ajuste'  => 'Ajuste',
-        'saida'   => 'Saída',
+        'entrada'  => 'Entrada',
+        'saida'    => 'Saída',
+        'ajuste'   => 'Ajuste',
+        'secagem'  => 'Secagem',
+        'colheita' => 'Colheita',
+        'producao' => 'Produção',
+        'comissao' => 'Comissão',
+    ];
+
+    /** Produto da movimentação. */
+    public const PRODUTO = [
+        'coco' => 'Café côco',
+        'seco' => 'Café seco',
     ];
 
     public static function farm(?string $status): string
@@ -60,5 +69,10 @@ class StatusLabels
     public static function movementTipo(?string $tipo): string
     {
         return self::MOVEMENT_TIPO[$tipo] ?? ucfirst((string) $tipo);
+    }
+
+    public static function produto(?string $produto): string
+    {
+        return self::PRODUTO[$produto] ?? ucfirst((string) $produto);
     }
 }

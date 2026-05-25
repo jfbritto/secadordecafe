@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -20,7 +21,7 @@ class Secagem extends Model
     protected $table = 'secagens';
 
     protected $fillable = [
-        'farm_id', 'user_id', 'dryer_id', 'area_id', 'numero', 'data',
+        'farm_id', 'user_id', 'dryer_id', 'numero', 'data',
         'observacoes', 'status', 'concluida_at',
     ];
 
@@ -32,7 +33,7 @@ class Secagem extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['numero', 'data', 'dryer_id', 'area_id', 'status'])
+            ->logOnly(['numero', 'data', 'dryer_id', 'status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $event) => "secagem {$event}");
@@ -41,7 +42,6 @@ class Secagem extends Model
     public function items(): HasMany { return $this->hasMany(SecagemItem::class); }
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function dryer(): BelongsTo { return $this->belongsTo(Dryer::class); }
-    public function area(): BelongsTo { return $this->belongsTo(Area::class); }
 
     public function secadorNome(): string
     {
@@ -62,5 +62,24 @@ class Secagem extends Model
     public function totalComissaoKg(): float
     {
         return (float) $this->items->sum('comissao_kg');
+    }
+
+    /**
+     * Áreas envolvidas nesta secagem (derivado dos items com origin=Area).
+     * Substitui o antigo $secagem->area_id (que era single-area).
+     */
+    public function areasEnvolvidas(): Collection
+    {
+        return $this->items
+            ->filter(fn ($i) => $i->isArea())
+            ->map(fn ($i) => $i->origin)
+            ->filter()
+            ->unique('id')
+            ->values();
+    }
+
+    public function todosItemsTemSaida(): bool
+    {
+        return $this->items->isNotEmpty() && $this->items->every(fn ($i) => $i->hasSaida());
     }
 }

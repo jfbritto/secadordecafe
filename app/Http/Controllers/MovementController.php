@@ -4,77 +4,153 @@ namespace App\Http\Controllers;
 
 use App\Actions\Movements\RegisterMovementAction;
 use App\Http\Requests\Movements\StoreMovementRequest;
+use App\Models\Area;
 use App\Models\Customer;
+use App\Models\Farm;
 use App\Models\Movement;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Extrato e lançamento manual de movimentações.
+ *
+ * Owner polimórfico:
+ *  - /movimentacoes/cliente/{id}
+ *  - /movimentacoes/area/{id}
+ *  - /movimentacoes/fazenda
+ *
+ * Filtro opcional de produto via querystring: ?produto=coco|seco
+ */
 class MovementController extends Controller
 {
-    public function index(Customer $cliente): View
+    public function index(string $tipo, ?int $id, Request $request): View
     {
-        $this->ensureSameFarm($cliente);
-        $this->authorize('view', $cliente);
+        $owner = $this->resolveOwner($tipo, $id);
+        $this->authorizeOwner($owner);
 
-        $movements = $cliente->movements()->with(['user', 'source'])->paginate(30);
+        $produto = $request->string('produto')->toString() ?: null;
 
-        // Running balance: saldo após cada movimentação, calculado a partir do cumulativo
-        // anterior ao mais antigo da página (1 query SUM extra, escala bem).
+        $query = $owner->movements()
+            ->with(['user', 'source'])
+            ->latest('occurred_at');
+
+        if ($produto) {
+            $query->where('produto', $produto);
+        }
+
+        $movements = $query->paginate(30)->withQueryString();
+
         if ($movements->isNotEmpty()) {
-            $oldestOnPage = $movements->last();
-            $somaAntes = (float) Movement::query()
-                ->where('customer_id', $cliente->id)
-                ->where(function ($q) use ($oldestOnPage) {
-                    $q->where('occurred_at', '<', $oldestOnPage->occurred_at)
-                      ->orWhere(function ($q2) use ($oldestOnPage) {
-                          $q2->where('occurred_at', $oldestOnPage->occurred_at)
-                             ->where('id', '<', $oldestOnPage->id);
-                      });
-                })
-                ->sum('quantidade_kg');
-
-            $running = $somaAntes;
-            $sortedAsc = $movements->getCollection()
-                ->sortBy(fn ($m) => sprintf('%s-%020d', $m->occurred_at->format('YmdHis'), $m->id))
-                ->values();
-
-            foreach ($sortedAsc as $m) {
-                $running += (float) $m->quantidade_kg;
-                $m->saldo_apos = $running;
-            }
+            $this->attachRunningBalance($movements, $owner, $produto);
         }
 
         return view('movements.index', [
-            'customer' => $cliente,
+            'owner' => $owner,
+            'ownerLabel' => $this->ownerLabel($owner),
+            'ownerKind' => $tipo,
             'movements' => $movements,
+            'produto' => $produto,
         ]);
     }
 
-    public function store(StoreMovementRequest $request, Customer $cliente, RegisterMovementAction $action): RedirectResponse
+    public function store(StoreMovementRequest $request, string $tipo, ?int $id, RegisterMovementAction $action): RedirectResponse
     {
-        $this->ensureSameFarm($cliente);
+        $owner = $this->resolveOwner($tipo, $id);
+        $this->authorizeOwner($owner);
 
         $action->execute(
-            customer: $cliente,
+            owner: $owner,
             user: $request->user(),
             tipo: $request->validated('tipo'),
+            produto: $request->validated('produto'),
             quantidade: (float) $request->validated('quantidade'),
             observacao: $request->validated('observacao'),
             direcao: $request->validated('direcao'),
-            occurredAt: $request->validated('occurred_at') ? new \DateTime($request->validated('occurred_at')) : null,
+            occurredAt: $request->validated('occurred_at')
+                ? new \DateTime($request->validated('occurred_at'))
+                : null,
         );
 
-        $cliente->refresh();
-        return redirect()->route('clientes.movimentacoes.index', $cliente)
-            ->with('flash', 'Movimentação registrada. Novo saldo: <strong>' . number_format((float) $cliente->saldo_cafe_kg, 2, ',', '.') . ' kg</strong>.');
+        $owner->refresh();
+
+        $params = ['tipo' => $tipo];
+        if ($id !== null) {
+            $params['id'] = $id;
+        }
+
+        return redirect()->route('movimentacoes.index', $params)
+            ->with('flash', 'Movimentação registrada.');
     }
 
-    private function ensureSameFarm(Customer $customer): void
+    /**
+     * Resolve o owner polimórfico a partir do slug da rota (cliente|area|fazenda).
+     */
+    private function resolveOwner(string $tipo, ?int $id): Model
+    {
+        return match ($tipo) {
+            'cliente' => Customer::query()->findOrFail($id),
+            'area'    => Area::query()->findOrFail($id),
+            'fazenda' => Farm::query()->where('id', auth()->user()->farm_id)->firstOrFail(),
+            default   => throw new AuthorizationException("Tipo de owner inválido: {$tipo}"),
+        };
+    }
+
+    private function authorizeOwner(Model $owner): void
     {
         $user = auth()->user();
-        if ($user && ! $user->isRoot() && $customer->farm_id !== $user->farm_id) {
+        if (! $user) {
             throw new AuthorizationException();
+        }
+        $ownerFarmId = $owner instanceof Farm ? $owner->id : $owner->farm_id;
+        if (! $user->isRoot() && $ownerFarmId !== $user->farm_id) {
+            throw new AuthorizationException();
+        }
+    }
+
+    private function ownerLabel(Model $owner): string
+    {
+        if ($owner instanceof Customer) return $owner->nome;
+        if ($owner instanceof Area)     return $owner->nome;
+        if ($owner instanceof Farm)     return $owner->nome . ' (estoque da fazenda)';
+        return '—';
+    }
+
+    /**
+     * Calcula `saldo_apos` em memória pra cada movimento da página.
+     * Considera apenas o produto do filtro atual (se houver). Sem filtro, soma todos.
+     */
+    private function attachRunningBalance($movements, Model $owner, ?string $produto): void
+    {
+        $oldestOnPage = $movements->last();
+
+        $baseQuery = Movement::query()
+            ->where('owner_type', $owner->getMorphClass())
+            ->where('owner_id', $owner->getKey())
+            ->where(function ($q) use ($oldestOnPage) {
+                $q->where('occurred_at', '<', $oldestOnPage->occurred_at)
+                  ->orWhere(function ($q2) use ($oldestOnPage) {
+                      $q2->where('occurred_at', $oldestOnPage->occurred_at)
+                         ->where('id', '<', $oldestOnPage->id);
+                  });
+            });
+
+        if ($produto) {
+            $baseQuery->where('produto', $produto);
+        }
+
+        $somaAntes = (float) $baseQuery->sum('quantidade_kg');
+
+        $running = $somaAntes;
+        $sortedAsc = $movements->getCollection()
+            ->sortBy(fn ($m) => sprintf('%s-%020d', $m->occurred_at->format('YmdHis'), $m->id))
+            ->values();
+
+        foreach ($sortedAsc as $m) {
+            $running += (float) $m->quantidade_kg;
+            $m->saldo_apos = $running;
         }
     }
 }

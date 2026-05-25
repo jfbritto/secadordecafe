@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Exceptions\DomainException;
+use App\Models\Concerns\HasStockMovements;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,15 +13,27 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Farm extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, LogsActivity, HasStockMovements;
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nome', 'status', 'cidade', 'estado', 'telefone'])
+            ->logOnly(['nome', 'status', 'cidade', 'estado', 'telefone', 'saldo_seco_comissao_kg'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $event) => "fazenda {$event}");
+    }
+
+    /**
+     * Farm só tem estoque de seco (comissões acumuladas do serviço de secagem).
+     * Tentar registrar movement de côco numa Farm é erro de programação.
+     */
+    public function saldoColumnFor(string $produto): string
+    {
+        return match ($produto) {
+            'seco' => 'saldo_seco_comissao_kg',
+            default => throw new DomainException("Farm só tem estoque de seco; produto inválido: {$produto}"),
+        };
     }
 
     public const STATUS_TRIAL = 'trial';
@@ -37,10 +51,12 @@ class Farm extends Model
         'cidade',
         'estado',
         'trial_ends_at',
+        'saldo_seco_comissao_kg',
     ];
 
     protected $casts = [
         'trial_ends_at' => 'datetime',
+        'saldo_seco_comissao_kg' => 'decimal:2',
     ];
 
     public function users(): HasMany

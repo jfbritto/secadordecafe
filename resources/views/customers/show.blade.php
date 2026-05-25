@@ -10,7 +10,7 @@
         <p class="text-xs text-leaf-500 mt-1">Cliente desde {{ $customer->created_at->format('d/m/Y') }} · {{ $stats['qtd_movimentacoes'] }} {{ $stats['qtd_movimentacoes'] === 1 ? 'movimentação' : 'movimentações' }}</p>
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('clientes.movimentacoes.index', $customer) }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:bg-leaf-50 rounded-lg transition">
+        <a href="{{ route('movimentacoes.index', ['tipo' => 'cliente', 'id' => $customer->id]) }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-leaf-700 bg-white border border-leaf-200 hover:bg-leaf-50 rounded-lg transition">
             Extrato
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </a>
@@ -40,29 +40,36 @@
         @endif
     </div>
 
-    <div class="bg-gradient-to-br from-leaf-700 to-leaf-800 text-white rounded-xl shadow-lg shadow-leaf-700/10 p-6">
-        <p class="text-xs uppercase tracking-wider text-leaf-200 font-semibold">Saldo de café</p>
-        <p class="text-4xl font-bold mt-2">{{ number_format($customer->saldo_cafe_kg, 2, ',', '.') }}</p>
-        <p class="text-sm text-leaf-200 mt-1">kg em estoque</p>
+    <div class="space-y-3">
+        <div class="bg-gradient-to-br from-amber-600 to-amber-700 text-white rounded-xl shadow-lg p-5">
+            <p class="text-xs uppercase tracking-wider text-amber-100 font-semibold">Café côco</p>
+            <p class="text-3xl font-bold mt-1">{{ number_format($customer->saldo_coco_kg, 2, ',', '.') }} <span class="text-base font-normal text-amber-100">kg</span></p>
+            <p class="text-xs text-amber-100 mt-0.5">{{ \App\Support\Sacos::formatSacos($customer->saldo_coco_kg) }}</p>
+        </div>
+        <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-xl shadow-lg p-5">
+            <p class="text-xs uppercase tracking-wider text-emerald-100 font-semibold">Café seco</p>
+            <p class="text-3xl font-bold mt-1">{{ number_format($customer->saldo_seco_kg, 2, ',', '.') }} <span class="text-base font-normal text-emerald-100">kg</span></p>
+            <p class="text-xs text-emerald-100 mt-0.5">{{ \App\Support\Sacos::formatSacos($customer->saldo_seco_kg) }}</p>
+        </div>
     </div>
 </div>
 
 {{-- Stats: histórico cumulativo --}}
 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total recebido</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-2">{{ number_format($stats['total_entradas'], 2, ',', '.') }}</p>
-        <p class="text-xs text-leaf-500 mt-0.5">kg de café que entraram</p>
+        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Entradas de côco</p>
+        <p class="text-2xl font-bold text-amber-600 mt-2">{{ number_format($stats['total_entradas_coco'], 2, ',', '.') }}</p>
+        <p class="text-xs text-leaf-500 mt-0.5">kg recebidos do cliente</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total secado</p>
-        <p class="text-2xl font-bold text-leaf-700 mt-2">{{ number_format($stats['total_secado'], 2, ',', '.') }}</p>
-        <p class="text-xs text-leaf-500 mt-0.5">kg debitados em secagens</p>
+        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Produção de seco</p>
+        <p class="text-2xl font-bold text-emerald-600 mt-2">{{ number_format($stats['total_producao_seco'], 2, ',', '.') }}</p>
+        <p class="text-xs text-leaf-500 mt-0.5">kg líquido após secagens</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total saídas</p>
-        <p class="text-2xl font-bold text-rose-600 mt-2">{{ number_format($stats['total_saidas'], 2, ',', '.') }}</p>
-        <p class="text-xs text-leaf-500 mt-0.5">kg retirados sem secagem</p>
+        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Saídas (seco)</p>
+        <p class="text-2xl font-bold text-rose-600 mt-2">{{ number_format($stats['total_saidas_seco'], 2, ',', '.') }}</p>
+        <p class="text-xs text-leaf-500 mt-0.5">kg retirados/vendidos</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
         <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Secagens</p>
@@ -76,7 +83,7 @@
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-leaf-100 flex items-center justify-between">
             <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Últimas movimentações</h2>
-            <a href="{{ route('clientes.movimentacoes.index', $customer) }}" class="text-xs font-semibold text-leaf-700 hover:underline inline-flex items-center gap-1">
+            <a href="{{ route('movimentacoes.index', ['tipo' => 'cliente', 'id' => $customer->id]) }}" class="text-xs font-semibold text-leaf-700 hover:underline inline-flex items-center gap-1">
                 Ver tudo
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             </a>

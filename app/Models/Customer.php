@@ -2,22 +2,23 @@
 
 namespace App\Models;
 
+use App\Exceptions\DomainException;
 use App\Models\Concerns\BelongsToFarm;
+use App\Models\Concerns\HasStockMovements;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Customer extends Model
 {
-    use HasFactory, BelongsToFarm, LogsActivity;
+    use HasFactory, BelongsToFarm, LogsActivity, HasStockMovements;
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nome', 'telefone', 'cpf_cnpj', 'saldo_cafe_kg'])
+            ->logOnly(['nome', 'telefone', 'cpf_cnpj', 'saldo_coco_kg', 'saldo_seco_kg'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $event) => "cliente {$event}");
@@ -29,16 +30,22 @@ class Customer extends Model
         'telefone',
         'cpf_cnpj',
         'observacoes',
-        'saldo_cafe_kg',
+        'saldo_coco_kg',
+        'saldo_seco_kg',
     ];
 
     protected $casts = [
-        'saldo_cafe_kg' => 'decimal:3',
+        'saldo_coco_kg' => 'decimal:2',
+        'saldo_seco_kg' => 'decimal:2',
     ];
 
-    public function movements(): HasMany
+    public function saldoColumnFor(string $produto): string
     {
-        return $this->hasMany(Movement::class)->orderByDesc('occurred_at');
+        return match ($produto) {
+            'coco' => 'saldo_coco_kg',
+            'seco' => 'saldo_seco_kg',
+            default => throw new DomainException("Produto inválido para Customer: {$produto}"),
+        };
     }
 
     public function scopeSearch(Builder $query, ?string $term): Builder

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Secagens\ConcludeSecagemAction;
 use App\Actions\Secagens\CreateSecagemAction;
 use App\Actions\Secagens\ReopenSecagemAction;
+use App\Http\Requests\Secagens\RegisterSaidaItemRequest;
 use App\Http\Requests\Secagens\StoreSecagemItemRequest;
 use App\Http\Requests\Secagens\StoreSecagemRequest;
 use App\Models\Area;
@@ -44,9 +45,7 @@ class SecagemController extends Controller
             return view('secagens.no-dryer');
         }
 
-        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome']);
-
-        return view('secagens.create', compact('dryers', 'areas'));
+        return view('secagens.create', compact('dryers'));
     }
 
     public function store(StoreSecagemRequest $request, CreateSecagemAction $action): RedirectResponse
@@ -60,7 +59,7 @@ class SecagemController extends Controller
     {
         $this->ensureSameFarm($secagem);
         $this->authorize('view', $secagem);
-        $secagem->load('items.customer', 'user', 'dryer', 'area');
+        $secagem->load('items.origin', 'user', 'dryer');
 
         return view('secagens.show', compact('secagem'));
     }
@@ -69,18 +68,14 @@ class SecagemController extends Controller
     {
         $this->ensureSameFarm($secagem);
         $this->authorize('update', $secagem);
-        $secagem->load('items.customer', 'dryer', 'area');
-        $customers = Customer::orderBy('nome')->get(['id', 'nome', 'saldo_cafe_kg']);
+        $secagem->load('items.origin', 'dryer');
+
+        $customers = Customer::orderBy('nome')->get(['id', 'nome', 'saldo_coco_kg', 'saldo_seco_kg']);
         $dryers = Dryer::ativo()->orderBy('nome')->get(['id', 'nome']);
-        // Inclui o secador atual se ele estiver inativo
         if ($secagem->dryer && ! $secagem->dryer->ativo) {
             $dryers->push($secagem->dryer->only(['id', 'nome']));
         }
-        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome']);
-        // Inclui a área atual se ela estiver inativa (pra não desvincular sem querer)
-        if ($secagem->area && ! $secagem->area->ativo) {
-            $areas->push($secagem->area->only(['id', 'nome']));
-        }
+        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome', 'saldo_coco_kg', 'saldo_seco_kg']);
 
         return view('secagens.edit', compact('secagem', 'customers', 'dryers', 'areas'));
     }
@@ -112,16 +107,42 @@ class SecagemController extends Controller
         $this->authorize('update', $secagem);
 
         $data = $request->validated();
-        $seca = (float) $data['quantidade_seca_kg'];
-        $perc = (float) ($data['comissao_percentual'] ?? 0);
-        $comissao = SecagemItem::calcularComissao($seca, $perc);
-        $liquido = SecagemItem::calcularSaldoLiquido($seca, $comissao);
+        $originClass = $request->resolvedOriginClass();
 
         SecagemItem::create([
             'farm_id' => $secagem->farm_id,
             'secagem_id' => $secagem->id,
-            'customer_id' => $data['customer_id'],
+            'origin_type' => $originClass,
+            'origin_id' => $data['origin_id'],
             'quantidade_recebida_kg' => $data['quantidade_recebida_kg'],
+            // Saída fica nula até o sogro registrar (PATCH /items/{i}/saida)
+            'quantidade_seca_kg' => null,
+            'comissao_percentual' => null,
+            'comissao_kg' => null,
+            'saldo_liquido_kg' => null,
+        ]);
+
+        return redirect()->route('secagens.edit', $secagem)
+            ->with('flash', 'Item adicionado à secagem. Registre a saída quando o café sair do secador.');
+    }
+
+    public function registerSaida(RegisterSaidaItemRequest $request, Secagem $secagem, SecagemItem $item): RedirectResponse
+    {
+        $this->ensureSameFarm($secagem);
+        $this->authorize('update', $secagem);
+
+        if ($item->secagem_id !== $secagem->id) {
+            throw new AuthorizationException();
+        }
+
+        $data = $request->validated();
+        $seca = (float) $data['quantidade_seca_kg'];
+        // Comissão só faz sentido pra origem Customer; pra Area ignora
+        $perc = $item->isCustomer() ? (float) ($data['comissao_percentual'] ?? 0) : 0;
+        $comissao = SecagemItem::calcularComissao($seca, $perc);
+        $liquido = SecagemItem::calcularSaldoLiquido($seca, $comissao);
+
+        $item->update([
             'quantidade_seca_kg' => $seca,
             'comissao_percentual' => $perc,
             'comissao_kg' => $comissao,
@@ -129,7 +150,7 @@ class SecagemController extends Controller
         ]);
 
         return redirect()->route('secagens.edit', $secagem)
-            ->with('flash', 'Item adicionado à secagem.');
+            ->with('flash', 'Saída registrada. Conclua a secagem quando todos os itens tiverem saída.');
     }
 
     public function destroyItem(Secagem $secagem, SecagemItem $item): RedirectResponse
@@ -148,7 +169,7 @@ class SecagemController extends Controller
     {
         $this->ensureSameFarm($secagem);
         $this->authorize('view', $secagem);
-        $secagem->load('items.customer', 'farm', 'dryer');
+        $secagem->load('items.origin', 'farm', 'dryer');
 
         $pdf = Pdf::loadView('secagens.pdf', compact('secagem'))->setPaper('a4', 'landscape');
         return $pdf->download("secagem-{$secagem->numero}.pdf");
@@ -162,13 +183,9 @@ class SecagemController extends Controller
         $action->execute($secagem, auth()->user());
 
         return redirect()->route('secagens.show', $secagem)
-            ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> concluída. Saldos dos clientes atualizados.');
+            ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> concluída. Saldos atualizados.');
     }
 
-    /**
-     * Reabre uma secagem concluída pra correção.
-     * Estorna os débitos dos clientes (Movements de ajuste +) e volta status pra rascunho.
-     */
     public function reopen(Secagem $secagem, ReopenSecagemAction $action): RedirectResponse
     {
         $this->ensureSameFarm($secagem);
@@ -177,7 +194,7 @@ class SecagemController extends Controller
         $action->execute($secagem, auth()->user());
 
         return redirect()->route('secagens.edit', $secagem)
-            ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> reaberta. Débitos estornados — corrija o que precisar e conclua de novo.');
+            ->with('flash', '<strong>Secagem #' . $secagem->numero . '</strong> reaberta. Movimentações estornadas, corrija e conclua de novo.');
     }
 
     private function ensureSameFarm(Secagem $secagem): void

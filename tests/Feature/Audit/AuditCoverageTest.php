@@ -52,37 +52,38 @@ it('User: editar email gera diff com old/new', function () {
 
 it('Movement: registrar gera activity com farm_id e tipo', function () {
     $admin = makeFarmUser('admin');
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 100]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 100]);
 
     $this->actingAs($admin)
-        ->post("/clientes/{$c->id}/movimentacoes", ['tipo' => 'entrada', 'quantidade' => 30])
+        ->post("/movimentacoes/cliente/{$c->id}", ['tipo' => 'entrada', 'produto' => 'coco', 'quantidade' => 30])
         ->assertRedirect();
 
     $a = Activity::where('description', 'movimentacao created')
         ->where('subject_type', Movement::class)->first();
     expect($a)->not->toBeNull();
     expect($a->properties['attributes']['tipo'])->toBe('entrada');
+    expect($a->properties['attributes']['produto'])->toBe('coco');
     expect((float) $a->properties['attributes']['quantidade_kg'])->toBe(30.0);
     expect((int) $a->properties['farm_id'])->toBe($admin->farm_id);
 });
 
-it('SecagemItem: adicionar item gera activity com secagem_id e customer_id', function () {
+it('SecagemItem: adicionar item gera activity com secagem_id e origin', function () {
     $admin = makeFarmUser('admin');
     $d = Dryer::factory()->forFarm($admin->farm)->create();
-    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_cafe_kg' => 1000]);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 1000]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-07', 'dryer_id' => $d->id]);
     $s = Secagem::first();
     $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
-        'customer_id' => $c->id, 'quantidade_recebida_kg' => 100,
-        'quantidade_seca_kg' => 60, 'comissao_percentual' => 5,
+        'origin_type' => 'cliente', 'origin_id' => $c->id, 'quantidade_recebida_kg' => 100,
     ]);
 
     $a = Activity::where('description', 'item de secagem created')
         ->where('subject_type', SecagemItem::class)->first();
     expect($a)->not->toBeNull();
     expect((int) $a->properties['attributes']['secagem_id'])->toBe($s->id);
-    expect((int) $a->properties['attributes']['customer_id'])->toBe($c->id);
+    expect((int) $a->properties['attributes']['origin_id'])->toBe($c->id);
+    expect($a->properties['attributes']['origin_type'])->toBe(Customer::class);
     expect((int) $a->properties['farm_id'])->toBe($admin->farm_id);
 });
 

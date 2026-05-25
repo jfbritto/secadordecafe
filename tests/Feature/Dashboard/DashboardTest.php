@@ -9,7 +9,7 @@ use App\Models\User;
 
 it('farm dashboard shows tenant metrics', function () {
     $admin = makeFarmUser('admin');
-    Customer::factory()->forFarm($admin->farm)->count(3)->create(['saldo_cafe_kg' => 100]);
+    Customer::factory()->forFarm($admin->farm)->count(3)->create(['saldo_coco_kg' => 100]);
 
     $this->actingAs($admin)
         ->get('/dashboard')

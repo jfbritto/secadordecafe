@@ -20,7 +20,7 @@ it('creates activity log on customer update with diff', function () {
     $c = Customer::factory()->forFarm($admin->farm)->create(['nome' => 'Old']);
 
     $this->actingAs($admin)
-        ->put("/clientes/{$c->id}", ['nome' => 'New', 'saldo_cafe_kg' => 0])
+        ->put("/clientes/{$c->id}", ['nome' => 'New', 'saldo_coco_kg' => 0])
         ->assertRedirect();
 
     $a = Activity::where('description', 'cliente updated')->first();
@@ -33,7 +33,7 @@ it('admin can view audit page', function () {
     $admin = makeFarmUser('admin');
     Customer::factory()->forFarm($admin->farm)->create(['nome' => 'AuditCli']);
 
-    $this->actingAs($admin)->put("/clientes/" . Customer::first()->id, ['nome' => 'Atualizado', 'saldo_cafe_kg' => 0]);
+    $this->actingAs($admin)->put("/clientes/" . Customer::first()->id, ['nome' => 'Atualizado', 'saldo_coco_kg' => 0]);
 
     $this->actingAs($admin)
         ->get('/auditoria')

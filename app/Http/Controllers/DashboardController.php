@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Area;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Farm;
@@ -47,15 +48,15 @@ class DashboardController extends Controller
         // Listas limitadas (limit 5-8 com índice em farm_id+ordem) são rápidas, fora do cache
         // pra refletir mudanças imediatas que o usuário acabou de fazer.
         $ultimasMovs = Movement::where('farm_id', $user->farm_id)
-            ->with('customer:id,nome', 'user:id,name')
+            ->with('owner', 'user:id,name')
             ->orderByDesc('occurred_at')
             ->limit(8)
             ->get();
 
         $topClientes = Customer::where('farm_id', $user->farm_id)
-            ->orderByDesc('saldo_cafe_kg')
+            ->orderByDesc(DB::raw('saldo_coco_kg + saldo_seco_kg'))
             ->limit(5)
-            ->get(['id', 'nome', 'saldo_cafe_kg']);
+            ->get(['id', 'nome', 'saldo_coco_kg', 'saldo_seco_kg']);
 
         return [
             'farm' => $farm,
@@ -73,8 +74,23 @@ class DashboardController extends Controller
 
         $custAgg = DB::table('customers')
             ->where('farm_id', $farmId)
-            ->selectRaw('COUNT(*) as total, COALESCE(SUM(saldo_cafe_kg), 0) as saldo_total')
+            ->selectRaw('
+                COUNT(*) as total,
+                COALESCE(SUM(saldo_coco_kg), 0) as saldo_coco,
+                COALESCE(SUM(saldo_seco_kg), 0) as saldo_seco
+            ')
             ->first();
+
+        $areaAgg = DB::table('areas')
+            ->where('farm_id', $farmId)
+            ->selectRaw('
+                COALESCE(SUM(saldo_coco_kg), 0) as saldo_coco,
+                COALESCE(SUM(saldo_seco_kg), 0) as saldo_seco
+            ')
+            ->first();
+
+        $farmRow = DB::table('farms')->where('id', $farmId)->first();
+        $saldoComissao = (float) ($farmRow->saldo_seco_comissao_kg ?? 0);
 
         $secAgg = DB::table('secagens')
             ->where('farm_id', $farmId)
@@ -93,12 +109,17 @@ class DashboardController extends Controller
         $kgSecadosMes = (float) DB::table('movements')
             ->where('farm_id', $farmId)
             ->where('tipo', Movement::TIPO_SECAGEM)
+            ->where('produto', Movement::PRODUTO_COCO)
             ->where('occurred_at', '>=', $startMonth)
             ->sum('quantidade_kg');
 
         return [
             'clientes' => (int) $custAgg->total,
-            'saldoCafeKg' => (float) $custAgg->saldo_total,
+            'saldoCocoClientesKg' => (float) $custAgg->saldo_coco,
+            'saldoSecoClientesKg' => (float) $custAgg->saldo_seco,
+            'saldoCocoAreasKg' => (float) $areaAgg->saldo_coco,
+            'saldoSecoAreasKg' => (float) $areaAgg->saldo_seco,
+            'saldoSecoComissaoKg' => $saldoComissao,
             'secagensMes' => (int) $secAgg->total,
             'secagensConcluidasMes' => (int) $secAgg->concluidas,
             'despesasMes' => $despesasMes,

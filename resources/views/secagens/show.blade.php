@@ -52,7 +52,7 @@
     <ul class="md:hidden divide-y divide-leaf-100">
         @foreach($secagem->items as $item)
             <li class="px-4 py-4">
-                <p class="font-semibold text-leaf-900 mb-2">{{ $item->customer->nome }}</p>
+                <p class="font-semibold text-leaf-900 mb-2">{{ ($item->isArea() ? '🌱 ' : '🧑 ') . $item->originLabel() }}</p>
                 <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
                     <div>
                         <p class="text-[10px] uppercase tracking-wider text-leaf-500">Recebido</p>
@@ -100,7 +100,7 @@
     <table class="hidden md:table w-full text-sm">
         <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
             <tr>
-                <th class="text-left px-4 py-3 font-semibold">Cliente</th>
+                <th class="text-left px-4 py-3 font-semibold">Origem</th>
                 <th class="text-right px-4 py-3 font-semibold">Recebido (kg)</th>
                 <th class="text-right px-4 py-3 font-semibold">Seco (kg)</th>
                 <th class="text-right px-4 py-3 font-semibold">Rendimento</th>
@@ -112,7 +112,7 @@
         <tbody class="divide-y divide-leaf-100">
             @foreach($secagem->items as $item)
                 <tr class="hover:bg-leaf-50/30 transition">
-                    <td class="px-4 py-3 text-leaf-900 font-medium">{{ $item->customer->nome }}</td>
+                    <td class="px-4 py-3 text-leaf-900 font-medium">{{ ($item->isArea() ? '🌱 ' : '🧑 ') . $item->originLabel() }}</td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }}</td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }}</td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
