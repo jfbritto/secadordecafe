@@ -24,10 +24,14 @@ echo ">> Rodando migrations..."
 php artisan migrate --force
 
 echo ">> Limpando e recompilando caches..."
+php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan event:cache
+
+echo ">> Recarregando PHP-FPM (pra zerar OPcache do código antigo)..."
+sudo systemctl reload php8.3-fpm 2>/dev/null || sudo systemctl reload php-fpm 2>/dev/null || echo "   (FPM reload não disponível — sysadmin pode liberar com NOPASSWD)"
 
 echo ">> Reiniciando workers da fila..."
 sudo supervisorctl restart rocanossa-worker:* || true

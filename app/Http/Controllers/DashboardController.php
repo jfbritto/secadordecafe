@@ -10,10 +10,14 @@ use App\Models\Secagem;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public const FARM_METRICS_TTL = 60;
+
     public function index(Request $request): View
     {
         $user = $request->user();
@@ -25,31 +29,23 @@ class DashboardController extends Controller
         return view('dashboard.farm', $this->farmMetrics($user));
     }
 
+    public static function farmMetricsCacheKey(int $farmId): string
+    {
+        return "dashboard:farm:{$farmId}:metrics";
+    }
+
     private function farmMetrics($user): array
     {
         $farm = $user->farm;
-        $startMonth = now()->startOfMonth();
 
-        $totalClientes = Customer::where('farm_id', $user->farm_id)->count();
-        $saldoTotal = (float) Customer::where('farm_id', $user->farm_id)->sum('saldo_cafe_kg');
+        $metrics = Cache::remember(
+            self::farmMetricsCacheKey($user->farm_id),
+            self::FARM_METRICS_TTL,
+            fn () => $this->computeFarmMetrics($user->farm_id),
+        );
 
-        $secagensMes = Secagem::where('farm_id', $user->farm_id)
-            ->where('data', '>=', $startMonth->toDateString())
-            ->count();
-        $secagensConcluidasMes = Secagem::where('farm_id', $user->farm_id)
-            ->where('status', Secagem::STATUS_CONCLUIDA)
-            ->where('data', '>=', $startMonth->toDateString())
-            ->count();
-
-        $despesasMes = (float) Expense::where('farm_id', $user->farm_id)
-            ->whereDate('data', '>=', $startMonth->toDateString())
-            ->sum('valor_total');
-
-        $kgSecadosMes = (float) Movement::where('farm_id', $user->farm_id)
-            ->where('tipo', Movement::TIPO_SECAGEM)
-            ->where('occurred_at', '>=', $startMonth)
-            ->sum('quantidade_kg'); // negativo
-
+        // Listas limitadas (limit 5-8 com índice em farm_id+ordem) são rápidas, fora do cache
+        // pra refletir mudanças imediatas que o usuário acabou de fazer.
         $ultimasMovs = Movement::where('farm_id', $user->farm_id)
             ->with('customer:id,nome', 'user:id,name')
             ->orderByDesc('occurred_at')
@@ -64,16 +60,49 @@ class DashboardController extends Controller
         return [
             'farm' => $farm,
             'user' => $user,
-            'metrics' => [
-                'clientes' => $totalClientes,
-                'saldoCafeKg' => $saldoTotal,
-                'secagensMes' => $secagensMes,
-                'secagensConcluidasMes' => $secagensConcluidasMes,
-                'despesasMes' => $despesasMes,
-                'kgSecadosMes' => abs($kgSecadosMes),
-            ],
+            'metrics' => $metrics,
             'ultimasMovs' => $ultimasMovs,
             'topClientes' => $topClientes,
+        ];
+    }
+
+    private function computeFarmMetrics(int $farmId): array
+    {
+        $startMonth = now()->startOfMonth();
+        $startMonthDate = $startMonth->toDateString();
+
+        $custAgg = DB::table('customers')
+            ->where('farm_id', $farmId)
+            ->selectRaw('COUNT(*) as total, COALESCE(SUM(saldo_cafe_kg), 0) as saldo_total')
+            ->first();
+
+        $secAgg = DB::table('secagens')
+            ->where('farm_id', $farmId)
+            ->where('data', '>=', $startMonthDate)
+            ->selectRaw(
+                'COUNT(*) as total, COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as concluidas',
+                [Secagem::STATUS_CONCLUIDA]
+            )
+            ->first();
+
+        $despesasMes = (float) DB::table('expenses')
+            ->where('farm_id', $farmId)
+            ->whereDate('data', '>=', $startMonthDate)
+            ->sum('valor_total');
+
+        $kgSecadosMes = (float) DB::table('movements')
+            ->where('farm_id', $farmId)
+            ->where('tipo', Movement::TIPO_SECAGEM)
+            ->where('occurred_at', '>=', $startMonth)
+            ->sum('quantidade_kg');
+
+        return [
+            'clientes' => (int) $custAgg->total,
+            'saldoCafeKg' => (float) $custAgg->saldo_total,
+            'secagensMes' => (int) $secAgg->total,
+            'secagensConcluidasMes' => (int) $secAgg->concluidas,
+            'despesasMes' => $despesasMes,
+            'kgSecadosMes' => abs($kgSecadosMes),
         ];
     }
 
