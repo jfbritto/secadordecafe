@@ -38,6 +38,14 @@
         ::-webkit-scrollbar-track { background: #fdfbf4; }
         ::-webkit-scrollbar-thumb { background: #b3c49d; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #2d8a4a; }
+
+        /* Sidebar: estado inicial controlado por CSS pra não piscar no carregamento.
+           A transição só liga depois que o Alpine assume (.is-ready), evitando o
+           flash de "aparece e esconde" toda vez que muda de página no celular. */
+        .sidebar-shell { transform: translateX(-100%); }
+        @media (min-width: 1024px) { .sidebar-shell { transform: translateX(0); } }
+        .sidebar-shell.is-open { transform: translateX(0); }
+        .sidebar-shell.is-ready { transition: transform 300ms ease; }
     </style>
 </head>
 <body class="bg-leaf-50 text-leaf-900">
@@ -67,8 +75,9 @@
          class="fixed inset-0 bg-black/50 z-40 lg:hidden"></div>
 
     {{-- Sidebar --}}
-    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-           class="fixed inset-y-0 left-0 lg:static z-50 w-64 flex-shrink-0 bg-leaf-700 text-white flex flex-col transition-transform duration-300">
+    <aside x-init="$nextTick(() => $el.classList.add('is-ready'))"
+           :class="{ 'is-open': sidebarOpen }"
+           class="sidebar-shell fixed inset-y-0 left-0 lg:static z-50 w-64 flex-shrink-0 bg-leaf-700 text-white flex flex-col">
 
         {{-- Header sidebar --}}
         <div class="px-5 pt-5 pb-4 border-b border-white/10 relative">
