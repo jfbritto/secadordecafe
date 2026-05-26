@@ -30,3 +30,18 @@ function makeFarmUser(string $role = 'admin', array $userAttrs = [], array $farm
 
     return $user->fresh('roles', 'farm');
 }
+
+/**
+ * Atalho de teste: pré-popula o saldo de côco/seco da Farm (estoque próprio).
+ * Replaceia o antigo `Area::factory()->create(['saldo_coco_kg' => N])` que
+ * já não existe — agora o estoque é unificado na Farm.
+ */
+function popularEstoqueFazenda(Farm|User $target, float $coco = 0, float $seco = 0): Farm
+{
+    $farm = $target instanceof User ? $target->farm : $target;
+    $farm->update([
+        'saldo_coco_kg' => $farm->saldo_coco_kg + $coco,
+        'saldo_seco_kg' => $farm->saldo_seco_kg + $seco,
+    ]);
+    return $farm->fresh();
+}

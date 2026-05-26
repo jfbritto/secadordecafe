@@ -116,13 +116,13 @@ it('extrato calcula saldo após cada movimentação (running balance)', function
     expect((float) $c->fresh()->saldo_coco_kg)->toBe(130.0);
 });
 
-it('extrato da fazenda abre sem id e mostra saldo de comissão', function () {
+it('extrato da fazenda abre sem id e mostra estoque próprio', function () {
     $admin = makeFarmUser('admin');
 
     $this->actingAs($admin)
         ->get('/movimentacoes/fazenda')
         ->assertOk()
-        ->assertSee('Comissão');
+        ->assertSee('Estoque seco');
 });
 
 it('extrato mostra link clicável pra Secagem como origem', function () {

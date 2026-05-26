@@ -84,8 +84,9 @@ it('operador cria e edita mas não exclui', function () {
 
 it('não permite excluir área com items de secagem vinculados', function () {
     $admin = makeFarmUser('admin');
-    $a = Area::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
+    $a = Area::factory()->forFarm($admin->farm)->create();
     $d = Dryer::factory()->forFarm($admin->farm)->create();
+    popularEstoqueFazenda($admin, coco: 500);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-21', 'dryer_id' => $d->id]);
     $s = Secagem::first();
@@ -109,12 +110,16 @@ it('lista áreas por tenant', function () {
     $this->actingAs($a)->get('/areas')->assertSee('AREA-DA-A')->assertDontSee('AREA-DA-B');
 });
 
-it('show da área expõe stats agregadas no período padrão (este ano)', function () {
+it('show da área expõe produção histórica no período padrão (este ano)', function () {
     $admin = makeFarmUser('admin');
-    $area = Area::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
+    $area = Area::factory()->forFarm($admin->farm)->create();
     $d = Dryer::factory()->forFarm($admin->farm)->create();
 
-    // Cria 1 secagem com item de área (sem cliente)
+    // Colheita primeiro pra ter saldo de côco na fazenda + rastreabilidade na área
+    $this->actingAs($admin)->post('/colheitas', [
+        'area_id' => $area->id, 'quantidade_kg' => 500,
+    ]);
+
     $this->actingAs($admin)->post('/secagens', [
         'data' => now()->format('Y-m-d'), 'dryer_id' => $d->id,
     ]);
@@ -133,8 +138,10 @@ it('show da área expõe stats agregadas no período padrão (este ano)', functi
     $stats = $resp->viewData('stats');
 
     expect($stats['qtd_secagens'])->toBe(1);
-    expect($stats['total_recebido'])->toBe(500.0);
-    expect($stats['total_seco'])->toBe(300.0);
+    expect($stats['colheita_coco'])->toBe(500.0);
+    expect($stats['secado_coco'])->toBe(500.0);
+    expect($stats['producao_seco'])->toBe(300.0);
+    expect((float) $stats['a_secar_coco'])->toBe(0.0);
     expect($stats['periodo_label'])->toBe('Este ano');
 });
 

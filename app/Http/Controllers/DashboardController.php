@@ -81,16 +81,9 @@ class DashboardController extends Controller
             ')
             ->first();
 
-        $areaAgg = DB::table('areas')
-            ->where('farm_id', $farmId)
-            ->selectRaw('
-                COALESCE(SUM(saldo_coco_kg), 0) as saldo_coco,
-                COALESCE(SUM(saldo_seco_kg), 0) as saldo_seco
-            ')
-            ->first();
-
         $farmRow = DB::table('farms')->where('id', $farmId)->first();
-        $saldoComissao = (float) ($farmRow->saldo_seco_comissao_kg ?? 0);
+        $saldoFazendaCoco = (float) ($farmRow->saldo_coco_kg ?? 0);
+        $saldoFazendaSeco = (float) ($farmRow->saldo_seco_kg ?? 0);
 
         $secAgg = DB::table('secagens')
             ->where('farm_id', $farmId)
@@ -117,9 +110,8 @@ class DashboardController extends Controller
             'clientes' => (int) $custAgg->total,
             'saldoCocoClientesKg' => (float) $custAgg->saldo_coco,
             'saldoSecoClientesKg' => (float) $custAgg->saldo_seco,
-            'saldoCocoAreasKg' => (float) $areaAgg->saldo_coco,
-            'saldoSecoAreasKg' => (float) $areaAgg->saldo_seco,
-            'saldoSecoComissaoKg' => $saldoComissao,
+            'saldoCocoFazendaKg' => $saldoFazendaCoco,
+            'saldoSecoFazendaKg' => $saldoFazendaSeco,
             'secagensMes' => (int) $secAgg->total,
             'secagensConcluidasMes' => (int) $secAgg->concluidas,
             'despesasMes' => $despesasMes,

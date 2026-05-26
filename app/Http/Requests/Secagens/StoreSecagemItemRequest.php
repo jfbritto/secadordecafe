@@ -69,10 +69,18 @@ class StoreSecagemItemRequest extends FormRequest
             }
 
             $recebida = (float) $this->input('quantidade_recebida_kg');
-            $saldo = (float) $origin->saldo_coco_kg;
+
+            // Cliente tem saldo próprio; Area aponta pro estoque da Farm.
+            if ($origin instanceof Customer) {
+                $saldo = (float) $origin->saldo_coco_kg;
+                $label = $origin->nome;
+            } else {
+                $farm = \App\Models\Farm::query()->whereKey($this->user()->farm_id)->first();
+                $saldo = (float) ($farm->saldo_coco_kg ?? 0);
+                $label = "estoque próprio (área {$origin->nome})";
+            }
 
             if ($recebida > $saldo) {
-                $label = $origin->nome;
                 $v->errors()->add(
                     'quantidade_recebida_kg',
                     "Saldo de côco insuficiente. {$label} tem apenas " . number_format($saldo, 2, ',', '.') . ' kg disponível.'

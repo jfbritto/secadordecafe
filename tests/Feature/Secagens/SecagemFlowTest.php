@@ -101,9 +101,9 @@ it('conclude secagem debita côco e credita seco (cliente + comissão na fazenda
     // Seco creditado (líquido)
     expect((float) $c1->fresh()->saldo_seco_kg)->toBe(342.0);
     expect((float) $c2->fresh()->saldo_seco_kg)->toBe(104.5);
-    // Comissão acumulada na Farm
+    // Comissão acumulada no estoque da Farm (côco zero, seco = 23.5)
     $farm = Farm::find($admin->farm_id);
-    expect((float) $farm->saldo_seco_comissao_kg)->toBe(23.5);
+    expect((float) $farm->saldo_seco_kg)->toBe(23.5);
 
     expect(Movement::where('tipo', 'secagem')->count())->toBe(2);
     expect(Movement::where('tipo', 'producao')->count())->toBe(2);
@@ -335,22 +335,29 @@ it('secagem mista: cliente + área no mesmo ciclo', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);
     $cliente = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
-    $area = Area::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 300]);
+    $area = Area::factory()->forFarm($admin->farm)->create();
+    popularEstoqueFazenda($admin, coco: 300); // estoque próprio pra área usar
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
     $s = Secagem::first();
 
-    addItemComOutput($this, $admin, $s, $cliente, 500, 120, 10);
-    addItemComOutput($this, $admin, $s, $area, 300, 72, 0); // áreas não têm comissão
+    addItemComOutput($this, $admin, $s, $cliente, 500, 120, 10); // comissão = 12
+    addItemComOutput($this, $admin, $s, $area, 300, 72, 0);      // áreas não têm comissão
 
     $this->actingAs($admin)
         ->post("/secagens/{$s->id}/concluir")
         ->assertRedirect();
 
+    // Cliente: côco zerou, recebeu seco líquido
     expect((float) $cliente->fresh()->saldo_coco_kg)->toBe(0.0);
     expect((float) $cliente->fresh()->saldo_seco_kg)->toBe(108.0); // 120 - 12 comissão
-    expect((float) $area->fresh()->saldo_coco_kg)->toBe(0.0);
-    expect((float) $area->fresh()->saldo_seco_kg)->toBe(72.0); // integral
+
+    // Farm: côco debitado da área (300→0), recebeu seco da própria (72) + comissão (12)
     $farm = Farm::find($admin->farm_id);
-    expect((float) $farm->saldo_seco_comissao_kg)->toBe(12.0); // só do cliente
+    expect((float) $farm->saldo_coco_kg)->toBe(0.0);
+    expect((float) $farm->saldo_seco_kg)->toBe(84.0); // 72 produção + 12 comissão
+
+    // Os movements da área têm area_id preenchido pra rastreabilidade
+    $movsDaArea = \App\Models\Movement::where('area_id', $area->id)->get();
+    expect($movsDaArea->count())->toBe(2); // secagem (-coco) + producao (+seco)
 });

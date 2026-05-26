@@ -29,17 +29,27 @@
     </div>
 </div>
 
-{{-- Saldos por produto --}}
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-    <div class="bg-gradient-to-br from-amber-600 to-amber-700 text-white rounded-xl shadow-lg p-5">
-        <p class="text-xs uppercase tracking-wider text-amber-100 font-semibold">Saldo de côco</p>
-        <p class="text-3xl font-bold mt-1">{{ number_format($area->saldo_coco_kg, 2, ',', '.') }} <span class="text-base font-normal text-amber-100">kg</span></p>
-        <p class="text-xs text-amber-100 mt-0.5">{{ \App\Support\Sacos::formatSacos($area->saldo_coco_kg) }}</p>
+{{-- Produção histórica (o estoque em si é da Farm) --}}
+<div class="mb-2 text-xs text-leaf-500 italic">Produção desta área no período. O estoque em si fica na <a href="{{ route('movimentacoes.fazenda.index') }}" class="text-leaf-700 font-semibold hover:underline">fazenda</a>.</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+    <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+        <p class="text-[10px] uppercase tracking-wider text-amber-700 font-semibold">Colheita</p>
+        <p class="text-xl font-bold text-amber-800 mt-1">{{ number_format($stats['colheita_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-amber-600">kg côco</span></p>
+        <p class="text-[10px] text-amber-600 mt-0.5">{{ \App\Support\Sacos::formatSacos($stats['colheita_coco']) }}</p>
     </div>
-    <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-xl shadow-lg p-5">
-        <p class="text-xs uppercase tracking-wider text-emerald-100 font-semibold">Saldo de seco</p>
-        <p class="text-3xl font-bold mt-1">{{ number_format($area->saldo_seco_kg, 2, ',', '.') }} <span class="text-base font-normal text-emerald-100">kg</span></p>
-        <p class="text-xs text-emerald-100 mt-0.5">{{ \App\Support\Sacos::formatSacos($area->saldo_seco_kg) }}</p>
+    <div class="bg-orange-50 border border-orange-100 rounded-xl p-4">
+        <p class="text-[10px] uppercase tracking-wider text-orange-700 font-semibold">Foi pro secador</p>
+        <p class="text-xl font-bold text-orange-800 mt-1">{{ number_format($stats['secado_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-orange-600">kg côco</span></p>
+    </div>
+    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+        <p class="text-[10px] uppercase tracking-wider text-emerald-700 font-semibold">Saiu do secador</p>
+        <p class="text-xl font-bold text-emerald-800 mt-1">{{ number_format($stats['producao_seco'], 2, ',', '.') }} <span class="text-xs font-normal text-emerald-600">kg seco</span></p>
+        <p class="text-[10px] text-emerald-600 mt-0.5">{{ \App\Support\Sacos::formatSacos($stats['producao_seco']) }}</p>
+    </div>
+    <div class="bg-leaf-50 border border-leaf-100 rounded-xl p-4">
+        <p class="text-[10px] uppercase tracking-wider text-leaf-700 font-semibold">A secar</p>
+        <p class="text-xl font-bold text-leaf-800 mt-1">{{ number_format($stats['a_secar_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-leaf-600">kg côco</span></p>
+        <p class="text-[10px] text-leaf-600 mt-0.5">colhido ainda não secado</p>
     </div>
 </div>
 
@@ -73,28 +83,10 @@
     </form>
 </div>
 
-{{-- Stats agregadas --}}
-<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Secagens</p>
-        <p class="text-2xl font-bold text-leaf-900 mt-2">{{ $stats['qtd_secagens'] }}</p>
-        <p class="text-xs text-leaf-500 mt-0.5">{{ $stats['qtd_secagens'] === 1 ? 'concluída' : 'concluídas' }} no período</p>
-    </div>
-    <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total recebido</p>
-        <p class="text-2xl font-bold text-leaf-700 mt-2">{{ number_format($stats['total_recebido'], 2, ',', '.') }}</p>
-        <p class="text-xs text-leaf-500 mt-0.5">kg que entraram na secagem</p>
-    </div>
-    <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Total seco</p>
-        <p class="text-2xl font-bold text-emerald-700 mt-2">{{ number_format($stats['total_seco'], 2, ',', '.') }}</p>
-        <p class="text-xs text-leaf-500 mt-0.5">kg de café seco produzidos</p>
-    </div>
-    <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Comissão paga</p>
-        <p class="text-2xl font-bold text-amber-700 mt-2">{{ number_format($stats['total_comissao'], 2, ',', '.') }}</p>
-        <p class="text-xs text-leaf-500 mt-0.5">kg em comissões nas secagens</p>
-    </div>
+{{-- Quantidade de secagens no período --}}
+<div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-4 mb-6 inline-block">
+    <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Secagens da área</p>
+    <p class="text-xl font-bold text-leaf-900 mt-1">{{ $stats['qtd_secagens'] }} <span class="text-xs font-normal text-leaf-500">{{ $stats['qtd_secagens'] === 1 ? 'concluída' : 'concluídas' }} no período</span></p>
 </div>
 
 <div class="grid lg:grid-cols-3 gap-6">

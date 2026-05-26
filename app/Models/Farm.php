@@ -18,21 +18,23 @@ class Farm extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nome', 'status', 'cidade', 'estado', 'telefone', 'saldo_seco_comissao_kg'])
+            ->logOnly(['nome', 'status', 'cidade', 'estado', 'telefone', 'saldo_coco_kg', 'saldo_seco_kg'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $event) => "fazenda {$event}");
     }
 
     /**
-     * Farm só tem estoque de seco (comissões acumuladas do serviço de secagem).
-     * Tentar registrar movement de côco numa Farm é erro de programação.
+     * Farm é o único dono do estoque próprio do produtor (côco + seco).
+     * Inclui produção própria (colheita das áreas) e comissões recebidas
+     * de serviços de secagem pra clientes externos.
      */
     public function saldoColumnFor(string $produto): string
     {
         return match ($produto) {
-            'seco' => 'saldo_seco_comissao_kg',
-            default => throw new DomainException("Farm só tem estoque de seco; produto inválido: {$produto}"),
+            'coco' => 'saldo_coco_kg',
+            'seco' => 'saldo_seco_kg',
+            default => throw new DomainException("Produto inválido para Farm: {$produto}"),
         };
     }
 
@@ -51,12 +53,14 @@ class Farm extends Model
         'cidade',
         'estado',
         'trial_ends_at',
-        'saldo_seco_comissao_kg',
+        'saldo_coco_kg',
+        'saldo_seco_kg',
     ];
 
     protected $casts = [
         'trial_ends_at' => 'datetime',
-        'saldo_seco_comissao_kg' => 'decimal:2',
+        'saldo_coco_kg' => 'decimal:2',
+        'saldo_seco_kg' => 'decimal:2',
     ];
 
     public function users(): HasMany

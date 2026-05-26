@@ -20,7 +20,7 @@ class Movement extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['tipo', 'produto', 'quantidade_kg', 'owner_type', 'owner_id', 'observacao', 'source_type', 'source_id', 'occurred_at'])
+            ->logOnly(['tipo', 'produto', 'quantidade_kg', 'owner_type', 'owner_id', 'area_id', 'observacao', 'source_type', 'source_id', 'occurred_at'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $event) => "movimentacao {$event}");
@@ -38,7 +38,7 @@ class Movement extends Model
     public const PRODUTO_SECO = 'seco';
 
     protected $fillable = [
-        'farm_id', 'owner_type', 'owner_id', 'user_id',
+        'farm_id', 'owner_type', 'owner_id', 'area_id', 'user_id',
         'tipo', 'produto', 'quantidade_kg', 'observacao',
         'source_type', 'source_id', 'occurred_at',
     ];
@@ -56,6 +56,11 @@ class Movement extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class);
     }
 
     public function source(): MorphTo

@@ -34,11 +34,13 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
     @php
+        $totalCoco = $metrics['saldoCocoClientesKg'] + $metrics['saldoCocoFazendaKg'];
+        $totalSeco = $metrics['saldoSecoClientesKg'] + $metrics['saldoSecoFazendaKg'];
         $metricCards = [
             ['label'=>'Clientes', 'value'=>number_format($metrics['clientes'], 0, ',', '.'), 'icon'=>'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'tone'=>'coffee'],
-            ['label'=>'Côco em estoque', 'value'=>number_format($metrics['saldoCocoClientesKg'] + $metrics['saldoCocoAreasKg'], 2, ',', '.').' kg', 'icon'=>'M12 2C8 6 5 10 5 14a7 7 0 0014 0c0-4-3-8-7-12z', 'tone'=>'amber'],
-            ['label'=>'Seco em estoque', 'value'=>number_format($metrics['saldoSecoClientesKg'] + $metrics['saldoSecoAreasKg'] + $metrics['saldoSecoComissaoKg'], 2, ',', '.').' kg', 'icon'=>'M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z', 'tone'=>'emerald'],
-            ['label'=>'Comissão acumulada', 'value'=>number_format($metrics['saldoSecoComissaoKg'], 2, ',', '.').' kg', 'icon'=>'M5 13l4 4L19 7', 'tone'=>'sky'],
+            ['label'=>'Côco em estoque (total)', 'value'=>number_format($totalCoco, 2, ',', '.').' kg', 'icon'=>'M12 2C8 6 5 10 5 14a7 7 0 0014 0c0-4-3-8-7-12z', 'tone'=>'amber'],
+            ['label'=>'Seco em estoque (total)', 'value'=>number_format($totalSeco, 2, ',', '.').' kg', 'icon'=>'M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z', 'tone'=>'emerald'],
+            ['label'=>'Estoque próprio (seco)', 'value'=>number_format($metrics['saldoSecoFazendaKg'], 2, ',', '.').' kg', 'icon'=>'M5 13l4 4L19 7', 'tone'=>'sky'],
             ['label'=>'Despesas do mês', 'value'=>'R$ '.number_format($metrics['despesasMes'], 2, ',', '.'), 'icon'=>'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'tone'=>'rose'],
         ];
         $tones = [

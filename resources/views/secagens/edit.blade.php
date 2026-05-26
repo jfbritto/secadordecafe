@@ -101,7 +101,7 @@
                             class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
                         <option value="">Selecione</option>
                         @foreach($areas as $a)
-                            <option value="{{ $a->id }}">{{ $a->nome }} ({{ number_format($a->saldo_coco_kg, 2, ',', '.') }} kg côco)</option>
+                            <option value="{{ $a->id }}">{{ $a->nome }}</option>
                         @endforeach
                     </select>
                     <p class="mt-2 text-xs text-leaf-500">Sem saldo de côco? Registre uma <a href="{{ route('colheitas.create') }}" class="text-leaf-700 font-semibold hover:underline">colheita</a> primeiro.</p>

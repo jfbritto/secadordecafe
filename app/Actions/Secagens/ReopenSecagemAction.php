@@ -63,6 +63,7 @@ class ReopenSecagemAction
                     direcao: $direcao,
                     occurredAt: $occurredAt,
                     source: $secagem,
+                    areaId: $m->area_id,
                 );
             }
 

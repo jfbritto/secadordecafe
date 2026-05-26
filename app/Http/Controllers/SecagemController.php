@@ -75,7 +75,7 @@ class SecagemController extends Controller
         if ($secagem->dryer && ! $secagem->dryer->ativo) {
             $dryers->push($secagem->dryer->only(['id', 'nome']));
         }
-        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome', 'saldo_coco_kg', 'saldo_seco_kg']);
+        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome']);
 
         return view('secagens.edit', compact('secagem', 'customers', 'dryers', 'areas'));
     }

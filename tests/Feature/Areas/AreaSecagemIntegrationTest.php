@@ -9,7 +9,8 @@ use App\Models\SecagemItem;
 it('adiciona item de área à secagem (em vez de marcar área na secagem inteira)', function () {
     $admin = makeFarmUser('admin');
     $d = Dryer::factory()->forFarm($admin->farm)->create();
-    $area = Area::factory()->forFarm($admin->farm)->create(['nome' => 'Talhão Sul', 'saldo_coco_kg' => 500]);
+    $area = Area::factory()->forFarm($admin->farm)->create(['nome' => 'Talhão Sul']);
+    popularEstoqueFazenda($admin, coco: 500);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-21', 'dryer_id' => $d->id])->assertRedirect();
     $s = Secagem::first();
@@ -30,7 +31,7 @@ it('rejeita area_id de outra fazenda', function () {
     $a = makeFarmUser('admin');
     $b = makeFarmUser('admin');
     $d = Dryer::factory()->forFarm($a->farm)->create();
-    $areaB = Area::factory()->forFarm($b->farm)->create(['saldo_coco_kg' => 500]);
+    $areaB = Area::factory()->forFarm($b->farm)->create([]);
 
     $this->actingAs($a)->post('/secagens', ['data' => '2026-05-21', 'dryer_id' => $d->id]);
     $s = Secagem::first();
@@ -47,7 +48,7 @@ it('rejeita area_id de outra fazenda', function () {
 it('rejeita item de área sem saldo de côco suficiente', function () {
     $admin = makeFarmUser('admin');
     $d = Dryer::factory()->forFarm($admin->farm)->create();
-    $area = Area::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 50]);
+    $area = Area::factory()->forFarm($admin->farm)->create([]);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-21', 'dryer_id' => $d->id]);
     $s = Secagem::first();
@@ -73,7 +74,8 @@ it('admin de outra farm não acessa área alheia', function () {
 it('secagem show exibe nome da área no item', function () {
     $admin = makeFarmUser('admin');
     $d = Dryer::factory()->forFarm($admin->farm)->create();
-    $area = Area::factory()->forFarm($admin->farm)->create(['nome' => 'Cafezal do Morro', 'saldo_coco_kg' => 500]);
+    $area = Area::factory()->forFarm($admin->farm)->create(['nome' => 'Cafezal do Morro']);
+    popularEstoqueFazenda($admin, coco: 500);
 
     $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-21', 'dryer_id' => $d->id]);
     $s = Secagem::first();
@@ -87,9 +89,9 @@ it('secagem show exibe nome da área no item', function () {
         ->assertSee('Cafezal do Morro');
 });
 
-it('colheita aumenta saldo de côco da área', function () {
+it('colheita aumenta o estoque de côco da fazenda e rastreia a área', function () {
     $admin = makeFarmUser('admin');
-    $area = Area::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 0]);
+    $area = Area::factory()->forFarm($admin->farm)->create();
 
     $this->actingAs($admin)
         ->post('/colheitas', [
@@ -99,5 +101,11 @@ it('colheita aumenta saldo de côco da área', function () {
         ])
         ->assertRedirect(route('areas.show', $area));
 
-    expect((float) $area->fresh()->saldo_coco_kg)->toBe(800.0);
+    // Estoque vai pra Farm (unificado); a Area só rotula via movement.area_id
+    expect((float) $admin->farm->fresh()->saldo_coco_kg)->toBe(800.0);
+
+    $mov = \App\Models\Movement::where('tipo', 'colheita')->first();
+    expect($mov)->not->toBeNull();
+    expect($mov->area_id)->toBe($area->id);
+    expect((float) $mov->quantidade_kg)->toBe(800.0);
 });

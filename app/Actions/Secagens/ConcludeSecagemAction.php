@@ -58,9 +58,13 @@ class ConcludeSecagemAction
                     throw new DomainException('Item sem origem definida.');
                 }
 
+                // Pra item de Area, o owner do movement é a Farm (estoque próprio
+                // do produtor é unificado); a Area entra só como rótulo via area_id.
+                [$owner, $areaId] = $item->isArea() ? [$farm, $origin->id] : [$origin, null];
+
                 // 1. Debita o côco do owner
                 $this->registerMovement->execute(
-                    owner: $origin,
+                    owner: $owner,
                     user: $user,
                     tipo: Movement::TIPO_SECAGEM,
                     produto: Movement::PRODUTO_COCO,
@@ -68,6 +72,7 @@ class ConcludeSecagemAction
                     observacao: "Secagem #{$secagem->numero}",
                     occurredAt: $occurredAt,
                     source: $secagem,
+                    areaId: $areaId,
                 );
 
                 // Calcula comissão (sempre 0 se origem=Area)
@@ -76,10 +81,10 @@ class ConcludeSecagemAction
                 $comissaoKg = SecagemItem::calcularComissao($seca, $percentual);
                 $liquido = SecagemItem::calcularSaldoLiquido($seca, $comissaoKg);
 
-                // 2. Credita seco no próprio owner (líquido)
+                // 2. Credita seco no owner (líquido)
                 if ($liquido > 0) {
                     $this->registerMovement->execute(
-                        owner: $origin,
+                        owner: $owner,
                         user: $user,
                         tipo: Movement::TIPO_PRODUCAO,
                         produto: Movement::PRODUTO_SECO,
@@ -87,6 +92,7 @@ class ConcludeSecagemAction
                         observacao: "Produção secagem #{$secagem->numero}",
                         occurredAt: $occurredAt,
                         source: $secagem,
+                        areaId: $areaId,
                     );
                 }
 

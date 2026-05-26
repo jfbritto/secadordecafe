@@ -45,12 +45,33 @@ class AreaController extends Controller
         $this->ensureSameFarm($area);
         $this->authorize('view', $area);
 
-        // Filtro de período: default = "este ano"
         $periodo = $request->string('periodo', 'ano')->toString();
         [$de, $ate, $periodoLabel] = $this->resolvePeriod($periodo, $request);
 
-        // Items desta área dentro do período (via secagens concluídas)
-        $itemsQuery = SecagemItem::query()
+        // Histórico de produção da área = movements.area_id filtrados
+        // (colheita, secagem do côco, produção do seco). O estoque em si é da Farm.
+        $movQuery = \App\Models\Movement::query()
+            ->where('area_id', $area->id)
+            ->where('farm_id', $area->farm_id);
+        if ($de) $movQuery->where('occurred_at', '>=', $de);
+        if ($ate) $movQuery->where('occurred_at', '<=', $ate . ' 23:59:59');
+
+        $totalColheitaCoco = (float) (clone $movQuery)
+            ->where('tipo', \App\Models\Movement::TIPO_COLHEITA)
+            ->where('produto', 'coco')
+            ->sum('quantidade_kg');
+
+        $totalSecagemCoco = abs((float) (clone $movQuery)
+            ->where('tipo', \App\Models\Movement::TIPO_SECAGEM)
+            ->where('produto', 'coco')
+            ->sum('quantidade_kg'));
+
+        $totalProducaoSeco = (float) (clone $movQuery)
+            ->where('tipo', \App\Models\Movement::TIPO_PRODUCAO)
+            ->where('produto', 'seco')
+            ->sum('quantidade_kg');
+
+        $itensSecagem = SecagemItem::query()
             ->where('origin_type', Area::class)
             ->where('origin_id', $area->id)
             ->whereHas('secagem', function ($q) use ($de, $ate) {
@@ -59,27 +80,19 @@ class AreaController extends Controller
                 if ($ate) $q->whereDate('data', '<=', $ate);
             });
 
-        $itemStats = (clone $itemsQuery)->selectRaw('
-            COALESCE(SUM(quantidade_recebida_kg), 0) as total_recebido,
-            COALESCE(SUM(quantidade_seca_kg), 0) as total_seco,
-            COALESCE(SUM(comissao_kg), 0) as total_comissao,
-            COALESCE(SUM(saldo_liquido_kg), 0) as total_liquido,
-            COUNT(*) as total_itens,
-            COUNT(DISTINCT secagem_id) as total_secagens
-        ')->first();
+        $qtdSecagens = (int) (clone $itensSecagem)->distinct('secagem_id')->count('secagem_id');
 
         $stats = [
-            'qtd_secagens' => (int) ($itemStats->total_secagens ?? 0),
-            'total_recebido' => (float) ($itemStats->total_recebido ?? 0),
-            'total_seco' => (float) ($itemStats->total_seco ?? 0),
-            'total_comissao' => (float) ($itemStats->total_comissao ?? 0),
-            'total_liquido' => (float) ($itemStats->total_liquido ?? 0),
-            'total_itens' => (int) ($itemStats->total_itens ?? 0),
+            'qtd_secagens' => $qtdSecagens,
+            'colheita_coco' => $totalColheitaCoco,
+            'secado_coco' => $totalSecagemCoco,
+            'producao_seco' => $totalProducaoSeco,
+            'a_secar_coco' => max(0, $totalColheitaCoco - $totalSecagemCoco),
             'periodo_label' => $periodoLabel,
         ];
 
         $ultimasSecagens = Secagem::query()
-            ->whereIn('id', (clone $itemsQuery)->select('secagem_id'))
+            ->whereIn('id', (clone $itensSecagem)->select('secagem_id'))
             ->with(['dryer', 'items' => fn ($q) => $q->where('origin_type', Area::class)->where('origin_id', $area->id)])
             ->orderByDesc('data')
             ->orderByDesc('id')

@@ -112,7 +112,6 @@ class AuditFormatter
         'ativo' => 'Ativo',
         'saldo_coco_kg' => 'Saldo de côco (kg)',
         'saldo_seco_kg' => 'Saldo de seco (kg)',
-        'saldo_seco_comissao_kg' => 'Saldo de comissão (kg)',
         'observacoes' => 'Observações',
         'observacao' => 'Observação',
         'concluida_at' => 'Concluída em',

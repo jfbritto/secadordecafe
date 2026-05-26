@@ -8,10 +8,14 @@
     $ownerIsArea = $owner instanceof \App\Models\Area;
     $ownerIsFarm = $owner instanceof \App\Models\Farm;
 
-    // Saldos exibidos no card de cabeçalho
-    $saldoCoco = $ownerIsFarm ? null : (float) $owner->saldo_coco_kg;
-    $saldoSeco = $ownerIsFarm ? (float) $owner->saldo_seco_comissao_kg : (float) $owner->saldo_seco_kg;
-    $secaoSecoLabel = $ownerIsFarm ? 'Comissão (seco)' : 'Saldo seco';
+    // Area NÃO tem saldo próprio (estoque é da Farm). A view se comporta como
+    // histórico de produção: lista os movements onde area_id = X, sem card de
+    // saldo, sem form de movimentação manual.
+    $showSaldoCard = ! $ownerIsArea;
+    $showFormNova = ! $ownerIsArea;
+    $saldoCoco = $ownerIsArea ? null : (float) $owner->saldo_coco_kg;
+    $saldoSeco = $ownerIsArea ? null : (float) $owner->saldo_seco_kg;
+    $secaoSecoLabel = $ownerIsFarm ? 'Estoque seco' : 'Saldo seco';
 
     $storeUrl = $ownerIsFarm
         ? route('movimentacoes.fazenda.store')
@@ -37,18 +41,18 @@
             </p>
             <h1 class="text-2xl font-bold text-leaf-900 break-words">Extrato, {{ $ownerLabel }}</h1>
         </div>
-        <div class="flex gap-2 flex-shrink-0">
-            @if($saldoCoco !== null)
+        @if($showSaldoCard)
+            <div class="flex gap-2 flex-shrink-0">
                 <div class="bg-amber-600 text-white px-4 py-3 rounded-xl shadow text-right">
                     <p class="text-[10px] uppercase tracking-wider text-amber-100">Côco</p>
                     <p class="text-xl font-bold">{{ number_format($saldoCoco, 2, ',', '.') }} <span class="text-xs font-normal text-amber-100">kg</span></p>
                 </div>
-            @endif
-            <div class="bg-emerald-600 text-white px-4 py-3 rounded-xl shadow text-right">
-                <p class="text-[10px] uppercase tracking-wider text-emerald-100">{{ $secaoSecoLabel }}</p>
-                <p class="text-xl font-bold">{{ number_format($saldoSeco, 2, ',', '.') }} <span class="text-xs font-normal text-emerald-100">kg</span></p>
+                <div class="bg-emerald-600 text-white px-4 py-3 rounded-xl shadow text-right">
+                    <p class="text-[10px] uppercase tracking-wider text-emerald-100">{{ $secaoSecoLabel }}</p>
+                    <p class="text-xl font-bold">{{ number_format($saldoSeco, 2, ',', '.') }} <span class="text-xs font-normal text-emerald-100">kg</span></p>
+                </div>
             </div>
-        </div>
+        @endif
     </div>
 
     {{-- Filtro por produto --}}
@@ -67,7 +71,8 @@
         </a>
     </div>
 
-    {{-- Form de nova movimentação manual --}}
+    {{-- Form de nova movimentação manual (Area não tem; veja Colheita) --}}
+    @if($showFormNova)
     @can('create', [\App\Models\Movement::class, 'entrada'])
     <div class="bg-white rounded-2xl border border-leaf-100 shadow-sm p-6 mb-6" x-data="{ tipo: 'entrada' }">
         <div class="border-b border-leaf-100 pb-4 mb-5">
@@ -128,6 +133,7 @@
         </form>
     </div>
     @endcan
+    @endif
 
     {{-- Extrato --}}
     <div class="bg-white rounded-2xl border border-leaf-100 shadow-sm overflow-hidden">

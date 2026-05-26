@@ -40,6 +40,7 @@ class RegisterMovementAction
         ?string $direcao = null,
         ?\DateTimeInterface $occurredAt = null,
         ?Model $source = null,
+        ?int $areaId = null,
     ): Movement {
         if ($quantidade <= 0) {
             throw new DomainException('Quantidade deve ser maior que zero.');
@@ -63,7 +64,7 @@ class RegisterMovementAction
             default => throw new DomainException("Tipo inválido: {$tipo}"),
         };
 
-        return DB::transaction(function () use ($owner, $user, $tipo, $produto, $signed, $observacao, $occurredAt, $source) {
+        return DB::transaction(function () use ($owner, $user, $tipo, $produto, $signed, $observacao, $occurredAt, $source, $areaId) {
             // Lock pessimista do owner. Farm não tem global scope; demais tipos usam scope farm,
             // por isso withoutGlobalScopes() pra evitar query duplicada.
             $ownerClass = get_class($owner);
@@ -93,6 +94,7 @@ class RegisterMovementAction
                 'farm_id' => $ownerFarmId,
                 'owner_type' => $locked->getMorphClass(),
                 'owner_id' => $locked->getKey(),
+                'area_id' => $areaId,
                 'user_id' => $user->id,
                 'tipo' => $tipo,
                 'produto' => $produto,

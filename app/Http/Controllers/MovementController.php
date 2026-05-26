@@ -53,8 +53,20 @@ class MovementController extends Controller
 
         $produto = $request->string('produto')->toString() ?: null;
 
-        $query = $owner->movements()
-            ->with(['user', 'source'])
+        // Pra Area: histórico filtrado por movements.area_id (Area não é dona,
+        // a Farm é). Saldo "após cada movimento" não faz sentido pra Area, então
+        // pulamos o running balance.
+        $isAreaHistorico = $owner instanceof Area;
+
+        if ($isAreaHistorico) {
+            $query = Movement::query()
+                ->where('area_id', $owner->id)
+                ->where('farm_id', $owner->farm_id);
+        } else {
+            $query = $owner->movements();
+        }
+
+        $query->with(['user', 'source', 'area'])
             ->latest('occurred_at');
 
         if ($produto) {
@@ -63,7 +75,7 @@ class MovementController extends Controller
 
         $movements = $query->paginate(30)->withQueryString();
 
-        if ($movements->isNotEmpty()) {
+        if (! $isAreaHistorico && $movements->isNotEmpty()) {
             $this->attachRunningBalance($movements, $owner, $produto);
         }
 
@@ -71,6 +83,7 @@ class MovementController extends Controller
             'owner' => $owner,
             'ownerLabel' => $this->ownerLabel($owner),
             'ownerKind' => $tipo,
+            'isAreaHistorico' => $isAreaHistorico,
             'movements' => $movements,
             'produto' => $produto,
         ]);
@@ -78,6 +91,13 @@ class MovementController extends Controller
 
     private function handleStore(StoreMovementRequest $request, RegisterMovementAction $action, string $tipo, ?int $id): RedirectResponse
     {
+        if ($tipo === 'area') {
+            // Area não tem saldo próprio; use Colheita pra entrada e o estoque da
+            // fazenda pra saída/ajuste. Vamos pra fazenda com flash explicativo.
+            return redirect()->route('movimentacoes.fazenda.index')
+                ->with('flash', 'Use o estoque da fazenda pra registrar entradas/saídas. Colheita de área tem tela própria.');
+        }
+
         $owner = $this->resolveOwner($tipo, $id);
         $this->authorizeOwner($owner);
 
