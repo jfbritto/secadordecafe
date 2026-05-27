@@ -76,8 +76,10 @@ class SecagemController extends Controller
             $dryers->push($secagem->dryer->only(['id', 'nome']));
         }
         $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome']);
+        // Estoque de côco da fazenda — é o disponível pra secar café próprio (de qualquer área).
+        $saldoCocoFazenda = (float) \App\Models\Farm::whereKey($secagem->farm_id)->value('saldo_coco_kg');
 
-        return view('secagens.edit', compact('secagem', 'customers', 'dryers', 'areas'));
+        return view('secagens.edit', compact('secagem', 'customers', 'dryers', 'areas', 'saldoCocoFazenda'));
     }
 
     public function update(StoreSecagemRequest $request, Secagem $secagem): RedirectResponse

@@ -115,7 +115,18 @@
                             <option value="{{ $a->id }}">{{ $a->nome }}</option>
                         @endforeach
                     </select>
-                    <p class="mt-2 text-xs text-leaf-500">Sem saldo de café côco? Registre uma <a href="{{ route('colheitas.create') }}" class="text-leaf-700 font-semibold hover:underline">colheita</a> primeiro.</p>
+                    <div class="mt-2 flex items-center justify-between gap-2 px-3 py-2 rounded-lg {{ $saldoCocoFazenda > 0 ? 'bg-amber-50 border border-amber-100' : 'bg-rose-50 border border-rose-100' }}">
+                        <span class="text-xs {{ $saldoCocoFazenda > 0 ? 'text-amber-800' : 'text-rose-700' }}">
+                            Estoque próprio disponível pra secar:
+                            <strong>{{ number_format($saldoCocoFazenda, 2, ',', '.') }} kg café côco</strong>
+                            ({{ \App\Support\Sacos::formatSacos($saldoCocoFazenda) }})
+                        </span>
+                    </div>
+                    @if($saldoCocoFazenda <= 0)
+                        <p class="mt-1.5 text-xs text-leaf-500">Sem café côco em estoque. Registre uma <a href="{{ route('colheitas.create') }}" class="text-leaf-700 font-semibold hover:underline">colheita</a> primeiro.</p>
+                    @else
+                        <p class="mt-1.5 text-[11px] text-leaf-400">O estoque de côco é único da fazenda (some o de todas as áreas). A área escolhida serve pra rastrear de onde veio.</p>
+                    @endif
                 </div>
 
                 @error('origin_id')<p class="text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
