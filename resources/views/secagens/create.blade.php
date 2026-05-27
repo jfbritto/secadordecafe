@@ -62,7 +62,10 @@
 
         <div class="bg-leaf-50/50 border border-leaf-100 rounded-lg p-4 mb-6 text-sm text-leaf-700">
             <strong>Misturando café?</strong> Depois de criar o rascunho, você adiciona cada lote escolhendo a origem:
-            🧑 <strong>cliente externo</strong> ou 🌱 <strong>área da sua roça</strong>. Pode misturar os dois no mesmo ciclo do secador.
+            <span class="inline-flex items-center gap-1"><x-origem-icone tipo="cliente" class="w-4 h-4 text-leaf-500" /><strong>cliente externo</strong></span>
+            ou
+            <span class="inline-flex items-center gap-1"><x-origem-icone tipo="area" class="w-4 h-4 text-leaf-500" /><strong>área da sua roça</strong></span>.
+            Pode misturar os dois no mesmo ciclo do secador.
         </div>
 
         <div class="mb-6">

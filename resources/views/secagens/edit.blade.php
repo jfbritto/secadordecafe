@@ -83,12 +83,14 @@
                         <label class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 cursor-pointer transition"
                                :class="originType === 'cliente' ? 'border-leaf-700 bg-leaf-50 text-leaf-900 font-semibold' : 'border-leaf-200 text-leaf-600'">
                             <input type="radio" name="origin_type" value="cliente" x-model="originType" class="hidden">
-                            <span>🧑 Cliente</span>
+                            <x-origem-icone tipo="cliente" />
+                            <span>Cliente</span>
                         </label>
                         <label class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 cursor-pointer transition"
                                :class="originType === 'area' ? 'border-leaf-700 bg-leaf-50 text-leaf-900 font-semibold' : 'border-leaf-200 text-leaf-600'">
                             <input type="radio" name="origin_type" value="area" x-model="originType" class="hidden">
-                            <span>🌱 Área própria</span>
+                            <x-origem-icone tipo="area" />
+                            <span>Área própria</span>
                         </label>
                     </div>
                 </div>
@@ -147,7 +149,7 @@
                     <div class="flex items-start justify-between gap-3 mb-3">
                         <div>
                             <p class="font-semibold text-leaf-900 flex items-center gap-2">
-                                <span>{{ $item->isArea() ? '🌱' : '🧑' }}</span>
+                                <x-origem-icone :tipo="$item->isArea() ? 'area' : 'cliente'" class="w-4 h-4 text-leaf-500" />
                                 {{ $item->originLabel() }}
                                 @if($item->hasSaida())
                                     <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">SAÍDA REGISTRADA</span>
@@ -252,8 +254,9 @@
                       data-confirm-danger="0"
                       class="w-full sm:w-auto">
                     @csrf
-                    <button class="w-full sm:w-auto px-6 py-3 text-base font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm" {{ ! $secagem->todosItemsTemSaida() ? 'disabled' : '' }}>
-                        ✓ Concluir secagem
+                    <button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm" {{ ! $secagem->todosItemsTemSaida() ? 'disabled' : '' }}>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        Concluir secagem
                     </button>
                 </form>
                 @unless($secagem->todosItemsTemSaida())

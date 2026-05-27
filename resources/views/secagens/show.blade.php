@@ -12,7 +12,7 @@
         <p class="text-sm text-leaf-500 mt-0.5">
             {{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secadorNome() }}
             @foreach($secagem->areasEnvolvidas() as $area)
-                · <a href="{{ route('areas.show', $area) }}" class="text-leaf-700 font-semibold hover:underline">🌱 {{ $area->nome }}</a>
+                · <a href="{{ route('areas.show', $area) }}" class="inline-flex items-center gap-1 text-leaf-700 font-semibold hover:underline"><x-origem-icone tipo="area" class="w-3.5 h-3.5" />{{ $area->nome }}</a>
             @endforeach
             ·
             @if($secagem->isConcluida())
@@ -54,7 +54,7 @@
     <ul class="md:hidden divide-y divide-leaf-100">
         @foreach($secagem->items as $item)
             <li class="px-4 py-4">
-                <p class="font-semibold text-leaf-900 mb-2">{{ ($item->isArea() ? '🌱 ' : '🧑 ') . $item->originLabel() }}</p>
+                <p class="font-semibold text-leaf-900 mb-2 flex items-center gap-1.5"><x-origem-icone :tipo="$item->isArea() ? 'area' : 'cliente'" class="w-4 h-4 text-leaf-500" />{{ $item->originLabel() }}</p>
                 <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
                     <div>
                         <p class="text-[10px] uppercase tracking-wider text-leaf-500">Recebido</p>
@@ -114,7 +114,7 @@
         <tbody class="divide-y divide-leaf-100">
             @foreach($secagem->items as $item)
                 <tr class="hover:bg-leaf-50/30 transition">
-                    <td class="px-4 py-3 text-leaf-900 font-medium">{{ ($item->isArea() ? '🌱 ' : '🧑 ') . $item->originLabel() }}</td>
+                    <td class="px-4 py-3 text-leaf-900 font-medium"><span class="inline-flex items-center gap-1.5"><x-origem-icone :tipo="$item->isArea() ? 'area' : 'cliente'" class="w-4 h-4 text-leaf-500" />{{ $item->originLabel() }}</span></td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }}</td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }}</td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
