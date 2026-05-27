@@ -27,7 +27,7 @@ class SecagemController extends Controller
         $this->authorize('viewAny', Secagem::class);
 
         $secagens = Secagem::query()
-            ->with('user', 'dryer')
+            ->with('user', 'dryer', 'items.origin')
             ->withCount('items')
             ->orderByDesc('data')
             ->orderByDesc('numero')

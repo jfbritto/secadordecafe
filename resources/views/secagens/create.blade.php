@@ -20,6 +20,17 @@
             <p class="text-sm text-leaf-500 mt-0.5">Quando e onde a secagem foi realizada.</p>
         </div>
 
+        <div class="mb-6">
+            <label for="apelido" class="block text-sm font-bold text-leaf-900 mb-2">
+                Apelido <span class="text-leaf-400 font-normal">(opcional)</span>
+            </label>
+            <input id="apelido" type="text" name="apelido" maxlength="80" value="{{ old('apelido') }}"
+                   placeholder="ex: Café do compadre, Mutirão de junho…"
+                   class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+            <p class="mt-1.5 text-sm text-leaf-500">Um nome pra lembrar dessa secagem na lista. Se deixar vazio, mostramos quem participou.</p>
+            @error('apelido')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+        </div>
+
         <div class="grid sm:grid-cols-2 gap-5 mb-6">
             <div>
                 <label for="data" class="block text-sm font-bold text-leaf-900 mb-2">

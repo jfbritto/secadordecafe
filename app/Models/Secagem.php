@@ -21,7 +21,7 @@ class Secagem extends Model
     protected $table = 'secagens';
 
     protected $fillable = [
-        'farm_id', 'user_id', 'dryer_id', 'numero', 'data',
+        'farm_id', 'user_id', 'dryer_id', 'numero', 'apelido', 'data',
         'observacoes', 'status', 'concluida_at',
     ];
 
@@ -33,7 +33,7 @@ class Secagem extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['numero', 'data', 'dryer_id', 'status'])
+            ->logOnly(['numero', 'apelido', 'data', 'dryer_id', 'status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $event) => "secagem {$event}");
@@ -81,5 +81,36 @@ class Secagem extends Model
     public function todosItemsTemSaida(): bool
     {
         return $this->items->isNotEmpty() && $this->items->every(fn ($i) => $i->hasSaida());
+    }
+
+    /**
+     * Resumo dos participantes (clientes + áreas) pra dar contexto na listagem.
+     * Requer items.origin carregado. Ex: "João Almeida, Maria + Área 3".
+     */
+    public function participantesResumo(int $max = 2): ?string
+    {
+        if ($this->items->isEmpty()) {
+            return null;
+        }
+        $nomes = $this->items
+            ->map(fn ($i) => $i->originLabel())
+            ->filter(fn ($n) => $n && $n !== '—')
+            ->unique()
+            ->values();
+        if ($nomes->isEmpty()) {
+            return null;
+        }
+        $mostrados = $nomes->take($max);
+        $resto = $nomes->count() - $mostrados->count();
+        return $mostrados->implode(', ') . ($resto > 0 ? " +{$resto}" : '');
+    }
+
+    /**
+     * Texto de referência da secagem pra UI: apelido manual ou, na falta dele,
+     * o resumo dos participantes. Null quando não há nenhum (rascunho vazio).
+     */
+    public function referencia(): ?string
+    {
+        return $this->apelido ?: $this->participantesResumo();
     }
 }

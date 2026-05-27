@@ -21,6 +21,7 @@ class CreateSecagemAction
                 'user_id' => $user->id,
                 'dryer_id' => $data['dryer_id'],
                 'numero' => $next,
+                'apelido' => $data['apelido'] ?? null,
                 'data' => $data['data'],
                 'observacoes' => $data['observacoes'] ?? null,
                 'status' => Secagem::STATUS_RASCUNHO,

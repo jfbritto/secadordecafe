@@ -53,6 +53,32 @@ it('admin can create secagem (rascunho) with sequential numero', function () {
     expect(Secagem::orderByDesc('id')->first()->numero)->toBe(2);
 });
 
+it('apelido opcional é salvo e vira referência; sem apelido cai pros participantes', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['nome' => 'João Almeida', 'saldo_coco_kg' => 500]);
+
+    // Com apelido
+    $this->actingAs($admin)->post('/secagens', [
+        'data' => '2026-05-06', 'dryer_id' => $d->id, 'apelido' => 'Mutirão de junho',
+    ])->assertRedirect();
+    $s1 = Secagem::orderByDesc('id')->first();
+    expect($s1->apelido)->toBe('Mutirão de junho');
+    expect($s1->referencia())->toBe('Mutirão de junho');
+
+    // Sem apelido: referência vem dos participantes
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
+    $s2 = Secagem::orderByDesc('id')->first();
+    expect($s2->apelido)->toBeNull();
+    $this->actingAs($admin)->post("/secagens/{$s2->id}/items", [
+        'origin_type' => 'cliente', 'origin_id' => $c->id, 'quantidade_recebida_kg' => 100,
+    ]);
+    expect($s2->fresh()->load('items.origin')->referencia())->toBe('João Almeida');
+
+    // Aparece na listagem
+    $this->actingAs($admin)->get('/secagens')->assertOk()->assertSee('Mutirão de junho')->assertSee('João Almeida');
+});
+
 it('numero is per-farm', function () {
     $a = makeFarmUser('admin');
     $b = makeFarmUser('admin');

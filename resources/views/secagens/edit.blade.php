@@ -28,6 +28,15 @@
 
             <div class="space-y-4">
                 <div>
+                    <label for="apelido" class="block text-sm font-bold text-leaf-900 mb-2">
+                        Apelido <span class="text-leaf-400 font-normal">(opcional)</span>
+                    </label>
+                    <input id="apelido" type="text" name="apelido" maxlength="80" value="{{ old('apelido', $secagem->apelido) }}"
+                           placeholder="ex: Café do compadre, Mutirão de junho…"
+                           class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                    @error('apelido')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+                </div>
+                <div>
                     <label for="data" class="block text-sm font-bold text-leaf-900 mb-2">
                         Data <span class="text-rose-500">*</span>
                     </label>

@@ -26,10 +26,13 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <p class="font-bold text-leaf-900">#{{ $s->numero }}</p>
+                            @if($s->referencia())
+                                <p class="font-semibold text-leaf-800 truncate">{{ $s->referencia() }}</p>
+                            @endif
                             @if($s->isConcluida())
-                                <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-100 text-emerald-700">CONCLUÍDA</span>
+                                <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-100 text-emerald-700 flex-shrink-0">CONCLUÍDA</span>
                             @else
-                                <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-100 text-amber-700">RASCUNHO</span>
+                                <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-100 text-amber-700 flex-shrink-0">RASCUNHO</span>
                             @endif
                         </div>
                         <p class="text-sm text-leaf-700 truncate">{{ $s->data->format('d/m/Y') }} · {{ $s->secadorNome() }}</p>
@@ -48,6 +51,7 @@
         <thead class="bg-leaf-50/50 text-leaf-600 text-xs uppercase tracking-wider">
             <tr>
                 <th class="text-left px-6 py-3 font-semibold">#</th>
+                <th class="text-left px-6 py-3 font-semibold">Referência</th>
                 <th class="text-left px-6 py-3 font-semibold">Data</th>
                 <th class="text-left px-6 py-3 font-semibold">Secador</th>
                 <th class="text-right px-6 py-3 font-semibold">Itens</th>
@@ -59,6 +63,7 @@
             @forelse($secagens as $s)
                 <tr class="hover:bg-leaf-50/30 transition">
                     <td class="px-6 py-3 font-bold text-leaf-700"><a href="{{ route('secagens.show', $s) }}" class="hover:underline">#{{ $s->numero }}</a></td>
+                    <td class="px-6 py-3 text-leaf-800 font-medium">{{ $s->referencia() ?? '—' }}</td>
                     <td class="px-6 py-3 text-leaf-700">{{ $s->data->format('d/m/Y') }}</td>
                     <td class="px-6 py-3 text-leaf-700">{{ $s->secadorNome() }}</td>
                     <td class="px-6 py-3 text-right text-leaf-700">{{ $s->items_count }}</td>
@@ -78,7 +83,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="6" class="px-6 py-12 text-center text-leaf-500">Nenhuma secagem registrada.</td></tr>
+                <tr><td colspan="7" class="px-6 py-12 text-center text-leaf-500">Nenhuma secagem registrada.</td></tr>
             @endforelse
         </tbody>
     </table>

@@ -17,6 +17,7 @@ class StoreSecagemRequest extends FormRequest
     {
         return [
             'data' => ['required', 'date'],
+            'apelido' => ['nullable', 'string', 'max:80'],
             'dryer_id' => [
                 'required',
                 Rule::exists('dryers', 'id')

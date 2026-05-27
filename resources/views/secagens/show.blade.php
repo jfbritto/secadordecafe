@@ -6,7 +6,9 @@
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
     <div class="min-w-0">
         <p class="text-xs text-leaf-500 mb-1"><a href="{{ route('secagens.index') }}" class="hover:underline">Secagens</a></p>
-        <h1 class="text-2xl font-bold text-leaf-900">Secagem #{{ $secagem->numero }}</h1>
+        <h1 class="text-2xl font-bold text-leaf-900">
+            Secagem #{{ $secagem->numero }}@if($secagem->apelido) · <span class="text-leaf-700">{{ $secagem->apelido }}</span>@endif
+        </h1>
         <p class="text-sm text-leaf-500 mt-0.5">
             {{ $secagem->data->format('d/m/Y') }} · {{ $secagem->secadorNome() }}
             @foreach($secagem->areasEnvolvidas() as $area)
