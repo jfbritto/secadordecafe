@@ -122,7 +122,7 @@ it('extrato da fazenda abre sem id e mostra estoque próprio', function () {
     $this->actingAs($admin)
         ->get('/movimentacoes/fazenda')
         ->assertOk()
-        ->assertSee('Estoque seco');
+        ->assertSee('Café seco');
 });
 
 it('extrato mostra link clicável pra Secagem como origem', function () {

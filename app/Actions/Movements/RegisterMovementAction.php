@@ -87,7 +87,7 @@ class RegisterMovementAction
 
             $novoSaldo = $locked->incrementSaldo($produto, $signed);
             if ($novoSaldo < 0) {
-                throw new DomainException("Saldo de {$produto} insuficiente para esta operação.");
+                throw new DomainException('Saldo de ' . mb_strtolower(\App\Support\StatusLabels::produto($produto)) . ' insuficiente para esta operação.');
             }
 
             $movement = Movement::create([

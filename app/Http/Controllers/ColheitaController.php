@@ -31,6 +31,6 @@ class ColheitaController extends Controller
         );
 
         return redirect()->route('areas.show', $area)
-            ->with('flash', 'Colheita registrada. Saldo de côco atualizado em <strong>' . e($area->nome) . '</strong>.');
+            ->with('flash', 'Colheita registrada. Saldo de café côco atualizado em <strong>' . e($area->nome) . '</strong>.');
     }
 }

@@ -83,7 +83,7 @@ class StoreSecagemItemRequest extends FormRequest
             if ($recebida > $saldo) {
                 $v->errors()->add(
                     'quantidade_recebida_kg',
-                    "Saldo de côco insuficiente. {$label} tem apenas " . number_format($saldo, 2, ',', '.') . ' kg disponível.'
+                    "Saldo de café côco insuficiente. {$label} tem apenas " . number_format($saldo, 2, ',', '.') . ' kg disponível.'
                 );
             }
         });

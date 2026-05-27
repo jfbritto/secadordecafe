@@ -52,7 +52,7 @@ class CustomerController extends Controller
                 tipo: Movement::TIPO_ENTRADA,
                 produto: Movement::PRODUTO_COCO,
                 quantidade: $saldoInicialCoco,
-                observacao: 'Saldo inicial de côco',
+                observacao: 'Saldo inicial de café côco',
             );
         }
 
@@ -63,7 +63,7 @@ class CustomerController extends Controller
                 tipo: Movement::TIPO_ENTRADA,
                 produto: Movement::PRODUTO_SECO,
                 quantidade: $saldoInicialSeco,
-                observacao: 'Saldo inicial de seco',
+                observacao: 'Saldo inicial de café seco',
             );
         }
 

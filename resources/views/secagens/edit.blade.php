@@ -125,7 +125,7 @@
                     @if($saldoCocoFazenda <= 0)
                         <p class="mt-1.5 text-xs text-leaf-500">Sem café côco em estoque. Registre uma <a href="{{ route('colheitas.create') }}" class="text-leaf-700 font-semibold hover:underline">colheita</a> primeiro.</p>
                     @else
-                        <p class="mt-1.5 text-[11px] text-leaf-400">O estoque de côco é único da fazenda (some o de todas as áreas). A área escolhida serve pra rastrear de onde veio.</p>
+                        <p class="mt-1.5 text-[11px] text-leaf-400">O estoque de café côco é único da fazenda (some o de todas as áreas). A área escolhida serve pra rastrear de onde veio.</p>
                     @endif
                 </div>
 
@@ -188,7 +188,7 @@
                             <div>
                                 <label class="block text-xs font-semibold text-leaf-700 mb-1">Quantidade seca <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
                                 <x-input-quantidade name="quantidade_seca_kg" :required="true" :max="(float) $item->quantidade_recebida_kg" />
-                                <p class="mt-1 text-[11px] text-leaf-400">No máximo {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg (não pode sair mais seco do que entrou de côco).</p>
+                                <p class="mt-1 text-[11px] text-leaf-400">No máximo {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg (não pode sair mais café seco do que entrou de café côco).</p>
                                 @error('quantidade_seca_kg')<p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>@enderror
                             </div>
                             <div class="grid grid-cols-2 gap-3 items-end">

@@ -15,7 +15,7 @@
     $showFormNova = ! $ownerIsArea;
     $saldoCoco = $ownerIsArea ? null : (float) $owner->saldo_coco_kg;
     $saldoSeco = $ownerIsArea ? null : (float) $owner->saldo_seco_kg;
-    $secaoSecoLabel = $ownerIsFarm ? 'Estoque seco' : 'Saldo seco';
+    $secaoSecoLabel = 'Café seco';
 
     $storeUrl = $ownerIsFarm
         ? route('movimentacoes.fazenda.store')

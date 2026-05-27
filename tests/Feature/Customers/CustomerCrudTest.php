@@ -147,7 +147,7 @@ it('cria movement de entrada "Saldo inicial" quando saldo informado > 0', functi
     $m = Movement::where('owner_type', Customer::class)->where('owner_id', $c->id)->first();
     expect($m->tipo)->toBe('entrada');
     expect((float) $m->quantidade_kg)->toBe(100.0);
-    expect($m->observacao)->toBe('Saldo inicial de côco');
+    expect($m->observacao)->toBe('Saldo inicial de café côco');
     expect($m->user_id)->toBe($admin->id);
 });
 

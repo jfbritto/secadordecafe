@@ -62,12 +62,12 @@
         <p class="text-xs text-leaf-500 mt-0.5">kg recebidos do cliente</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Produção de seco</p>
+        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Produção de café seco</p>
         <p class="text-2xl font-bold text-emerald-600 mt-2">{{ number_format($stats['total_producao_seco'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg líquido após secagens</p>
     </div>
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Saídas (seco)</p>
+        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Saídas (café seco)</p>
         <p class="text-2xl font-bold text-rose-600 mt-2">{{ number_format($stats['total_saidas_seco'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg retirados/vendidos</p>
     </div>
