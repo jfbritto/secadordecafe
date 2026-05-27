@@ -25,13 +25,9 @@
         </div>
 
         <div>
-            <label for="quantidade_kg" class="block text-sm font-bold text-leaf-900 mb-2">Quantidade colhida (kg) <span class="text-rose-500">*</span></label>
-            <div class="relative">
-                <input id="quantidade_kg" type="number" step="0.01" min="0.01" inputmode="decimal" name="quantidade_kg" required
-                       placeholder="0,00"
-                       class="w-full pl-4 pr-14 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
-                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">kg</span>
-            </div>
+            <label for="quantidade_kg" class="block text-sm font-bold text-leaf-900 mb-2">Quantidade colhida (café côco) <span class="text-rose-500">*</span></label>
+            <x-input-quantidade name="quantidade_kg" id="quantidade_kg" :required="true" />
+            <p class="mt-1.5 text-sm text-leaf-500">Digite em kg ou em sacos — o outro campo atualiza sozinho (1 sc = 60 kg).</p>
             @error('quantidade_kg')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
         </div>
 
