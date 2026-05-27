@@ -129,6 +129,7 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
         Route::delete('secagens/{secagem}', [SecagemController::class, 'destroy'])->name('secagens.destroy');
         Route::post('secagens/{secagem}/items', [SecagemController::class, 'storeItem'])->name('secagens.items.store');
         Route::patch('secagens/{secagem}/items/{item}/saida', [SecagemController::class, 'registerSaida'])->name('secagens.items.saida');
+        Route::patch('secagens/{secagem}/saidas', [SecagemController::class, 'registrarSaidas'])->name('secagens.saidas');
         Route::delete('secagens/{secagem}/items/{item}', [SecagemController::class, 'destroyItem'])->name('secagens.items.destroy');
         Route::post('secagens/{secagem}/concluir', [SecagemController::class, 'conclude'])->name('secagens.conclude');
         Route::post('secagens/{secagem}/reabrir', [SecagemController::class, 'reopen'])->name('secagens.reopen');

@@ -229,36 +229,29 @@
                     </div>
 
                     @if(! $item->hasSaida())
-                        {{-- Form de registrar saída inline --}}
-                        <form method="POST" action="{{ route('secagens.items.saida', [$secagem, $item]) }}"
-                              class="mt-3 bg-leaf-50/40 p-3 rounded-lg space-y-3"
-                              data-saida-item data-recebido="{{ $item->quantidade_recebida_kg }}">
-                            @csrf @method('PATCH')
+                        {{-- Inputs da saída — enviados juntos pelo form #saidas-form (sem reload entre itens) --}}
+                        <div class="mt-3 bg-leaf-50/40 p-3 rounded-lg space-y-3" data-saida-item data-recebido="{{ $item->quantidade_recebida_kg }}">
                             <div>
                                 <label class="block text-xs font-semibold text-leaf-700 mb-1">Quantidade seca <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
-                                <x-input-quantidade name="quantidade_seca_kg" id="seca-{{ $item->id }}" :required="true" :max="(float) $item->quantidade_recebida_kg" data-qtd-kg="true" />
+                                <x-input-quantidade name="itens[{{ $item->id }}][quantidade_seca_kg]" id="seca-{{ $item->id }}" :max="(float) $item->quantidade_recebida_kg" form="saidas-form" data-qtd-kg="true" />
                                 <p class="mt-1 text-[11px] text-leaf-400">No máximo {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg (não pode sair mais café seco do que entrou de café côco).</p>
-                                @error('quantidade_seca_kg')<p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>@enderror
+                                @error("itens.{$item->id}.quantidade_seca_kg")<p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>@enderror
                             </div>
-                            <div class="grid grid-cols-2 gap-3 items-end">
-                                @if($item->isCustomer())
-                                    <div>
-                                        <label class="block text-xs font-semibold text-leaf-700 mb-1">Comissão</label>
-                                        <div class="relative">
-                                            <input type="number" step="0.01" min="0" max="100" inputmode="decimal" name="comissao_percentual" value="0"
-                                                   placeholder="ex: 10"
-                                                   class="w-full pl-3 pr-8 py-2.5 text-sm rounded-md border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
-                                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500">%</span>
-                                        </div>
+                            @if($item->isCustomer())
+                                <div class="max-w-[220px]">
+                                    <label class="block text-xs font-semibold text-leaf-700 mb-1">Comissão</label>
+                                    <div class="relative">
+                                        <input type="number" step="0.01" min="0" max="100" inputmode="decimal"
+                                               name="itens[{{ $item->id }}][comissao_percentual]" value="0" form="saidas-form"
+                                               placeholder="ex: 10"
+                                               class="w-full pl-3 pr-8 py-2.5 text-sm rounded-md border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
+                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500">%</span>
                                     </div>
-                                @else
-                                    <div class="flex items-center text-xs text-leaf-500">
-                                        Sem comissão (café próprio).
-                                    </div>
-                                @endif
-                                <button class="w-full px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md transition">Registrar saída</button>
-                            </div>
-                        </form>
+                                </div>
+                            @else
+                                <p class="text-xs text-leaf-500">Sem comissão (café próprio).</p>
+                            @endif
+                        </div>
                     @else
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-leaf-700 mt-2">
                             <div><p class="text-[10px] text-leaf-500 uppercase">Seco</p><p class="font-semibold">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }} kg</p></div>
@@ -293,6 +286,20 @@
                 </li>
             @endif
         </ul>
+
+        @if($pendentes->count() > 0)
+            {{-- Form único que registra todas as saídas de uma vez (inputs acima usam form="saidas-form") --}}
+            <div class="px-4 sm:px-6 py-4 border-t border-leaf-100 flex flex-col sm:flex-row sm:items-center gap-3">
+                <form id="saidas-form" method="POST" action="{{ route('secagens.saidas', $secagem) }}" class="contents">
+                    @csrf @method('PATCH')
+                </form>
+                <button type="submit" form="saidas-form" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    Registrar saídas
+                </button>
+                <p class="text-xs text-leaf-500">Preencha a quantidade seca dos itens que saíram e registre tudo de uma vez. Pode registrar só alguns.</p>
+            </div>
+        @endif
     </div>
 
     {{-- Ações finais --}}

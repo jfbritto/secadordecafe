@@ -182,6 +182,65 @@ it('conclude blocks if any owner has insufficient saldo de côco', function () {
     expect($s->fresh()->status)->toBe('rascunho');
 });
 
+it('registra saída de vários itens de uma vez (sem perder nenhum)', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $marcos = Customer::factory()->forFarm($admin->farm)->create(['nome' => 'Marcos', 'saldo_coco_kg' => 70]);
+    $rodrigo = Customer::factory()->forFarm($admin->farm)->create(['nome' => 'Rodrigo', 'saldo_coco_kg' => 200]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", ['origin_type' => 'cliente', 'origin_id' => $marcos->id, 'quantidade_recebida_kg' => 70]);
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", ['origin_type' => 'cliente', 'origin_id' => $rodrigo->id, 'quantidade_recebida_kg' => 200]);
+    $iMarcos = SecagemItem::where('origin_id', $marcos->id)->first();
+    $iRodrigo = SecagemItem::where('origin_id', $rodrigo->id)->first();
+
+    // Registra as duas saídas de uma vez (o que a tela faz com o form único)
+    $this->actingAs($admin)
+        ->patch("/secagens/{$s->id}/saidas", [
+            'itens' => [
+                $iMarcos->id => ['quantidade_seca_kg' => 38.89, 'comissao_percentual' => 5],
+                $iRodrigo->id => ['quantidade_seca_kg' => 111.11, 'comissao_percentual' => 5],
+            ],
+        ])
+        ->assertRedirect(route('secagens.edit', $s));
+
+    // AMBOS ficam com saída registrada — nenhum se perde
+    expect((float) $iMarcos->fresh()->quantidade_seca_kg)->toBe(38.89);
+    expect((float) $iRodrigo->fresh()->quantidade_seca_kg)->toBe(111.11);
+    expect($s->fresh()->todosItemsTemSaida())->toBeTrue();
+});
+
+it('saída em lote: registro parcial (só os preenchidos) e trava de seco > côco', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $a = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 100]);
+    $b = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 100]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", ['origin_type' => 'cliente', 'origin_id' => $a->id, 'quantidade_recebida_kg' => 100]);
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", ['origin_type' => 'cliente', 'origin_id' => $b->id, 'quantidade_recebida_kg' => 100]);
+    $iA = SecagemItem::where('origin_id', $a->id)->first();
+    $iB = SecagemItem::where('origin_id', $b->id)->first();
+
+    // Registra só o A; B fica vazio → registro parcial
+    $this->actingAs($admin)->patch("/secagens/{$s->id}/saidas", [
+        'itens' => [
+            $iA->id => ['quantidade_seca_kg' => 60, 'comissao_percentual' => 0],
+            $iB->id => ['quantidade_seca_kg' => ''],
+        ],
+    ])->assertRedirect();
+    expect($iA->fresh()->hasSaida())->toBeTrue();
+    expect($iB->fresh()->hasSaida())->toBeFalse();
+
+    // Trava: tenta dar saída do B com seco > côco recebido → erro, nada gravado
+    $this->actingAs($admin)->patch("/secagens/{$s->id}/saidas", [
+        'itens' => [$iB->id => ['quantidade_seca_kg' => 150, 'comissao_percentual' => 0]],
+    ])->assertSessionHasErrors("itens.{$iB->id}.quantidade_seca_kg");
+    expect($iB->fresh()->hasSaida())->toBeFalse();
+});
+
 it('trava: saída de seco não pode ser maior que o côco recebido', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);

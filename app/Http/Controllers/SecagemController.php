@@ -18,6 +18,8 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class SecagemController extends Controller
@@ -153,6 +155,76 @@ class SecagemController extends Controller
 
         return redirect()->route('secagens.edit', $secagem)
             ->with('flash', 'Saída registrada. Conclua a secagem quando todos os itens tiverem saída.');
+    }
+
+    /**
+     * Registra a saída de vários itens de uma vez (a secagem sai junta do secador).
+     * Grava só os itens que vieram com quantidade seca preenchida — permite registro
+     * parcial. Valida tudo antes de gravar; nenhum reload entre itens, então o valor
+     * distribuído nos outros não se perde.
+     */
+    public function registrarSaidas(Request $request, Secagem $secagem): RedirectResponse
+    {
+        $this->ensureSameFarm($secagem);
+        $this->authorize('update', $secagem);
+
+        $secagem->load('items.origin');
+        $entrada = (array) $request->input('itens', []);
+
+        $validator = Validator::make([], []);
+        $aGravar = [];
+
+        foreach ($secagem->items as $item) {
+            if ($item->hasSaida()) {
+                continue;
+            }
+            $dados = $entrada[$item->id] ?? null;
+            $secaRaw = $dados['quantidade_seca_kg'] ?? null;
+            if ($secaRaw === null || $secaRaw === '') {
+                continue; // item não preenchido — registro parcial
+            }
+
+            $seca = (float) $secaRaw;
+            $recebida = (float) $item->quantidade_recebida_kg;
+
+            if ($seca <= 0) {
+                $validator->errors()->add("itens.{$item->id}.quantidade_seca_kg", "Informe um valor maior que zero para {$item->originLabel()}.");
+                continue;
+            }
+            if ($seca > $recebida) {
+                $validator->errors()->add(
+                    "itens.{$item->id}.quantidade_seca_kg",
+                    "O café seco de {$item->originLabel()} (" . number_format($seca, 2, ',', '.') . ' kg) não pode passar do café côco recebido ('
+                    . number_format($recebida, 2, ',', '.') . ' kg).'
+                );
+                continue;
+            }
+
+            $perc = $item->isCustomer() ? (float) ($dados['comissao_percentual'] ?? 0) : 0;
+            $aGravar[] = ['item' => $item, 'seca' => $seca, 'perc' => $perc];
+        }
+
+        if ($validator->errors()->isNotEmpty()) {
+            return back()->withErrors($validator)->withInput();
+        }
+        if (empty($aGravar)) {
+            return back()->with('error', 'Informe a quantidade seca de ao menos um item.');
+        }
+
+        DB::transaction(function () use ($aGravar) {
+            foreach ($aGravar as $g) {
+                $comissao = SecagemItem::calcularComissao($g['seca'], $g['perc']);
+                $g['item']->update([
+                    'quantidade_seca_kg' => $g['seca'],
+                    'comissao_percentual' => $g['perc'],
+                    'comissao_kg' => $comissao,
+                    'saldo_liquido_kg' => SecagemItem::calcularSaldoLiquido($g['seca'], $comissao),
+                ]);
+            }
+        });
+
+        return redirect()->route('secagens.edit', $secagem)
+            ->with('flash', count($aGravar) . ' saída(s) registrada(s). Confira e conclua a secagem.');
     }
 
     public function destroyItem(Secagem $secagem, SecagemItem $item): RedirectResponse
