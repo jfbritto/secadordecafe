@@ -20,6 +20,12 @@ class AreaController extends Controller
 
         $areas = Area::query()
             ->withCount(['secagemItems as itens_count'])
+            ->withSum(['movements as colhido_kg' => fn ($q) => $q
+                ->where('tipo', \App\Models\Movement::TIPO_COLHEITA)
+                ->where('produto', 'coco')], 'quantidade_kg')
+            ->withSum(['movements as produzido_seco_kg' => fn ($q) => $q
+                ->where('tipo', \App\Models\Movement::TIPO_PRODUCAO)
+                ->where('produto', 'seco')], 'quantidade_kg')
             ->orderByDesc('ativo')
             ->orderBy('nome')
             ->paginate(20);

@@ -35,6 +35,10 @@
                                 · <span class="inline-flex items-center gap-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>com localização</span>
                             @endif
                         </p>
+                        <div class="flex gap-3 mt-1 text-xs">
+                            <span class="text-amber-700 font-semibold">{{ \App\Support\Sacos::formatSacos($a->colhido_kg ?? 0) }} colhido</span>
+                            <span class="text-emerald-700 font-semibold">{{ \App\Support\Sacos::formatSacos($a->produzido_seco_kg ?? 0) }} seco</span>
+                        </div>
                     </div>
                     <svg class="w-4 h-4 text-leaf-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </a>
@@ -55,6 +59,8 @@
             <tr>
                 <th class="text-left px-6 py-3 font-semibold">Nome</th>
                 <th class="text-left px-6 py-3 font-semibold">Localização</th>
+                <th class="text-right px-6 py-3 font-semibold">Colhido (côco)</th>
+                <th class="text-right px-6 py-3 font-semibold">Produzido (seco)</th>
                 <th class="text-right px-6 py-3 font-semibold">Secagens</th>
                 <th class="text-left px-6 py-3 font-semibold">Status</th>
                 <th class="px-6 py-3"></th>
@@ -76,6 +82,14 @@
                             <span class="text-leaf-400">—</span>
                         @endif
                     </td>
+                    <td class="px-6 py-3 text-right">
+                        <span class="font-semibold text-amber-700">{{ number_format($a->colhido_kg ?? 0, 2, ',', '.') }} kg</span>
+                        <span class="block text-[10px] text-leaf-400">{{ \App\Support\Sacos::formatSacos($a->colhido_kg ?? 0) }}</span>
+                    </td>
+                    <td class="px-6 py-3 text-right">
+                        <span class="font-semibold text-emerald-700">{{ number_format($a->produzido_seco_kg ?? 0, 2, ',', '.') }} kg</span>
+                        <span class="block text-[10px] text-leaf-400">{{ \App\Support\Sacos::formatSacos($a->produzido_seco_kg ?? 0) }}</span>
+                    </td>
                     <td class="px-6 py-3 text-right text-leaf-700">{{ $a->itens_count }}</td>
                     <td class="px-6 py-3">
                         @if($a->ativo)
@@ -92,7 +106,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="5" class="px-6 py-12 text-center text-leaf-500">
+                <tr><td colspan="7" class="px-6 py-12 text-center text-leaf-500">
                     Nenhuma área cadastrada.
                     @can('create', App\Models\Area::class)
                         <a href="{{ route('areas.create') }}" class="text-leaf-700 font-semibold hover:underline">Cadastrar agora</a>.
