@@ -108,4 +108,12 @@ it('colheita aumenta o estoque de côco da fazenda e rastreia a área', function
     expect($mov)->not->toBeNull();
     expect($mov->area_id)->toBe($area->id);
     expect((float) $mov->quantidade_kg)->toBe(800.0);
+
+    // A colheita aparece listada na tela da área
+    $this->actingAs($admin)
+        ->get(route('areas.show', $area))
+        ->assertOk()
+        ->assertSee('Colheitas')
+        ->assertSee('Colheita do dia')
+        ->assertSee('800,00');
 });

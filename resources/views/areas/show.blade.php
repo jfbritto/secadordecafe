@@ -111,37 +111,69 @@
         @endif
     </div>
 
-    {{-- Últimas secagens da área --}}
-    <div class="lg:col-span-2 bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-leaf-100 flex items-center justify-between">
-            <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Últimas secagens</h2>
-            <span class="text-xs text-leaf-500">desta área</span>
-        </div>
-        <ul class="divide-y divide-leaf-100">
-            @forelse($ultimasSecagens as $s)
-                @php
-                    $itemSums = $s->items;
-                    $recebido = $itemSums->sum('quantidade_recebida_kg');
-                    $seco = $itemSums->sum('quantidade_seca_kg');
-                @endphp
-                <li class="px-6 py-3">
-                    <div class="flex items-center justify-between gap-3">
+    <div class="lg:col-span-2 space-y-6">
+        {{-- Colheitas da área --}}
+        <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-leaf-100 flex items-center justify-between">
+                <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Colheitas</h2>
+                <a href="{{ route('colheitas.create') }}" class="text-xs font-semibold text-leaf-700 hover:underline">+ Nova colheita</a>
+            </div>
+            <ul class="divide-y divide-leaf-100">
+                @forelse($ultimasColheitas as $colheita)
+                    <li class="px-6 py-3 flex items-center justify-between gap-3">
                         <div class="min-w-0">
-                            <a href="{{ route('secagens.show', $s) }}" class="text-sm font-semibold text-leaf-900 hover:underline">Secagem #{{ $s->numero }}</a>
+                            <p class="text-sm font-semibold text-leaf-900">{{ $colheita->occurred_at->format('d/m/Y') }}</p>
                             <p class="text-xs text-leaf-500">
-                                {{ $s->data->format('d/m/Y') }} · {{ $s->dryer?->nome ?? '—' }} · {{ $itemSums->count() }} {{ $itemSums->count() === 1 ? 'item' : 'itens' }}
+                                @if($colheita->observacao){{ $colheita->observacao }}@else Colheita registrada @endif
+                                {{ $colheita->user?->name ? '· por '.$colheita->user->name : '' }}
                             </p>
                         </div>
                         <div class="text-right whitespace-nowrap">
-                            <p class="text-sm font-bold text-leaf-700">{{ number_format($recebido, 2, ',', '.') }} kg</p>
-                            <p class="text-[10px] text-leaf-500">recebido · seco {{ number_format($seco, 2, ',', '.') }} kg</p>
+                            <p class="text-sm font-bold text-amber-700">{{ number_format($colheita->quantidade_kg, 2, ',', '.') }} kg</p>
+                            <p class="text-[10px] text-leaf-500">{{ \App\Support\Sacos::formatSacos($colheita->quantidade_kg) }} café côco</p>
                         </div>
-                    </div>
-                </li>
-            @empty
-                <li class="px-6 py-8 text-center text-sm text-leaf-500">Nenhuma secagem desta área no período.</li>
-            @endforelse
-        </ul>
+                    </li>
+                @empty
+                    <li class="px-6 py-8 text-center text-sm text-leaf-500">
+                        Nenhuma colheita desta área no período.
+                        <a href="{{ route('colheitas.create') }}" class="text-leaf-700 font-semibold hover:underline">Registrar agora</a>.
+                    </li>
+                @endforelse
+            </ul>
+        </div>
+
+        {{-- Últimas secagens da área --}}
+        <div class="bg-white rounded-xl border border-leaf-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-leaf-100 flex items-center justify-between">
+                <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Secagens</h2>
+                <span class="text-xs text-leaf-500">desta área</span>
+            </div>
+            <ul class="divide-y divide-leaf-100">
+                @forelse($ultimasSecagens as $s)
+                    @php
+                        $itemSums = $s->items;
+                        $recebido = $itemSums->sum('quantidade_recebida_kg');
+                        $seco = $itemSums->sum('quantidade_seca_kg');
+                    @endphp
+                    <li class="px-6 py-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <a href="{{ route('secagens.show', $s) }}" class="text-sm font-semibold text-leaf-900 hover:underline">Secagem #{{ $s->numero }}</a>
+                                <p class="text-xs text-leaf-500">
+                                    {{ $s->data->format('d/m/Y') }} · {{ $s->dryer?->nome ?? '—' }} · {{ $itemSums->count() }} {{ $itemSums->count() === 1 ? 'item' : 'itens' }}
+                                </p>
+                            </div>
+                            <div class="text-right whitespace-nowrap">
+                                <p class="text-sm font-bold text-leaf-700">{{ number_format($recebido, 2, ',', '.') }} kg</p>
+                                <p class="text-[10px] text-leaf-500">recebido · seco {{ number_format($seco, 2, ',', '.') }} kg</p>
+                            </div>
+                        </div>
+                    </li>
+                @empty
+                    <li class="px-6 py-8 text-center text-sm text-leaf-500">Nenhuma secagem desta área no período.</li>
+                @endforelse
+            </ul>
+        </div>
     </div>
 </div>
 @endsection

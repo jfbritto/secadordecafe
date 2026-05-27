@@ -99,10 +99,18 @@ class AreaController extends Controller
             ->limit(5)
             ->get();
 
+        $ultimasColheitas = (clone $movQuery)
+            ->where('tipo', \App\Models\Movement::TIPO_COLHEITA)
+            ->with('user:id,name')
+            ->orderByDesc('occurred_at')
+            ->limit(5)
+            ->get();
+
         return view('areas.show', [
             'area' => $area,
             'stats' => $stats,
             'ultimasSecagens' => $ultimasSecagens,
+            'ultimasColheitas' => $ultimasColheitas,
             'periodo' => $periodo,
             'de' => $de,
             'ate' => $ate,
