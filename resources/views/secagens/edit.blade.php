@@ -144,11 +144,59 @@
     </div>
 
     {{-- Lista de items --}}
+    @php
+        $pendentes = $secagem->items->filter(fn ($i) => ! $i->hasSaida());
+        $totalRecebidoPendente = (float) $pendentes->sum('quantidade_recebida_kg');
+    @endphp
     <div class="bg-white rounded-2xl border border-leaf-100 shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-4 border-b border-leaf-100 flex items-center justify-between">
             <h2 class="text-sm font-bold text-leaf-900 uppercase tracking-wider">Itens da secagem</h2>
             <span class="text-xs text-leaf-500">{{ $secagem->items->count() }} item(ns)</span>
         </div>
+
+        {{-- Distribuição proporcional: secou tudo junto, rateia o seco pelo côco de cada um --}}
+        @if($pendentes->count() > 1)
+            <div class="px-4 sm:px-6 py-4 border-b border-leaf-100 bg-amber-50/40"
+                 x-data="{
+                    erro: '',
+                    distribuir() {
+                        this.erro = '';
+                        const total = parseFloat(document.getElementById('distribuir-total')?.value) || 0;
+                        const itens = [...document.querySelectorAll('[data-saida-item]')];
+                        if (total <= 0 || itens.length === 0) return;
+                        const soma = itens.reduce((s, el) => s + (parseFloat(el.dataset.recebido) || 0), 0);
+                        if (soma <= 0) return;
+                        if (total > soma + 0.001) {
+                            this.erro = 'O total de seco não pode passar do café côco recebido (' + soma.toFixed(2).replace('.', ',') + ' kg).';
+                            return;
+                        }
+                        let acumulado = 0;
+                        itens.forEach((el, i) => {
+                            const recebido = parseFloat(el.dataset.recebido) || 0;
+                            const seca = (i === itens.length - 1)
+                                ? Math.round((total - acumulado) * 100) / 100
+                                : Math.round((total * recebido / soma) * 100) / 100;
+                            if (i < itens.length - 1) acumulado += seca;
+                            const kgInput = el.querySelector('[data-qtd-kg]');
+                            if (kgInput) {
+                                kgInput.value = seca;
+                                kgInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                        });
+                    }
+                 }">
+                <p class="text-sm font-semibold text-leaf-900">Secou tudo junto?</p>
+                <p class="text-xs text-leaf-500 mt-0.5 mb-3">Informe o total de café seco que saiu do secador e o sistema reparte proporcional ao que cada um colocou ({{ number_format($totalRecebidoPendente, 2, ',', '.') }} kg de café côco no total). Depois é só conferir, pôr a comissão e dar a saída de cada um.</p>
+                <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-leaf-700 mb-1">Total de café seco que saiu <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
+                        <x-input-quantidade name="distribuir_total_helper" id="distribuir-total" min="0" :max="$totalRecebidoPendente" />
+                    </div>
+                    <button type="button" @click="distribuir()" class="px-5 py-3 text-sm font-bold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition whitespace-nowrap">Distribuir proporcionalmente</button>
+                </div>
+                <p x-show="erro" x-cloak x-text="erro" class="mt-2 text-xs font-medium text-rose-600"></p>
+            </div>
+        @endif
 
         <ul class="divide-y divide-leaf-100">
             @forelse($secagem->items as $item)
@@ -183,11 +231,12 @@
                     @if(! $item->hasSaida())
                         {{-- Form de registrar saída inline --}}
                         <form method="POST" action="{{ route('secagens.items.saida', [$secagem, $item]) }}"
-                              class="mt-3 bg-leaf-50/40 p-3 rounded-lg space-y-3">
+                              class="mt-3 bg-leaf-50/40 p-3 rounded-lg space-y-3"
+                              data-saida-item data-recebido="{{ $item->quantidade_recebida_kg }}">
                             @csrf @method('PATCH')
                             <div>
                                 <label class="block text-xs font-semibold text-leaf-700 mb-1">Quantidade seca <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
-                                <x-input-quantidade name="quantidade_seca_kg" :required="true" :max="(float) $item->quantidade_recebida_kg" />
+                                <x-input-quantidade name="quantidade_seca_kg" id="seca-{{ $item->id }}" :required="true" :max="(float) $item->quantidade_recebida_kg" data-qtd-kg="true" />
                                 <p class="mt-1 text-[11px] text-leaf-400">No máximo {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg (não pode sair mais café seco do que entrou de café côco).</p>
                                 @error('quantidade_seca_kg')<p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>@enderror
                             </div>
