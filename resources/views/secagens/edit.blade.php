@@ -134,7 +134,7 @@
                 <div>
                     <label for="qtd_recebida" class="block text-sm font-bold text-leaf-900 mb-2">Quantidade recebida (café côco)</label>
                     <x-input-quantidade name="quantidade_recebida_kg" id="qtd_recebida" :required="true" />
-                    <p class="mt-1 text-xs text-leaf-500">Digite em kg ou em sacos — o outro campo atualiza sozinho (1 sc = 60 kg).</p>
+                    <p class="mt-1 text-xs text-leaf-500">Digite em kg ou em sacos, o outro campo atualiza sozinho (1 sc = 60 kg).</p>
                     @error('quantidade_recebida_kg')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
                 </div>
             </div>

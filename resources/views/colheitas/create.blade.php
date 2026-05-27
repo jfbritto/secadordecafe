@@ -27,7 +27,7 @@
         <div>
             <label for="quantidade_kg" class="block text-sm font-bold text-leaf-900 mb-2">Quantidade colhida (café côco) <span class="text-rose-500">*</span></label>
             <x-input-quantidade name="quantidade_kg" id="quantidade_kg" :required="true" />
-            <p class="mt-1.5 text-sm text-leaf-500">Digite em kg ou em sacos — o outro campo atualiza sozinho (1 sc = 60 kg).</p>
+            <p class="mt-1.5 text-sm text-leaf-500">Digite em kg ou em sacos, o outro campo atualiza sozinho (1 sc = 60 kg).</p>
             @error('quantidade_kg')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
         </div>
 

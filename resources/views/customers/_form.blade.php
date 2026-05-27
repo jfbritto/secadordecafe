@@ -51,7 +51,7 @@
 @if(! $C)
 <div class="border-b border-leaf-100 pb-5 mb-6">
     <h2 class="text-base font-bold text-leaf-900">Saldo de café inicial</h2>
-    <p class="text-sm text-leaf-500 mt-0.5">Já tem café deste cliente em estoque? Informe os valores iniciais — vão entrar no extrato como entrada.</p>
+    <p class="text-sm text-leaf-500 mt-0.5">Já tem café deste cliente em estoque? Informe os valores iniciais, vão entrar no extrato como entrada.</p>
 </div>
 
 <div class="space-y-5 mb-6">

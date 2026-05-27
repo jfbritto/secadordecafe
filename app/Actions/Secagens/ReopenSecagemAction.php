@@ -44,7 +44,7 @@ class ReopenSecagemAction
             foreach ($movements as $m) {
                 $owner = $m->owner;
                 if (! $owner) {
-                    throw new DomainException("Owner do movement #{$m->id} desapareceu — estorno impossível.");
+                    throw new DomainException("Owner do movement #{$m->id} desapareceu, estorno impossível.");
                 }
 
                 // Movement original tem sinal embutido em quantidade_kg (positivo ou negativo).

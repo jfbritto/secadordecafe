@@ -62,7 +62,7 @@ HTML;
 <p>Dados ficam em servidores no Brasil, com backups diários criptografados. Conexão sempre via HTTPS.</p>
 
 <h2>4. Seus direitos (LGPD)</h2>
-<p>Você pode solicitar a qualquer momento: acesso aos seus dados, correção, exportação ou exclusão. Atendemos em até 15 dias úteis. A roça é sua — os dados também.</p>
+<p>Você pode solicitar a qualquer momento: acesso aos seus dados, correção, exportação ou exclusão. Atendemos em até 15 dias úteis. A roça é sua, os dados também.</p>
 
 <h2>5. Cookies</h2>
 <p>Usamos apenas cookies essenciais para autenticação e segurança. Não usamos cookies de rastreamento de terceiros.</p>
