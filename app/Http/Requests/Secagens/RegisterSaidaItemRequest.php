@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Secagens;
 
+use App\Models\SecagemItem;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -23,5 +25,32 @@ class RegisterSaidaItemRequest extends FormRequest
             'quantidade_seca_kg' => ['required', 'numeric', 'gt:0'],
             'comissao_percentual' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $v) {
+            if ($v->errors()->has('quantidade_seca_kg')) {
+                return;
+            }
+
+            $item = $this->route('item');
+            if (! $item instanceof SecagemItem) {
+                return;
+            }
+
+            $seca = (float) $this->input('quantidade_seca_kg');
+            $recebida = (float) $item->quantidade_recebida_kg;
+
+            // Trava física: secar só remove água/casca, então o seco nunca pode
+            // ser maior que o côco recebido (rendimento máximo = 100%).
+            if ($seca > $recebida) {
+                $v->errors()->add(
+                    'quantidade_seca_kg',
+                    'O café seco (' . number_format($seca, 2, ',', '.') . ' kg) não pode ser maior que o café côco recebido ('
+                    . number_format($recebida, 2, ',', '.') . ' kg). Confira os valores.'
+                );
+            }
+        });
     }
 }

@@ -182,6 +182,37 @@ it('conclude blocks if any owner has insufficient saldo de côco', function () {
     expect($s->fresh()->status)->toBe('rascunho');
 });
 
+it('trava: saída de seco não pode ser maior que o côco recebido', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 500]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+    $this->actingAs($admin)->post("/secagens/{$s->id}/items", [
+        'origin_type' => 'cliente', 'origin_id' => $c->id, 'quantidade_recebida_kg' => 60,
+    ]);
+    $item = SecagemItem::first();
+
+    // Tenta registrar saída de 240 kg de seco com 60 kg de côco recebido → impossível
+    $this->actingAs($admin)
+        ->patch("/secagens/{$s->id}/items/{$item->id}/saida", [
+            'quantidade_seca_kg' => 240, 'comissao_percentual' => 0,
+        ])
+        ->assertSessionHasErrors('quantidade_seca_kg');
+
+    // Item continua sem saída registrada
+    expect($item->fresh()->quantidade_seca_kg)->toBeNull();
+
+    // Igual ao recebido (rendimento 100%) é o limite aceito
+    $this->actingAs($admin)
+        ->patch("/secagens/{$s->id}/items/{$item->id}/saida", [
+            'quantidade_seca_kg' => 60, 'comissao_percentual' => 0,
+        ])
+        ->assertSessionHasNoErrors();
+    expect((float) $item->fresh()->quantidade_seca_kg)->toBe(60.0);
+});
+
 it('cannot edit concluded secagem', function () {
     $admin = makeFarmUser('admin');
     $d = dryerFor($admin);

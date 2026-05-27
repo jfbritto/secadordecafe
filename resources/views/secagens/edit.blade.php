@@ -176,7 +176,9 @@
                             @csrf @method('PATCH')
                             <div>
                                 <label class="block text-xs font-semibold text-leaf-700 mb-1">Quantidade seca <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
-                                <x-input-quantidade name="quantidade_seca_kg" :required="true" />
+                                <x-input-quantidade name="quantidade_seca_kg" :required="true" :max="(float) $item->quantidade_recebida_kg" />
+                                <p class="mt-1 text-[11px] text-leaf-400">No máximo {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg (não pode sair mais seco do que entrou de côco).</p>
+                                @error('quantidade_seca_kg')<p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>@enderror
                             </div>
                             <div class="grid grid-cols-2 gap-3 items-end">
                                 @if($item->isCustomer())
