@@ -34,21 +34,21 @@
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
     <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
         <p class="text-[10px] uppercase tracking-wider text-amber-700 font-semibold">Colheita</p>
-        <p class="text-xl font-bold text-amber-800 mt-1">{{ number_format($stats['colheita_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-amber-600">kg côco</span></p>
+        <p class="text-xl font-bold text-amber-800 mt-1">{{ number_format($stats['colheita_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-amber-600">kg café côco</span></p>
         <p class="text-[10px] text-amber-600 mt-0.5">{{ \App\Support\Sacos::formatSacos($stats['colheita_coco']) }}</p>
     </div>
     <div class="bg-orange-50 border border-orange-100 rounded-xl p-4">
         <p class="text-[10px] uppercase tracking-wider text-orange-700 font-semibold">Foi pro secador</p>
-        <p class="text-xl font-bold text-orange-800 mt-1">{{ number_format($stats['secado_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-orange-600">kg côco</span></p>
+        <p class="text-xl font-bold text-orange-800 mt-1">{{ number_format($stats['secado_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-orange-600">kg café côco</span></p>
     </div>
     <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
         <p class="text-[10px] uppercase tracking-wider text-emerald-700 font-semibold">Saiu do secador</p>
-        <p class="text-xl font-bold text-emerald-800 mt-1">{{ number_format($stats['producao_seco'], 2, ',', '.') }} <span class="text-xs font-normal text-emerald-600">kg seco</span></p>
+        <p class="text-xl font-bold text-emerald-800 mt-1">{{ number_format($stats['producao_seco'], 2, ',', '.') }} <span class="text-xs font-normal text-emerald-600">kg café seco</span></p>
         <p class="text-[10px] text-emerald-600 mt-0.5">{{ \App\Support\Sacos::formatSacos($stats['producao_seco']) }}</p>
     </div>
     <div class="bg-leaf-50 border border-leaf-100 rounded-xl p-4">
         <p class="text-[10px] uppercase tracking-wider text-leaf-700 font-semibold">A secar</p>
-        <p class="text-xl font-bold text-leaf-800 mt-1">{{ number_format($stats['a_secar_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-leaf-600">kg côco</span></p>
+        <p class="text-xl font-bold text-leaf-800 mt-1">{{ number_format($stats['a_secar_coco'], 2, ',', '.') }} <span class="text-xs font-normal text-leaf-600">kg café côco</span></p>
         <p class="text-[10px] text-leaf-600 mt-0.5">colhido ainda não secado</p>
     </div>
 </div>

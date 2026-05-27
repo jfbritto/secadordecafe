@@ -83,8 +83,8 @@
     <h2 class="text-base font-bold text-leaf-900">Saldo de café</h2>
     <p class="text-sm text-leaf-500 mt-0.5">
         Saldo atual:
-        <strong class="text-amber-700">{{ number_format($C->saldo_coco_kg, 2, ',', '.') }} kg côco</strong> ·
-        <strong class="text-emerald-700">{{ number_format($C->saldo_seco_kg, 2, ',', '.') }} kg seco</strong>.
+        <strong class="text-amber-700">{{ number_format($C->saldo_coco_kg, 2, ',', '.') }} kg café côco</strong> ·
+        <strong class="text-emerald-700">{{ number_format($C->saldo_seco_kg, 2, ',', '.') }} kg café seco</strong>.
         <a href="{{ route('movimentacoes.index', ['tipo' => 'cliente', 'id' => $C->id]) }}" class="text-leaf-700 font-semibold hover:underline ml-1">Abrir extrato</a>.
     </p>
 </div>

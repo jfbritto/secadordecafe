@@ -38,8 +38,8 @@
                         </p>
                     </div>
                     <div class="text-right flex-shrink-0">
-                        <p class="font-bold text-amber-700 text-xs whitespace-nowrap">{{ number_format($c->saldo_coco_kg, 2, ',', '.') }} kg côco</p>
-                        <p class="font-bold text-emerald-700 text-xs whitespace-nowrap mt-0.5">{{ number_format($c->saldo_seco_kg, 2, ',', '.') }} kg seco</p>
+                        <p class="font-bold text-amber-700 text-xs whitespace-nowrap">{{ number_format($c->saldo_coco_kg, 2, ',', '.') }} kg café côco</p>
+                        <p class="font-bold text-emerald-700 text-xs whitespace-nowrap mt-0.5">{{ number_format($c->saldo_seco_kg, 2, ',', '.') }} kg café seco</p>
                     </div>
                     <svg class="w-4 h-4 text-leaf-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </a>
@@ -56,8 +56,8 @@
                 <th class="text-left px-6 py-3 font-semibold">Nome</th>
                 <th class="text-left px-6 py-3 font-semibold">Telefone</th>
                 <th class="text-left px-6 py-3 font-semibold">CPF/CNPJ</th>
-                <th class="text-right px-6 py-3 font-semibold">Côco (kg)</th>
-                <th class="text-right px-6 py-3 font-semibold">Seco (kg)</th>
+                <th class="text-right px-6 py-3 font-semibold">Café côco (kg)</th>
+                <th class="text-right px-6 py-3 font-semibold">Café seco (kg)</th>
                 <th class="px-6 py-3"></th>
             </tr>
         </thead>

@@ -44,7 +44,7 @@
         @if($showSaldoCard)
             <div class="flex gap-2 flex-shrink-0">
                 <div class="bg-amber-600 text-white px-4 py-3 rounded-xl shadow text-right">
-                    <p class="text-[10px] uppercase tracking-wider text-amber-100">Côco</p>
+                    <p class="text-[10px] uppercase tracking-wider text-amber-100">Café côco</p>
                     <p class="text-xl font-bold">{{ number_format($saldoCoco, 2, ',', '.') }} <span class="text-xs font-normal text-amber-100">kg</span></p>
                 </div>
                 <div class="bg-emerald-600 text-white px-4 py-3 rounded-xl shadow text-right">
@@ -99,10 +99,8 @@
                 <div class="sm:col-span-2">
                     <label class="block text-sm font-bold text-leaf-900 mb-2">Produto <span class="text-rose-500">*</span></label>
                     <select name="produto" class="w-full px-3 py-2.5 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none bg-white">
-                        @unless($ownerIsFarm)
-                            <option value="coco">Côco</option>
-                        @endunless
-                        <option value="seco">Seco</option>
+                        <option value="coco">Café côco</option>
+                        <option value="seco">Café seco</option>
                     </select>
                 </div>
                 <div class="sm:col-span-2" x-show="tipo === 'ajuste'" x-cloak>

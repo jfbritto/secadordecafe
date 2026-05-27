@@ -90,7 +90,7 @@
                             class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
                         <option value="">Selecione</option>
                         @foreach($customers as $c)
-                            <option value="{{ $c->id }}">{{ $c->nome }} ({{ number_format($c->saldo_coco_kg, 2, ',', '.') }} kg côco)</option>
+                            <option value="{{ $c->id }}">{{ $c->nome }} ({{ number_format($c->saldo_coco_kg, 2, ',', '.') }} kg café côco)</option>
                         @endforeach
                     </select>
                 </div>
@@ -104,13 +104,13 @@
                             <option value="{{ $a->id }}">{{ $a->nome }}</option>
                         @endforeach
                     </select>
-                    <p class="mt-2 text-xs text-leaf-500">Sem saldo de côco? Registre uma <a href="{{ route('colheitas.create') }}" class="text-leaf-700 font-semibold hover:underline">colheita</a> primeiro.</p>
+                    <p class="mt-2 text-xs text-leaf-500">Sem saldo de café côco? Registre uma <a href="{{ route('colheitas.create') }}" class="text-leaf-700 font-semibold hover:underline">colheita</a> primeiro.</p>
                 </div>
 
                 @error('origin_id')<p class="text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
 
                 <div>
-                    <label for="qtd_recebida" class="block text-sm font-bold text-leaf-900 mb-2">Quantidade recebida (côco)</label>
+                    <label for="qtd_recebida" class="block text-sm font-bold text-leaf-900 mb-2">Quantidade recebida (café côco)</label>
                     <div class="relative">
                         <input id="qtd_recebida" type="number" step="0.01" min="0.01" inputmode="decimal" name="quantidade_recebida_kg" required
                                placeholder="0,00"

@@ -57,7 +57,7 @@
 {{-- Stats: histórico cumulativo --}}
 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-white rounded-xl border border-leaf-100 shadow-sm p-5">
-        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Entradas de côco</p>
+        <p class="text-xs uppercase tracking-wider text-leaf-500 font-semibold">Entradas de café côco</p>
         <p class="text-2xl font-bold text-amber-600 mt-2">{{ number_format($stats['total_entradas_coco'], 2, ',', '.') }}</p>
         <p class="text-xs text-leaf-500 mt-0.5">kg recebidos do cliente</p>
     </div>
