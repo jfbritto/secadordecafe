@@ -42,9 +42,10 @@
     <thead>
         <tr>
             <th>Origem</th>
-            <th class="right">Recebido (kg)</th>
-            <th class="right">Seco (kg)</th>
+            <th class="right">Recebido (sc / kg)</th>
+            <th class="right">Seco (sc / kg)</th>
             <th class="right">Rendimento</th>
+            <th class="right">Proporção</th>
             <th class="right">Comissão %</th>
             <th class="right">Comissão (kg)</th>
             <th class="right">Líquido (kg)</th>
@@ -54,9 +55,10 @@
         @foreach($secagem->items as $item)
             <tr>
                 <td>{{ ($item->isArea() ? '[Area] ' : '') . $item->originLabel() }}</td>
-                <td class="right">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }}</td>
-                <td class="right">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }}</td>
+                <td class="right">{{ \App\Support\Sacos::formatSacos($item->quantidade_recebida_kg) }} / {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }}</td>
+                <td class="right">{{ \App\Support\Sacos::formatSacos($item->quantidade_seca_kg) }} / {{ number_format($item->quantidade_seca_kg, 2, ',', '.') }}</td>
                 <td class="right">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
+                <td class="right">@if($item->proporcaoCocoSeco() > 0){{ number_format($item->proporcaoCocoSeco(), 2, ',', '.') }} : 1@else—@endif</td>
                 <td class="right">{{ number_format($item->comissao_percentual, 2, ',', '.') }}%</td>
                 <td class="right">{{ number_format($item->comissao_kg, 2, ',', '.') }}</td>
                 <td class="right">{{ number_format($item->saldo_liquido_kg, 2, ',', '.') }}</td>
@@ -66,9 +68,9 @@
     <tfoot>
         <tr>
             <td>Totais</td>
-            <td class="right">{{ number_format($secagem->totalRecebidoKg(), 2, ',', '.') }}</td>
-            <td class="right">{{ number_format($secagem->totalSecoKg(), 2, ',', '.') }}</td>
-            <td></td><td></td>
+            <td class="right">{{ \App\Support\Sacos::formatSacos($secagem->totalRecebidoKg()) }} / {{ number_format($secagem->totalRecebidoKg(), 2, ',', '.') }}</td>
+            <td class="right">{{ \App\Support\Sacos::formatSacos($secagem->totalSecoKg()) }} / {{ number_format($secagem->totalSecoKg(), 2, ',', '.') }}</td>
+            <td></td><td></td><td></td>
             <td class="right">{{ number_format($secagem->totalComissaoKg(), 2, ',', '.') }}</td>
             <td></td>
         </tr>

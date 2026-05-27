@@ -79,6 +79,24 @@ it('apelido opcional é salvo e vira referência; sem apelido cai pros participa
     $this->actingAs($admin)->get('/secagens')->assertOk()->assertSee('Mutirão de junho')->assertSee('João Almeida');
 });
 
+it('tela da secagem concluída mostra rendimento em proporção de sacos (regra 3)', function () {
+    $admin = makeFarmUser('admin');
+    $d = dryerFor($admin);
+    // 900 kg côco (15 sc) → 220 kg seco → proporção 900/220 = 4,09
+    $c = Customer::factory()->forFarm($admin->farm)->create(['saldo_coco_kg' => 900]);
+
+    $this->actingAs($admin)->post('/secagens', ['data' => '2026-05-06', 'dryer_id' => $d->id]);
+    $s = Secagem::first();
+    addItemComOutput($this, $admin, $s, $c, 900, 220, 0);
+    $this->actingAs($admin)->post("/secagens/{$s->id}/concluir");
+
+    $this->actingAs($admin)
+        ->get("/secagens/{$s->id}")
+        ->assertOk()
+        ->assertSee('4,09')           // proporção côco→seco
+        ->assertSee('sc côco');       // rótulo da proporção
+});
+
 it('numero is per-farm', function () {
     $a = makeFarmUser('admin');
     $b = makeFarmUser('admin');

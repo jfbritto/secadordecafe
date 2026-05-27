@@ -110,18 +110,14 @@
                         <option value="-">− Subtrai</option>
                     </select>
                 </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-sm font-bold text-leaf-900 mb-2">Quantidade <span class="text-rose-500">*</span></label>
-                    <div class="relative">
-                        <input type="number" step="0.01" min="0.01" inputmode="decimal" name="quantidade" required placeholder="0,00"
-                               class="w-full pl-3 pr-10 py-2.5 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500">kg</span>
-                    </div>
+                <div class="sm:col-span-4">
+                    <label class="block text-sm font-bold text-leaf-900 mb-2">Quantidade <span class="text-rose-500">*</span> <span class="text-leaf-400 font-normal text-xs">(kg ou sacos)</span></label>
+                    <x-input-quantidade name="quantidade" :required="true" />
                 </div>
                 <div class="sm:col-span-3">
                     <label class="block text-sm font-bold text-leaf-900 mb-2">Observação</label>
                     <input type="text" name="observacao" maxlength="500" placeholder="Opcional"
-                           class="w-full px-3 py-2.5 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
+                           class="w-full px-3 py-3 text-sm rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
                 </div>
                 <div class="sm:col-span-12">
                     <button class="px-5 py-2.5 text-sm font-bold text-white bg-leaf-700 hover:bg-leaf-800 rounded-lg transition">Registrar</button>

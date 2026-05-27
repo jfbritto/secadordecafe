@@ -122,12 +122,8 @@
 
                 <div>
                     <label for="qtd_recebida" class="block text-sm font-bold text-leaf-900 mb-2">Quantidade recebida (café côco)</label>
-                    <div class="relative">
-                        <input id="qtd_recebida" type="number" step="0.01" min="0.01" inputmode="decimal" name="quantidade_recebida_kg" required
-                               placeholder="0,00"
-                               class="w-full pl-3 pr-10 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500 pointer-events-none">kg</span>
-                    </div>
+                    <x-input-quantidade name="quantidade_recebida_kg" id="qtd_recebida" :required="true" />
+                    <p class="mt-1 text-xs text-leaf-500">Digite em kg ou em sacos — o outro campo atualiza sozinho (1 sc = 60 kg).</p>
                     @error('quantidade_recebida_kg')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
                 </div>
             </div>
@@ -176,34 +172,29 @@
                     @if(! $item->hasSaida())
                         {{-- Form de registrar saída inline --}}
                         <form method="POST" action="{{ route('secagens.items.saida', [$secagem, $item]) }}"
-                              class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 bg-leaf-50/40 p-3 rounded-lg">
+                              class="mt-3 bg-leaf-50/40 p-3 rounded-lg space-y-3">
                             @csrf @method('PATCH')
                             <div>
-                                <label class="block text-xs font-semibold text-leaf-700 mb-1">Quantidade seca</label>
-                                <div class="relative">
-                                    <input type="number" step="0.01" min="0.01" inputmode="decimal" name="quantidade_seca_kg" required
-                                           placeholder="0,00"
-                                           class="w-full pl-3 pr-10 py-2 text-sm rounded-md border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
-                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500">kg</span>
-                                </div>
+                                <label class="block text-xs font-semibold text-leaf-700 mb-1">Quantidade seca <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
+                                <x-input-quantidade name="quantidade_seca_kg" :required="true" />
                             </div>
-                            @if($item->isCustomer())
-                                <div>
-                                    <label class="block text-xs font-semibold text-leaf-700 mb-1">Comissão</label>
-                                    <div class="relative">
-                                        <input type="number" step="0.01" min="0" max="100" inputmode="decimal" name="comissao_percentual" value="0"
-                                               placeholder="ex: 10"
-                                               class="w-full pl-3 pr-8 py-2 text-sm rounded-md border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500">%</span>
+                            <div class="grid grid-cols-2 gap-3 items-end">
+                                @if($item->isCustomer())
+                                    <div>
+                                        <label class="block text-xs font-semibold text-leaf-700 mb-1">Comissão</label>
+                                        <div class="relative">
+                                            <input type="number" step="0.01" min="0" max="100" inputmode="decimal" name="comissao_percentual" value="0"
+                                                   placeholder="ex: 10"
+                                                   class="w-full pl-3 pr-8 py-2.5 text-sm rounded-md border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
+                                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500">%</span>
+                                        </div>
                                     </div>
-                                </div>
-                            @else
-                                <div class="flex items-center text-xs text-leaf-500 pt-5">
-                                    Sem comissão (café próprio).
-                                </div>
-                            @endif
-                            <div class="flex items-end">
-                                <button class="w-full px-4 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md transition">Registrar saída</button>
+                                @else
+                                    <div class="flex items-center text-xs text-leaf-500">
+                                        Sem comissão (café próprio).
+                                    </div>
+                                @endif
+                                <button class="w-full px-4 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md transition">Registrar saída</button>
                             </div>
                         </form>
                     @else
