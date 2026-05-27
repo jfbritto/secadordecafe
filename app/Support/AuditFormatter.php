@@ -247,7 +247,7 @@ class AuditFormatter
         if (in_array($field, ['valor_total', 'valor_unitario'], true) && is_numeric($value)) {
             return 'R$ ' . number_format((float) $value, 2, ',', '.');
         }
-        if (in_array($field, ['saldo_coco_kg', 'saldo_seco_kg', 'saldo_seco_comissao_kg', 'capacidade_kg', 'quantidade', 'quantidade_kg', 'quantidade_recebida_kg', 'quantidade_seca_kg', 'comissao_kg', 'saldo_liquido_kg'], true) && is_numeric($value)) {
+        if (in_array($field, ['saldo_coco_kg', 'saldo_seco_kg', 'capacidade_kg', 'quantidade', 'quantidade_kg', 'quantidade_recebida_kg', 'quantidade_seca_kg', 'comissao_kg', 'saldo_liquido_kg'], true) && is_numeric($value)) {
             return number_format((float) $value, 2, ',', '.') . ' kg';
         }
 

@@ -25,9 +25,9 @@
         </div>
     </form>
 
-    @if($area->secagens()->exists())
+    @if($area->secagemItems()->exists())
         <div class="mt-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-900">
-            Esta área possui <strong>{{ $area->secagens()->count() }}</strong> secagem(ns) vinculada(s).
+            Esta área já participou de <strong>{{ $area->secagemItems()->count() }}</strong> secagem(ns).
             Pra tirar de circulação sem perder o histórico, desmarque <strong>"Área ativa"</strong> em vez de excluir.
         </div>
     @endif

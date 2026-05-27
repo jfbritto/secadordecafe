@@ -30,7 +30,7 @@
                             @endunless
                         </div>
                         <p class="text-xs text-leaf-500">
-                            {{ $a->secagens_count }} {{ $a->secagens_count === 1 ? 'secagem' : 'secagens' }}
+                            {{ $a->itens_count }} {{ $a->itens_count === 1 ? 'secagem' : 'secagens' }}
                             @if($a->hasLocation()) · 📍 com localização @endif
                         </p>
                     </div>
@@ -74,7 +74,7 @@
                             <span class="text-leaf-400">—</span>
                         @endif
                     </td>
-                    <td class="px-6 py-3 text-right text-leaf-700">{{ $a->secagens_count }}</td>
+                    <td class="px-6 py-3 text-right text-leaf-700">{{ $a->itens_count }}</td>
                     <td class="px-6 py-3">
                         @if($a->ativo)
                             <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">ATIVA</span>

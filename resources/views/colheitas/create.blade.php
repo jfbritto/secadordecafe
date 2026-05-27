@@ -18,7 +18,7 @@
                     class="w-full px-4 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition bg-white">
                 <option value="">Selecione</option>
                 @foreach($areas as $a)
-                    <option value="{{ $a->id }}">{{ $a->nome }} (saldo atual: {{ number_format($a->saldo_coco_kg, 2, ',', '.') }} kg côco)</option>
+                    <option value="{{ $a->id }}">{{ $a->nome }}</option>
                 @endforeach
             </select>
             @error('area_id')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror

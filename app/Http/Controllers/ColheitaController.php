@@ -12,7 +12,7 @@ class ColheitaController extends Controller
 {
     public function create(): View
     {
-        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome', 'saldo_coco_kg']);
+        $areas = Area::ativo()->orderBy('nome')->get(['id', 'nome']);
         return view('colheitas.create', compact('areas'));
     }
 
