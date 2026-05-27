@@ -188,7 +188,7 @@
                 <p class="text-sm font-semibold text-leaf-900">Secou tudo junto?</p>
                 <p class="text-xs text-leaf-500 mt-0.5 mb-3">Informe o total de café seco que saiu do secador e o sistema reparte proporcional ao que cada um colocou ({{ number_format($totalRecebidoPendente, 2, ',', '.') }} kg de café côco no total). Depois é só conferir, pôr a comissão e dar a saída de cada um.</p>
                 <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
-                    <div class="flex-1">
+                    <div class="w-full sm:max-w-sm">
                         <label class="block text-xs font-semibold text-leaf-700 mb-1">Total de café seco que saiu <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
                         <x-input-quantidade name="distribuir_total_helper" id="distribuir-total" min="0" :max="$totalRecebidoPendente" />
                     </div>
@@ -230,27 +230,31 @@
 
                     @if(! $item->hasSaida())
                         {{-- Inputs da saída — enviados juntos pelo form #saidas-form (sem reload entre itens) --}}
-                        <div class="mt-3 bg-leaf-50/40 p-3 rounded-lg space-y-3" data-saida-item data-recebido="{{ $item->quantidade_recebida_kg }}">
-                            <div>
-                                <label class="block text-xs font-semibold text-leaf-700 mb-1">Quantidade seca <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
-                                <x-input-quantidade name="itens[{{ $item->id }}][quantidade_seca_kg]" id="seca-{{ $item->id }}" :max="(float) $item->quantidade_recebida_kg" form="saidas-form" data-qtd-kg="true" />
-                                <p class="mt-1 text-[11px] text-leaf-400">No máximo {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg (não pode sair mais café seco do que entrou de café côco).</p>
-                                @error("itens.{$item->id}.quantidade_seca_kg")<p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>@enderror
-                            </div>
-                            @if($item->isCustomer())
-                                <div class="max-w-[220px]">
-                                    <label class="block text-xs font-semibold text-leaf-700 mb-1">Comissão</label>
-                                    <div class="relative">
-                                        <input type="number" step="0.01" min="0" max="100" inputmode="decimal"
-                                               name="itens[{{ $item->id }}][comissao_percentual]" value="0" form="saidas-form"
-                                               placeholder="ex: 10"
-                                               class="w-full pl-3 pr-8 py-2.5 text-sm rounded-md border border-leaf-200 focus:border-leaf-500 focus:ring-2 focus:ring-leaf-500/15 outline-none">
-                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500">%</span>
-                                    </div>
+                        <div class="mt-3 bg-leaf-50/40 p-3 rounded-lg" data-saida-item data-recebido="{{ $item->quantidade_recebida_kg }}">
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 max-w-3xl">
+                                <div class="sm:col-span-8">
+                                    <label class="block text-xs font-semibold text-leaf-700 mb-1">Quantidade seca <span class="text-leaf-400 font-normal">(kg ou sacos)</span></label>
+                                    <x-input-quantidade name="itens[{{ $item->id }}][quantidade_seca_kg]" id="seca-{{ $item->id }}" :max="(float) $item->quantidade_recebida_kg" form="saidas-form" data-qtd-kg="true" />
                                 </div>
-                            @else
-                                <p class="text-xs text-leaf-500">Sem comissão (café próprio).</p>
-                            @endif
+                                @if($item->isCustomer())
+                                    <div class="sm:col-span-4">
+                                        <label class="block text-xs font-semibold text-leaf-700 mb-1">Comissão</label>
+                                        <div class="relative">
+                                            <input type="number" step="0.01" min="0" max="100" inputmode="decimal"
+                                                   name="itens[{{ $item->id }}][comissao_percentual]" value="0" form="saidas-form"
+                                                   placeholder="ex: 10"
+                                                   class="w-full pl-3 pr-8 py-3 text-base rounded-lg border border-leaf-200 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500">%</span>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="sm:col-span-4 flex items-end">
+                                        <p class="text-xs text-leaf-500 pb-3">Sem comissão (café próprio).</p>
+                                    </div>
+                                @endif
+                            </div>
+                            <p class="mt-1.5 text-[11px] text-leaf-400">No máximo {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg (não pode sair mais café seco do que entrou de café côco).</p>
+                            @error("itens.{$item->id}.quantidade_seca_kg")<p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>@enderror
                         </div>
                     @else
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-leaf-700 mt-2">
