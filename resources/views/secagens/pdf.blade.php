@@ -58,7 +58,7 @@
                 <td class="right">{{ \App\Support\Sacos::formatSacos($item->quantidade_recebida_kg) }} / {{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }}</td>
                 <td class="right">{{ \App\Support\Sacos::formatSacos($item->quantidade_seca_kg) }} / {{ number_format($item->quantidade_seca_kg, 2, ',', '.') }}</td>
                 <td class="right">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
-                <td class="right">@if($item->proporcaoCocoSeco() > 0){{ number_format($item->proporcaoCocoSeco(), 2, ',', '.') }} : 1@else—@endif</td>
+                <td class="right">{{ $item->proporcaoCocoSeco() > 0 ? number_format($item->proporcaoCocoSeco(), 2, ',', '.') . ' : 1' : '—' }}</td>
                 <td class="right">{{ number_format($item->comissao_percentual, 2, ',', '.') }}%</td>
                 <td class="right">{{ number_format($item->comissao_kg, 2, ',', '.') }}</td>
                 <td class="right">{{ number_format($item->saldo_liquido_kg, 2, ',', '.') }}</td>

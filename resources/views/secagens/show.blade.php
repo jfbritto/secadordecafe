@@ -124,7 +124,13 @@
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_recebida_kg, 2, ',', '.') }} kg<span class="block text-[10px] text-leaf-400">{{ \App\Support\Sacos::formatSacos($item->quantidade_recebida_kg) }}</span></td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->quantidade_seca_kg, 2, ',', '.') }} kg<span class="block text-[10px] text-leaf-400">{{ \App\Support\Sacos::formatSacos($item->quantidade_seca_kg) }}</span></td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->rendimentoPercentual(), 2, ',', '.') }}%</td>
-                    <td class="px-4 py-3 text-right text-leaf-700">@if($item->proporcaoCocoSeco() > 0)<span class="font-semibold">{{ number_format($item->proporcaoCocoSeco(), 2, ',', '.') }}</span><span class="block text-[10px] text-leaf-400">sc côco → 1 sc seco</span>@else—@endif</td>
+                    <td class="px-4 py-3 text-right text-leaf-700">
+                        @if($item->proporcaoCocoSeco() > 0)
+                            <span class="font-semibold">{{ number_format($item->proporcaoCocoSeco(), 2, ',', '.') }}</span><span class="block text-[10px] text-leaf-400">sc côco → 1 sc seco</span>
+                        @else
+                            <span class="text-leaf-400">—</span>
+                        @endif
+                    </td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->comissao_percentual, 2, ',', '.') }}%</td>
                     <td class="px-4 py-3 text-right text-leaf-700">{{ number_format($item->comissao_kg, 2, ',', '.') }}</td>
                     <td class="px-4 py-3 text-right font-bold text-leaf-800">{{ number_format($item->saldo_liquido_kg, 2, ',', '.') }}</td>
