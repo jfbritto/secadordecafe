@@ -12,11 +12,16 @@
         <p class="text-sm text-leaf-500 mt-1">A compra cria uma despesa no caixa e adiciona o café ao estoque da fazenda.</p>
     </div>
 
+    @php
+        $oldUnit = old('valor_unitario');
+        $oldUnitSc = $oldUnit !== null && $oldUnit !== '' ? number_format((float) $oldUnit * 60, 2, '.', '') : '';
+    @endphp
     <form method="POST" action="{{ route('compras.store') }}" class="bg-white rounded-2xl border border-leaf-100 shadow-sm p-6 sm:p-8"
           x-data="{
               produto: @js(old('produto', 'coco')),
               qtde: @js(old('quantidade_kg', '')),
               unit: @js(old('valor_unitario', '')),
+              unitSc: @js($oldUnitSc),
               total: @js(old('valor_total', '')),
               recalcTotal() {
                   if (this.qtde !== '' && this.unit !== '') {
@@ -26,7 +31,16 @@
               recalcUnit() {
                   if (this.qtde !== '' && this.total !== '' && parseFloat(this.qtde) > 0) {
                       this.unit = (parseFloat(this.total) / parseFloat(this.qtde)).toFixed(2);
+                      this.unitSc = (parseFloat(this.unit) * 60).toFixed(2);
                   }
+              },
+              fromUnitKg() {
+                  this.unitSc = this.unit === '' || this.unit === null ? '' : (parseFloat(this.unit) * 60).toFixed(2);
+                  this.recalcTotal();
+              },
+              fromUnitSc() {
+                  this.unit = this.unitSc === '' || this.unitSc === null ? '' : (parseFloat(this.unitSc) / 60).toFixed(2);
+                  this.recalcTotal();
               }
           }">
         @csrf
@@ -83,31 +97,40 @@
                 <p class="mt-1.5 text-xs text-leaf-500">Você pode digitar em kg ou em sacos (1 sc = 60 kg) — atualiza sozinho.</p>
             </div>
 
-            <div class="grid sm:grid-cols-2 gap-5">
-                <div>
-                    <label for="valor_unitario" class="block text-sm font-bold text-leaf-900 mb-2">Valor por kg</label>
+            <div>
+                <label class="block text-sm font-bold text-leaf-900 mb-2">Valor unitário</label>
+                <div class="grid grid-cols-2 gap-2">
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">R$</span>
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500 pointer-events-none">R$</span>
                         <input id="valor_unitario" type="number" step="0.01" min="0" inputmode="decimal" name="valor_unitario"
-                               x-model="unit" x-on:input.debounce.250ms="recalcTotal()"
+                               x-model="unit" x-on:input.debounce.250ms="fromUnitKg()"
                                placeholder="0,00"
-                               class="w-full pl-12 pr-4 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                               class="w-full pl-10 pr-9 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500 pointer-events-none">/kg</span>
                     </div>
-                    <p class="mt-1.5 text-xs text-leaf-500">Opcional. Multiplica pelo total.</p>
-                    @error('valor_unitario')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <label for="valor_total" class="block text-sm font-bold text-leaf-900 mb-2">Valor total pago <span class="text-rose-500">*</span></label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">R$</span>
-                        <input id="valor_total" type="number" step="0.01" min="0.01" inputmode="decimal" name="valor_total" required
-                               x-model="total" x-on:input.debounce.250ms="recalcUnit()"
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500 pointer-events-none">R$</span>
+                        <input type="number" step="0.01" min="0" inputmode="decimal"
+                               x-model="unitSc" x-on:input.debounce.250ms="fromUnitSc()"
                                placeholder="0,00"
-                               class="w-full pl-12 pr-4 py-3 text-base rounded-lg border-2 border-leaf-300 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition font-semibold">
+                               class="w-full pl-10 pr-9 py-3 text-base rounded-lg border border-leaf-200 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-leaf-500 pointer-events-none">/sc</span>
                     </div>
-                    @error('valor_total')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
                 </div>
+                <p class="mt-1.5 text-xs text-leaf-500">Preço por kg ou por saca (60 kg) — atualiza sozinho. Opcional, o total recalcula com a quantidade.</p>
+                @error('valor_unitario')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label for="valor_total" class="block text-sm font-bold text-leaf-900 mb-2">Valor total pago <span class="text-rose-500">*</span></label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-leaf-500 pointer-events-none">R$</span>
+                    <input id="valor_total" type="number" step="0.01" min="0.01" inputmode="decimal" name="valor_total" required
+                           x-model="total" x-on:input.debounce.250ms="recalcUnit()"
+                           placeholder="0,00"
+                           class="w-full pl-12 pr-4 py-3 text-base rounded-lg border-2 border-leaf-300 placeholder-leaf-300 focus:border-leaf-500 focus:ring-4 focus:ring-leaf-500/15 outline-none transition font-semibold">
+                </div>
+                @error('valor_total')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
             </div>
 
             <div>
