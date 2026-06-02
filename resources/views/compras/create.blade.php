@@ -17,6 +17,7 @@
         $oldUnitSc = $oldUnit !== null && $oldUnit !== '' ? number_format((float) $oldUnit * 60, 2, '.', '') : '';
     @endphp
     <form method="POST" action="{{ route('compras.store') }}" class="bg-white rounded-2xl border border-leaf-100 shadow-sm p-6 sm:p-8"
+          @quantidade-change="qtde = $event.detail.value; recalcTotal()"
           x-data="{
               produto: @js(old('produto', 'coco')),
               qtde: @js(old('quantidade_kg', '')),
@@ -91,8 +92,7 @@
 
             <div>
                 <label for="quantidade_kg" class="block text-sm font-bold text-leaf-900 mb-2">Quantidade comprada <span class="text-rose-500">*</span></label>
-                <x-input-quantidade name="quantidade_kg" id="quantidade_kg" :value="old('quantidade_kg')" required
-                                    x-on:input.debounce.250ms="qtde = $event.target.value; recalcTotal()" />
+                <x-input-quantidade name="quantidade_kg" id="quantidade_kg" :value="old('quantidade_kg')" required />
                 @error('quantidade_kg')<p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>@enderror
                 <p class="mt-1.5 text-xs text-leaf-500">Você pode digitar em kg ou em sacos (1 sc = 60 kg) — atualiza sozinho.</p>
             </div>

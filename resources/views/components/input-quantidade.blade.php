@@ -23,8 +23,14 @@
 <div x-data="{
         kg: @js($valKg),
         sc: @js($valSc),
-        fromKg() { this.sc = this.kg === '' || this.kg === null ? '' : (parseFloat(this.kg) / 60).toFixed(2); },
-        fromSc() { this.kg = this.sc === '' || this.sc === null ? '' : (parseFloat(this.sc) * 60).toFixed(2); },
+        fromKg() {
+            this.sc = this.kg === '' || this.kg === null ? '' : (parseFloat(this.kg) / 60).toFixed(2);
+            $dispatch('quantidade-change', { value: this.kg, name: @js($name) });
+        },
+        fromSc() {
+            this.kg = this.sc === '' || this.sc === null ? '' : (parseFloat(this.sc) * 60).toFixed(2);
+            $dispatch('quantidade-change', { value: this.kg, name: @js($name) });
+        },
      }"
      class="grid grid-cols-2 gap-2">
     <div class="relative">
