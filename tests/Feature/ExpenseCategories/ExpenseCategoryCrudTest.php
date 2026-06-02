@@ -3,10 +3,10 @@
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 
-it('seeds 6 default categories when farm is created', function () {
+it('seeds default categories when farm is created', function () {
     $admin = makeFarmUser('admin');
 
-    expect(ExpenseCategory::count())->toBe(6);
+    expect(ExpenseCategory::count())->toBe(count(ExpenseCategory::DEFAULTS));
     foreach (ExpenseCategory::DEFAULTS as $nome) {
         expect(ExpenseCategory::where('farm_id', $admin->farm_id)->where('nome', $nome)->exists())->toBeTrue();
     }

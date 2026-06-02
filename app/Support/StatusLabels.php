@@ -43,6 +43,7 @@ class StatusLabels
         'colheita' => 'Colheita',
         'producao' => 'Produção',
         'comissao' => 'Comissão',
+        'compra'   => 'Compra de café',
     ];
 
     /** Produto da movimentação. */

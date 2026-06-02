@@ -18,8 +18,14 @@ class ExpenseCategory extends Model
 
     public const DEFAULTS = [
         'Combustível', 'Manutenção', 'Mão de obra',
-        'Impostos', 'Equipamentos', 'Outros',
+        'Impostos', 'Equipamentos', 'Compra de café', 'Outros',
     ];
+
+    /**
+     * Nome da categoria reservada que recebe as compras de café feitas pelo dono
+     * da fazenda. Lançamentos pela tela /compras criam Expense aqui.
+     */
+    public const COMPRA_CAFE = 'Compra de café';
 
     protected $fillable = ['farm_id', 'nome', 'ativo', 'observacoes'];
 

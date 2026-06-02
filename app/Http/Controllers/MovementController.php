@@ -31,6 +31,39 @@ class MovementController extends Controller
         return $this->renderIndex($request, 'fazenda', null);
     }
 
+    /**
+     * Lista TODAS as movimentações da fazenda (qualquer owner — clientes, áreas,
+     * a própria farm). Substitui a antiga seção "Últimas movimentações" do
+     * dashboard. Filtros opcionais: ?produto=, ?tipo=, ?owner_type=.
+     */
+    public function recentes(Request $request): View
+    {
+        $user = $request->user();
+
+        $query = Movement::query()
+            ->where('farm_id', $user->farm_id)
+            ->with(['owner', 'user:id,name', 'source', 'area'])
+            ->latest('occurred_at');
+
+        $produto = $request->string('produto')->toString() ?: null;
+        if ($produto && in_array($produto, [Movement::PRODUTO_COCO, Movement::PRODUTO_SECO], true)) {
+            $query->where('produto', $produto);
+        }
+
+        $tipo = $request->string('tipo')->toString() ?: null;
+        if ($tipo && array_key_exists($tipo, \App\Support\StatusLabels::MOVEMENT_TIPO)) {
+            $query->where('tipo', $tipo);
+        }
+
+        $movements = $query->paginate(30)->withQueryString();
+
+        return view('movements.recentes', [
+            'movements' => $movements,
+            'produto' => $produto,
+            'tipo' => $tipo,
+        ]);
+    }
+
     public function storeFazenda(StoreMovementRequest $request, RegisterMovementAction $action): RedirectResponse
     {
         return $this->handleStore($request, $action, 'fazenda', null);

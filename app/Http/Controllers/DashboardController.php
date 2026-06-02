@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Area;
 use App\Models\Customer;
-use App\Models\Expense;
 use App\Models\Farm;
 use App\Models\Movement;
 use App\Models\Secagem;
@@ -45,14 +43,9 @@ class DashboardController extends Controller
             fn () => $this->computeFarmMetrics($user->farm_id),
         );
 
-        // Listas limitadas (limit 5-8 com índice em farm_id+ordem) são rápidas, fora do cache
-        // pra refletir mudanças imediatas que o usuário acabou de fazer.
-        $ultimasMovs = Movement::where('farm_id', $user->farm_id)
-            ->with('owner', 'user:id,name')
-            ->orderByDesc('occurred_at')
-            ->limit(8)
-            ->get();
-
+        // Top 5 clientes por saldo total (côco + seco) — fora do cache pra
+        // refletir mudanças imediatas que o usuário acabou de fazer.
+        // As "últimas movimentações" antigas viraram a aba /movimentacoes.
         $topClientes = Customer::where('farm_id', $user->farm_id)
             ->orderByDesc(DB::raw('saldo_coco_kg + saldo_seco_kg'))
             ->limit(5)
@@ -62,7 +55,6 @@ class DashboardController extends Controller
             'farm' => $farm,
             'user' => $user,
             'metrics' => $metrics,
-            'ultimasMovs' => $ultimasMovs,
             'topClientes' => $topClientes,
         ];
     }

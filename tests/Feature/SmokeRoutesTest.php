@@ -46,12 +46,25 @@ it('todas as telas GET principais abrem sem erro pra um admin com dados', functi
         'data' => '2026-05-20', 'descricao' => 'Diesel', 'valor_total' => 350, 'expense_category_id' => $cat?->id,
     ]);
 
+    // Compra de café pra exercitar listagem em /compras
+    $this->actingAs($admin)->post('/compras', [
+        'data' => '2026-05-21', 'produto' => 'coco',
+        'quantidade_kg' => 50, 'valor_total' => 400, 'fornecedor' => 'Fornecedor',
+    ]);
+
     $rotas = [
         '/dashboard',
         '/clientes', "/clientes/criar", "/clientes/{$cliente->id}", "/clientes/{$cliente->id}/editar",
         "/movimentacoes/cliente/{$cliente->id}",
         "/movimentacoes/area/{$area->id}",
         '/movimentacoes/fazenda',
+        '/movimentacoes',
+        '/movimentacoes?produto=coco',
+        '/saldos/clientes?produto=coco',
+        '/saldos/clientes?produto=seco',
+        '/saldos/geral?produto=coco',
+        '/saldos/geral?produto=seco',
+        '/compras', '/compras/criar',
         '/secagens', '/secagens/criar', "/secagens/{$s->id}", "/secagens/{$s->id}/editar",
         '/areas', '/areas/criar', "/areas/{$area->id}", "/areas/{$area->id}/editar",
         '/colheitas/criar',

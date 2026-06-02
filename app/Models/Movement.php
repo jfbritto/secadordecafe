@@ -33,6 +33,7 @@ class Movement extends Model
     public const TIPO_COLHEITA = 'colheita';
     public const TIPO_PRODUCAO = 'producao';
     public const TIPO_COMISSAO = 'comissao';
+    public const TIPO_COMPRA   = 'compra';
 
     public const PRODUTO_COCO = 'coco';
     public const PRODUTO_SECO = 'seco';

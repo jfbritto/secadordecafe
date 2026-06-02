@@ -54,7 +54,8 @@ class RegisterMovementAction
             Movement::TIPO_ENTRADA,
             Movement::TIPO_COLHEITA,
             Movement::TIPO_PRODUCAO,
-            Movement::TIPO_COMISSAO => +$quantidade,
+            Movement::TIPO_COMISSAO,
+            Movement::TIPO_COMPRA => +$quantidade,
 
             Movement::TIPO_SAIDA,
             Movement::TIPO_SECAGEM => -$quantidade,

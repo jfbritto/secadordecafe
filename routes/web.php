@@ -19,7 +19,9 @@ use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MovementController;
+use App\Http\Controllers\CompraCafeController;
 use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\SaldoController;
 use App\Http\Controllers\SecagemController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -85,10 +87,21 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
         // Movimentações polimórficas: owner pode ser cliente, area ou fazenda.
         // Fazenda usa rota separada (sempre é a fazenda do usuário logado, sem id).
+        Route::get('movimentacoes', [MovementController::class, 'recentes'])
+            ->name('movimentacoes.recentes');
         Route::get('movimentacoes/fazenda', [MovementController::class, 'indexFazenda'])
             ->name('movimentacoes.fazenda.index');
         Route::post('movimentacoes/fazenda', [MovementController::class, 'storeFazenda'])
             ->name('movimentacoes.fazenda.store');
+
+        // Saldos agregados (cards clicáveis do dashboard)
+        Route::get('saldos/clientes', [SaldoController::class, 'porCliente'])->name('saldos.clientes');
+        Route::get('saldos/geral', [SaldoController::class, 'geral'])->name('saldos.geral');
+
+        // Compras de café (Juvenal compra côco/seco de terceiros pra revender)
+        Route::get('compras', [CompraCafeController::class, 'index'])->name('compras.index');
+        Route::get('compras/criar', [CompraCafeController::class, 'create'])->name('compras.create');
+        Route::post('compras', [CompraCafeController::class, 'store'])->name('compras.store');
         Route::get('movimentacoes/{tipo}/{id}', [MovementController::class, 'index'])
             ->whereIn('tipo', ['cliente', 'area'])->whereNumber('id')
             ->name('movimentacoes.index');
