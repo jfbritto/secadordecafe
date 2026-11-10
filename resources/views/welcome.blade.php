@@ -269,7 +269,7 @@
                 ['q'=>'Preciso instalar algo na fazenda?','a'=>'Não. A Roça Nossa abre direto no celular, no tablet ou no computador. Só precisa de internet e do navegador.'],
                 ['q'=>'Quanto custa?','a'=>'Por enquanto, é grátis. Estamos refinando o sistema com os primeiros produtores e, quando definirmos a estrutura de planos, avisamos com antecedência. Quem entrar agora tem acesso completo.'],
                 ['q'=>'Eu trabalho só com café. Serve pra mim?','a'=>'Sim. A Roça Nossa nasceu na secagem de café e tem tudo pronto: cliente, secagem multi-produtor, comissão, rendimento, PDF da secagem. E ainda vai crescer junto com a roça.'],
-                ['q'=>'Posso ter mais de uma roça?','a'=>'Cada conta cuida de uma fazenda. Se você tem mais de uma propriedade ou uma cooperativa, fala com a gente em contato@rocanossa.com.br.'],
+                ['q'=>'Posso ter mais de uma roça?','a'=>'Cada conta cuida de uma fazenda. Se você tem mais de uma propriedade ou uma cooperativa, fala com a gente em suporte@helpflux.com.br.'],
                 ['q'=>'E os dados, ficam seguros?','a'=>'Sim. Cada roça tem seu espaço isolado, ninguém vê o que é seu. Tem auditoria de tudo, backup diário e conexão criptografada (HTTPS).'],
             ] as $f)
                 <details class="group bg-white rounded-xl border border-leaf-100 overflow-hidden">

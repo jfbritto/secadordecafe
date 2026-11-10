@@ -43,7 +43,7 @@ class PublicSiteController extends Controller
 <p>Podemos atualizar estes termos. Comunicaremos alterações relevantes por e-mail. O uso continuado após as alterações implica aceitação.</p>
 
 <h2>9. Contato</h2>
-<p>Dúvidas: <a class="text-leaf-700 font-semibold hover:underline" href="mailto:contato@rocanossa.com.br">contato@rocanossa.com.br</a></p>
+<p>Dúvidas: <a class="text-leaf-700 font-semibold hover:underline" href="mailto:suporte@helpflux.com.br">suporte@helpflux.com.br</a></p>
 HTML;
 
         return view('pages.legal', ['title' => 'Termos de uso', 'body' => $body]);
@@ -71,7 +71,7 @@ HTML;
 <p>Provedor de e-mail transacional e hospedagem em VPS. Todos sob acordo de confidencialidade e LGPD.</p>
 
 <h2>7. Contato do encarregado (DPO)</h2>
-<p><a class="text-leaf-700 font-semibold hover:underline" href="mailto:privacidade@rocanossa.com.br">privacidade@rocanossa.com.br</a></p>
+<p><a class="text-leaf-700 font-semibold hover:underline" href="mailto:privacidade@helpflux.com.br">privacidade@helpflux.com.br</a></p>
 HTML;
 
         return view('pages.legal', ['title' => 'Política de privacidade', 'body' => $body]);
